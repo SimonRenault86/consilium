@@ -8,7 +8,7 @@ const outputDir = path.join(__dirname, '../public/elus');
 
 const deputes = JSON.parse(readFileSync(deputesPath, 'utf-8'));
 
-async function fetchDeputePhoto(id) {
+async function fetchDeputePhoto (id) {
     const depute = deputes.find(d => d.id === id);
 
     if (!depute) {
@@ -44,7 +44,7 @@ async function fetchDeputePhoto(id) {
     }
 }
 
-function sleep(ms) {
+function sleep (ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
