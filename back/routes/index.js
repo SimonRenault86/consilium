@@ -4,7 +4,7 @@ const router = Router();
 
 router.get('/', (req, res) => {
     res.render('home.njk', {
-        title: 'Politica — Assemblée Nationale'
+        title: 'Consilium — Assemblée Nationale'
     });
 });
 
