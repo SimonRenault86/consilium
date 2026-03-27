@@ -105,6 +105,15 @@ const CHAMP_SCORE = { loyaute: 'scoreLoyaute', participation: 'scoreParticipatio
 
 const champ = computed(() => CHAMP_SCORE[props.vueActive] ?? null);
 
-const stats = statsParGroupe;
+const stats = computed(() => {
+    const tri = champ.value;
+    return [...statsParGroupe].sort((a, b) => {
+        if (!tri) return b.nombreDeputes - a.nombreDeputes;
+        const va = a[tri] ?? -1;
+        const vb = b[tri] ?? -1;
+        return vb - va;
+    });
+});
+
 const logoErreur = reactive({});
 </script>

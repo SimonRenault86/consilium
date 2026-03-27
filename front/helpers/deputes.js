@@ -12,9 +12,9 @@ const toSlug = text =>
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '');
 
-// Retourne l'URL de la photo d'un élu selon son slug (/elus/{slug}.jpg)
-// Retourne null si le slug est absent — le composant affichera les initiales
-export const getPhotoUrl = depute => depute?.slug ? `/elus/${depute.slug}.jpg` : null;
+// Retourne l'URL de la photo d'un élu selon son id (/elus/{id}.jpg)
+// Retourne null si l'id est absent — le composant affichera les initiales
+export const getPhotoUrl = depute => depute?.id ? `/elus/${depute.id}.jpg` : null;
 
 // Construit la map seatId → député à partir du JSON
 // On trie par groupe (gauche → droite) pour que les sièges reflètent l'hémicycle réel
