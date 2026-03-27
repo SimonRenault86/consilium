@@ -1,0 +1,5 @@
+{
+    "watch": ["back", "views"],
+    "ext": "js,njk",
+    "ignore": ["public", "front"]
+}
