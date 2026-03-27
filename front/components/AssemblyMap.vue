@@ -1,6 +1,11 @@
 <template>
-    <div class="relative flex items-end justify-center px-4 pt-6">
+    <div
+        ref="containerEl"
+        class="relative flex items-end justify-center px-4 pt-6"
+    >
         <div class="w-full">
+            <HemicycleFilters v-model="vueActive" />
+            <DeputeSearchBar @pin="onPin" />
             <svg
                 ref="svgEl"
                 :viewBox="`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`"
@@ -13,23 +18,31 @@
                     :href="getDepute(seat.seatId) ? `/elu/${getDepute(seat.seatId).slug}` : undefined"
                     class="seat-link"
                 >
-                    <!-- Anneau couleur2 visible au hover -->
+                    <!-- Anneau couleur2 visible au hover ou pin -->
                     <circle
                         :cx="seat.x"
                         :cy="seat.y"
                         :r="SEAT_RADIUS + 2.5"
-                        :fill="hoveredSeat === seat.seatId ? getCouleur2Siege(seat.seatId) : 'transparent'"
-                        :opacity="hoveredSeat && hoveredSeat !== seat.seatId ? 0.3 : 1"
+                        :fill="(hoveredSeat === seat.seatId || pinnedSeat === seat.seatId) ? getCouleur2Siege(seat.seatId) : 'transparent'"
+                        :opacity="isSeatDimmed(seat.seatId) ? 0.3 : 1"
                     />
                     <!-- Cercle principal -->
                     <circle
                         :cx="seat.x"
                         :cy="seat.y"
                         :r="SEAT_RADIUS"
-                        :fill="getCouleurSiege(seat.seatId)"
+                        :fill="getCouleurSiegeActive(seat.seatId)"
                         stroke="none"
-                        class="cursor-pointer transition-opacity duration-150"
-                        :opacity="hoveredSeat && hoveredSeat !== seat.seatId ? 0.3 : 1"
+                        class="transition-opacity duration-150"
+                        :opacity="isSeatDimmed(seat.seatId) ? 0.3 : 1"
+                    />
+                    <!-- Zone de hover invisible plus grande -->
+                    <circle
+                        :cx="seat.x"
+                        :cy="seat.y"
+                        :r="SEAT_RADIUS + 4"
+                        fill="transparent"
+                        class="cursor-pointer"
                         @mouseenter="onSeatHover(seat, $event)"
                     />
                 </a>
@@ -82,8 +95,49 @@
                             <span class="truncate text-xs text-slate-400">{{ groupes[hoveredDepute.groupe]?.nom }}</span>
                         </div>
                     </div>
+
+                    <!-- Scores -->
+                    <div class="flex flex-col gap-1.5 px-3 pb-3">
+                        <div
+                            v-for="score in scores"
+                            :key="score.champ"
+                            class="flex flex-col gap-0.5"
+                        >
+                            <div class="flex justify-between text-xs text-slate-500">
+                                <span>{{ score.label }}</span>
+                                <span
+                                    class="font-medium"
+                                    :style="{ color: scoreToCouleur(score.normaliser(hoveredDepute[score.champ])) }"
+                                >
+                                    {{ hoveredDepute[score.champ] !== null ? Math.round(hoveredDepute[score.champ] * 100) + ' %' : '—' }}
+                                </span>
+                            </div>
+                            <div class="relative h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                                <div
+                                    class="absolute inset-y-0 left-0 rounded-full"
+                                    :style="{
+                                        width: hoveredDepute[score.champ] !== null ? (hoveredDepute[score.champ] * 100) + '%' : '0%',
+                                        backgroundColor: scoreToCouleur(score.normaliser(hoveredDepute[score.champ]))
+                                    }"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </Transition>
+
+            <!-- Légende dégradé pour les vues score -->
+            <div
+                v-if="vueActive !== 'standard'"
+                class="mt-3 flex items-center justify-center gap-3"
+            >
+                <span class="text-xs text-slate-500">0 %</span>
+                <div
+                    class="h-2.5 w-40 rounded-full"
+                    style="background: linear-gradient(to right, #ef4444, #22c55e)"
+                />
+                <span class="text-xs text-slate-500">100 %</span>
+            </div>
 
             <div
                 v-if="!hoveredDepute"
@@ -91,18 +145,83 @@
             >
                 Survolez un siège pour afficher le député
             </div>
+
+            <AssemblyStats
+                v-model:hovered-groupe="hoveredGroupe"
+                :vue-active="vueActive"
+            />
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch } from 'vue';
+import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue';
 import seats, { VIEWBOX_WIDTH, VIEWBOX_HEIGHT, SEAT_RADIUS } from '@/helpers/hemicycle.js';
-import { getDepute, getCouleurSiege, getCouleur2Siege, getPhotoUrl } from '@/helpers/deputes.js';
+import { getDepute, getCouleurSiege, getCouleur2Siege, getCouleurScoreSiege, getPhotoUrl } from '@/helpers/deputes.js';
 import { groupes, getLogoUrl } from '@/helpers/partis.js';
+import HemicycleFilters from '@/components/HemicycleFilters.vue';
+import AssemblyStats from '@/components/AssemblyStats.vue';
+import DeputeSearchBar from '@/components/DeputeSearchBar.vue';
 
 const svgEl = ref(null);
+const containerEl = ref(null);
 const hoveredSeat = ref(null);
+const pinnedSeat = ref(null); // siège épinglé via la barre de recherche
+const hoveredGroupe = ref(null);
+const vueActive = ref('standard');
+
+const CHAMP_SCORE = { loyaute: 'scoreLoyaute', participation: 'scoreParticipation' };
+
+const getCouleurSiegeActive = seatId => {
+    if (vueActive.value === 'standard') return getCouleurSiege(seatId);
+    return getCouleurScoreSiege(seatId, CHAMP_SCORE[vueActive.value]);
+};
+
+const isSeatDimmed = seatId => {
+    if (pinnedSeat.value) return pinnedSeat.value !== seatId;
+    if (hoveredSeat.value) return hoveredSeat.value !== seatId;
+    if (hoveredGroupe.value) return getDepute(seatId)?.groupe !== hoveredGroupe.value;
+    return false;
+};
+
+const onPin = seatId => {
+    pinnedSeat.value = seatId;
+    hoveredGroupe.value = null;
+};
+
+// Clic en dehors du composant → efface le pin
+const onDocumentClick = e => {
+    if (!containerEl.value?.contains(e.target)) pinnedSeat.value = null;
+};
+
+onMounted(() => document.addEventListener('click', onDocumentClick));
+onUnmounted(() => document.removeEventListener('click', onDocumentClick));
+
+// Mêmes seuils que dans deputes.js
+const normaliserScore = (score, champ) => {
+    if (score === null || score === undefined) return null;
+    if (champ === 'scoreLoyaute') return Math.min(1, Math.pow(score / 0.95, 3));
+    if (champ === 'scoreParticipation') {
+        if (score <= 0.15) return 0;
+        if (score >= 0.25) return 1;
+        return (score - 0.15) / 0.10;
+    }
+    return Math.max(0, Math.min(1, score));
+};
+
+const scoreToCouleur = t => {
+    if (t === null || t === undefined) return '#94a3b8';
+    const clamped = Math.max(0, Math.min(1, t));
+    const r = Math.round(239 + (34 - 239) * clamped);
+    const g = Math.round(68 + (197 - 68) * clamped);
+    const b = Math.round(68 + (94 - 68) * clamped);
+    return `rgb(${r}, ${g}, ${b})`;
+};
+
+const scores = [
+    { champ: 'scoreLoyaute', label: 'Loyauté', normaliser: score => normaliserScore(score, 'scoreLoyaute') },
+    { champ: 'scoreParticipation', label: 'Participation', normaliser: score => normaliserScore(score, 'scoreParticipation') },
+];
 const tooltipPos = reactive({ x: 0, y: 0 });
 
 // Mémorise quelles photos/logos ont chargé avec succès pour afficher les initiales/sigle en fallback
@@ -140,6 +259,7 @@ const tooltipStyle = computed(() => ({
 }));
 
 const onSeatHover = (seat, event) => {
+    hoveredGroupe.value = null;
     hoveredSeat.value = seat.seatId;
     if (!svgEl.value) return;
 

@@ -37,7 +37,6 @@ const generateSeats = () => {
 
     // Génération des coordonnées
     const seats = [];
-    let seatId = 1;
     for (let row = 0; row < ROWS; row++) {
         const radius = rows[row].radius;
         const count = seatsPerRow[row];
@@ -46,9 +45,16 @@ const generateSeats = () => {
             const angle = ANGLE_START + ((ANGLE_END - ANGLE_START) * (col + 0.5)) / count;
             const x = CENTER_X - radius * Math.cos(angle);
             const y = CENTER_Y - radius * Math.sin(angle);
-            seats.push({ seatId, row, col, x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 });
-            seatId++;
+            // Position normalisée sur l'arc [0, 1] pour pouvoir trier toutes les rangées ensemble
+            const positionSurArc = (col + 0.5) / count;
+            seats.push({ row, col, x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100, positionSurArc });
         }
+    }
+
+    // Tri par position sur l'arc (gauche → droite de l'hémicycle), tous rangs confondus
+    seats.sort((a, b) => a.positionSurArc - b.positionSurArc);
+    for (let i = 0; i < seats.length; i++) {
+        seats[i].seatId = i + 1;
     }
 
     return seats;

@@ -2,7 +2,7 @@
 export const groupes = {
     RN:       { nom: 'Rassemblement National', couleur: '#0d3b66', couleur2: '#c8102e', logo: '/partis/rn.png' },
     EPR:      { nom: 'Ensemble pour la République', couleur: '#ffcc00', couleur2: '#003189', logo: '/partis/epr.png' },
-    'LFI-NFP': { nom: 'La France insoumise - Nouveau Front Populaire', couleur: '#cc2443', couleur2: '#f0504e', logo: '/partis/lfi-nfp.png' },
+    LFI:       { nom: 'La France insoumise', couleur: '#cc2443', couleur2: '#f0504e', logo: '/partis/lfi-nfp.png' },
     DR:       { nom: 'Droite Républicaine', couleur: '#0066cc', couleur2: '#ffffff', logo: '/partis/dr.png' },
     SOC:      { nom: 'Socialistes et apparentés', couleur: '#e4032e', couleur2: '#f7a1b0', logo: '/partis/soc.png' },
     DEM:      { nom: 'Les Démocrates', couleur: '#ff9900', couleur2: '#005bac', logo: '/partis/dem.png' },
@@ -12,6 +12,22 @@ export const groupes = {
     LIOT:     { nom: 'Libertés, Indépendants, Outre-mer et Territoires', couleur: '#5ba4cf', couleur2: '#f4a300', logo: '/partis/liot.png' },
     UDDPLR:   { nom: 'Union des droites pour la République', couleur: '#1a2d5a', couleur2: '#c8102e', logo: '/partis/uddplr.png' },
     NI:       { nom: 'Non inscrit', couleur: '#aaaaaa', couleur2: '#666666', logo: null }
+};
+
+// Ordre politique gauche → droite (XVIIe législature)
+export const groupeOrdreGaucheaDroite = {
+    LFI:       1,
+    GDR:       3,
+    ECOS:      2,
+    SOC:       4,
+    DEM:       5,
+    HOR:       6,
+    EPR:       7,
+    DR:        8,
+    LIOT:      9,
+    UDDPLR:   10,
+    RN:       11,
+    NI:       12,
 };
 
 // Retourne l'URL du logo d'un groupe — null si absent
