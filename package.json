@@ -10,6 +10,7 @@
         "start": "node back/server.js",
         "seed:deputes": "node back/db/seeds/deputes.js",
         "seed:partis": "node back/db/seeds/partis.js",
+        "seed:votes": "node back/db/seeds/votes.js",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix"
     },

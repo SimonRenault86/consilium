@@ -93,6 +93,40 @@ export default {
                 },
             },
         },
+        '/votes/{uid}': {
+            get: {
+                tags: ['Votes'],
+                summary: 'Détail d\'un scrutin avec les votes nominatifs',
+                operationId: 'getVoteByUid',
+                parameters: [
+                    {
+                        name: 'uid',
+                        in: 'path',
+                        required: true,
+                        description: 'Identifiant unique du scrutin (ex: VTANR5L17V78)',
+                        schema: { type: 'string', example: 'VTANR5L17V78' },
+                    },
+                ],
+                responses: {
+                    '200': {
+                        description: 'Scrutin avec la map des votants',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/Vote' },
+                            },
+                        },
+                    },
+                    '404': {
+                        description: 'Vote introuvable',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/Erreur' },
+                            },
+                        },
+                    },
+                },
+            },
+        },
         '/votes': {
             get: {
                 tags: ['Votes'],
