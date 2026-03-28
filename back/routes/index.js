@@ -105,7 +105,8 @@ router.get('/elu/:slug', (req, res) => {
             groupe: null,
             hatvpUrl: null,
             mandatPrincipal: null,
-            commissions: []
+            commissions: [],
+            deputesSimilaires: []
         });
     }
 
@@ -135,6 +136,30 @@ router.get('/elu/:slug', (req, res) => {
             : null
     };
 
+    // Députés du même département, en excluant le député courant
+    let memeZone = deputes.filter(d => d.departementCode === deputeRaw.departementCode && d.id !== deputeRaw.id);
+    // Si le département a moins de 3 autres députés, on complète avec la même région
+    if (memeZone.length < 3) {
+        const memeRegion = deputes.filter(d =>
+            d.departementCode !== deputeRaw.departementCode
+            && d.id !== deputeRaw.id
+            && !memeZone.some(x => x.id === d.id)
+        );
+        memeZone = [...memeZone, ...memeRegion];
+    }
+    // Shuffle
+    for (let i = memeZone.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [memeZone[i], memeZone[j]] = [memeZone[j], memeZone[i]];
+    }
+    const deputesSimilaires = memeZone.slice(0, 3).map(d => ({
+        prenom: d.prenom,
+        nom: d.nom,
+        slug: toSlug(`${d.prenom} ${d.nom}`),
+        photoUrl: `/elus/${d.id}.jpg`,
+        initiales: `${d.prenom[0]}${d.nom[0]}`
+    }));
+
     res.render('elu.njk', {
         title: `${depute.civ} ${depute.prenom} ${depute.nom} — Consilium`,
         slug,
@@ -142,7 +167,8 @@ router.get('/elu/:slug', (req, res) => {
         groupe,
         hatvpUrl,
         mandatPrincipal,
-        commissions
+        commissions,
+        deputesSimilaires
     });
 });
 
