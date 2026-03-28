@@ -5,8 +5,231 @@
         <a href="/" class="text-sm text-slate-500 hover:text-slate-700">← Retour à l'hémicycle</a>
     </div>
 
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-        <h1 class="text-3xl font-bold text-slate-900 mb-2 capitalize">{{ slug | replace("-", " ") }}</h1>
-        <p class="text-slate-400 text-sm">Fiche du député à venir.</p>
+    {% if not depute %}
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+            <p class="text-slate-500">Député introuvable.</p>
+        </section>
+    {% else %}
+
+    {# En-tête #}
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6">
+        <div class="flex items-center gap-6">
+            <div class="flex-shrink-0 relative w-24 h-24">
+                <img
+                    src="/elus/{{ depute.id }}.jpg"
+                    alt="Photo de {{ depute.prenom }} {{ depute.nom }}"
+                    class="w-24 h-24 rounded-full object-cover border border-slate-100"
+                    onerror="this.style.display='none'; document.getElementById('initiales').style.display='flex'"
+                >
+                <div
+                    id="initiales"
+                    class="w-24 h-24 rounded-full bg-slate-200 text-slate-600 text-2xl font-bold absolute inset-0 hidden items-center justify-center"
+                >
+                    {{ depute.prenom[0] }}{{ depute.nom[0] }}
+                </div>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900">{{ depute.civ }} {{ depute.prenom }} {{ depute.nom }}</h1>
+                {% if groupe %}
+                <div class="flex items-center gap-2 mt-2">
+                    {% if groupe.logo %}
+                        <img src="{{ groupe.logo }}" alt="{{ groupe.nom }}" class="h-5 object-contain">
+                    {% else %}
+                        <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">{{ depute.groupeAbrev }}</span>
+                    {% endif %}
+                    <span class="text-slate-600 text-sm">{{ groupe.nom }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </section>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+        {# Mandat #}
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Mandat</h2>
+            <dl class="space-y-3">
+                <div>
+                    <dt class="text-xs text-slate-400 mb-0.5">Circonscription</dt>
+                    <dd class="text-slate-800 font-medium">
+                        {{ depute.departementNom }}{% if depute.departementCode %} ({{ depute.departementCode }}){% endif %} — {{ depute.circo }}e
+                    </dd>
+                </div>
+                {% if mandatPrincipal and mandatPrincipal.region %}
+                <div>
+                    <dt class="text-xs text-slate-400 mb-0.5">Région</dt>
+                    <dd class="text-slate-800 font-medium">{{ mandatPrincipal.region }}</dd>
+                </div>
+                {% endif %}
+                {% if mandatPrincipal and mandatPrincipal.legislature %}
+                <div>
+                    <dt class="text-xs text-slate-400 mb-0.5">Législature</dt>
+                    <dd class="text-slate-800 font-medium">{{ mandatPrincipal.legislature }}e</dd>
+                </div>
+                {% endif %}
+                {% if depute.priseFonctionFormatee %}
+                <div>
+                    <dt class="text-xs text-slate-400 mb-0.5">Prise de fonction</dt>
+                    <dd class="text-slate-800 font-medium">{{ depute.priseFonctionFormatee }}</dd>
+                </div>
+                {% endif %}
+                {% if mandatPrincipal and mandatPrincipal.causeMandat %}
+                <div>
+                    <dt class="text-xs text-slate-400 mb-0.5">Cause du mandat</dt>
+                    <dd class="text-slate-800 font-medium capitalize">{{ mandatPrincipal.causeMandat }}</dd>
+                </div>
+                {% endif %}
+                {% if mandatPrincipal and mandatPrincipal.placeHemicycle %}
+                <div>
+                    <dt class="text-xs text-slate-400 mb-0.5">Siège à l'hémicycle</dt>
+                    <dd class="text-slate-800 font-medium">N° {{ mandatPrincipal.placeHemicycle }}</dd>
+                </div>
+                {% endif %}
+                {% if depute.nombreMandats %}
+                <div>
+                    <dt class="text-xs text-slate-400 mb-0.5">Expérience</dt>
+                    <dd class="text-slate-800 font-medium">
+                        {{ depute.nombreMandats }} mandat{% if depute.nombreMandats > 1 %}s{% endif %}{% if depute.experienceDepute %} · {{ depute.experienceDepute }}{% endif %}
+                        {% if mandatPrincipal and mandatPrincipal.premiereElection %} · <span class="text-emerald-600">Première élection</span>{% endif %}
+                    </dd>
+                </div>
+                {% endif %}
+            </dl>
+        </section>
+
+        {# Identité #}
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Identité</h2>
+            <dl class="space-y-3">
+                {% if depute.naissanceFormatee %}
+                <div>
+                    <dt class="text-xs text-slate-400 mb-0.5">Date de naissance</dt>
+                    <dd class="text-slate-800 font-medium">
+                        {{ depute.naissanceFormatee }}{% if depute.age %} ({{ depute.age }} ans){% endif %}
+                    </dd>
+                </div>
+                {% endif %}
+                {% if depute.villeNaissance %}
+                <div>
+                    <dt class="text-xs text-slate-400 mb-0.5">Lieu de naissance</dt>
+                    <dd class="text-slate-800 font-medium">{{ depute.villeNaissance }}</dd>
+                </div>
+                {% endif %}
+                {% if depute.job %}
+                <div>
+                    <dt class="text-xs text-slate-400 mb-0.5">Profession</dt>
+                    <dd class="text-slate-800 font-medium">{{ depute.job }}</dd>
+                </div>
+                {% endif %}
+            </dl>
+        </section>
+
+    </div>
+
+    {# Commissions & collaborateurs #}
+    {% if commissions.length or (mandatPrincipal and mandatPrincipal.collaborateurs.length) %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+        {% if commissions.length %}
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Commission{% if commissions.length > 1 %}s{% endif %} permanente{% if commissions.length > 1 %}s{% endif %}</h2>
+            <ul class="space-y-2">
+                {% for commission in commissions %}
+                <li class="flex items-start gap-2">
+                    <span class="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                    <span class="text-slate-800 text-sm">
+                        {{ commission.nom }}
+                        {% if commission.role and commission.role != 'Membre' %}
+                        <span class="ml-1 text-xs text-slate-400">({{ commission.role }})</span>
+                        {% endif %}
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        {% if mandatPrincipal and mandatPrincipal.collaborateurs.length %}
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Collaborateurs parlementaires</h2>
+            <ul class="space-y-2">
+                {% for collaborateur in mandatPrincipal.collaborateurs %}
+                <li class="flex items-center gap-2 text-sm text-slate-800">
+                    <span class="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                    {{ collaborateur }}
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+    </div>
+    {% endif %}
+
+    {# Activité parlementaire #}
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+        <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Activité parlementaire</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% if depute.scoreParticipationPct is not none %}
+            <div>
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-sm text-slate-600">Participation</span>
+                    <span class="text-sm font-semibold text-slate-800">{{ depute.scoreParticipationPct }} %</span>
+                </div>
+                <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-2 rounded-full bg-blue-500" style="width: {{ depute.scoreParticipationPct }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+            {% if depute.scoreLoyautePct is not none %}
+            <div>
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-sm text-slate-600">Loyauté au groupe</span>
+                    <span class="text-sm font-semibold text-slate-800">{{ depute.scoreLoyautePct }} %</span>
+                </div>
+                <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-2 rounded-full bg-emerald-500" style="width: {{ depute.scoreLoyautePct }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {# Contact & liens #}
+    {% if depute.mail or depute.twitter or depute.facebook or depute.website or hatvpUrl %}
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Contact & liens</h2>
+        <div class="flex flex-wrap gap-3">
+            {% if depute.mail %}
+            <a href="mailto:{{ depute.mail }}" class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5">
+                ✉ {{ depute.mail }}
+            </a>
+            {% endif %}
+            {% if depute.twitter %}
+            <a href="https://twitter.com/{{ depute.twitter | replace('@', '') }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5">
+                𝕏 {{ depute.twitter }}
+            </a>
+            {% endif %}
+            {% if depute.facebook %}
+            <a href="https://facebook.com/{{ depute.facebook }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5">
+                Facebook
+            </a>
+            {% endif %}
+            {% if depute.website %}
+            <a href="https://{{ depute.website }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5">
+                🌐 Site web
+            </a>
+            {% endif %}
+            {% if hatvpUrl %}
+            <a href="{{ hatvpUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5">
+                📋 Déclaration HATVP
+            </a>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% endif %}
 {% endblock %}
+

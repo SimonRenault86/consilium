@@ -1,6 +1,91 @@
 import { Router } from 'express';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import { groupes } from '../../front/helpers/partis.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = Router();
+
+const deputes = JSON.parse(
+    readFileSync(path.join(__dirname, '../../front/helpers/brut/deputes.json'), 'utf8')
+);
+
+const toSlug = text =>
+    text
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+
+const mois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+    'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+
+const formatDate = dateStr => {
+    if (!dateStr) return null;
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return `${d} ${mois[m - 1]} ${y}`;
+};
+
+// Commissions permanentes de l'Assemblée nationale (organeRef → nom)
+const commissionsPermRef = {
+    PO59046: 'Commission des affaires culturelles et de l\'éducation',
+    PO59048: 'Commission des affaires économiques',
+    PO59050: 'Commission des affaires étrangères',
+    PO59051: 'Commission des affaires sociales',
+    PO59052: 'Commission de la défense nationale et des forces armées',
+    PO59053: 'Commission du développement durable et de l\'aménagement du territoire',
+    PO59054: 'Commission des finances, de l\'économie générale et du contrôle budgétaire',
+    PO59056: 'Commission des lois constitutionnelles, de la législation et de l\'administration générale de la République',
+};
+
+const extractMandatsInfo = eluBrut => {
+    const raw = eluBrut?.acteur?.mandats?.mandat;
+    if (!raw) return {};
+
+    const mandats = Array.isArray(raw) ? raw : [raw];
+
+    const mandatAssemblee = mandats.find(m => m.typeOrgane === 'ASSEMBLEE') || null;
+    const mandatsComper = mandats.filter(m => m.typeOrgane === 'COMPER');
+
+    // Infos mandat principal
+    let mandatPrincipal = null;
+    if (mandatAssemblee) {
+        const election = mandatAssemblee.election || {};
+        const mandature = mandatAssemblee.mandature || {};
+        const lieu = election.lieu || {};
+
+        const collaborateursRaw = mandatAssemblee.collaborateurs?.collaborateur;
+        const collaborateurs = collaborateursRaw
+            ? (Array.isArray(collaborateursRaw) ? collaborateursRaw : [collaborateursRaw])
+            : [];
+
+        mandatPrincipal = {
+            legislature: mandatAssemblee.legislature,
+            region: lieu.region || null,
+            causeMandat: election.causeMandat || null,
+            placeHemicycle: mandature.placeHemicycle ? parseInt(mandature.placeHemicycle, 10) : null,
+            premiereElection: mandature.premiereElection === '1',
+            collaborateurs: collaborateurs.map(c => `${c.qualite} ${c.prenom} ${c.nom}`)
+        };
+    }
+
+    // Commissions permanentes
+    const commissions = mandatsComper
+        .map(m => {
+            const ref = m.organes?.organeRef;
+            const nom = commissionsPermRef[ref] || null;
+            if (!nom) return null;
+            return {
+                nom,
+                role: m.infosQualite?.libQualite || 'Membre'
+            };
+        })
+        .filter(Boolean);
+
+    return { mandatPrincipal, commissions };
+};
 
 router.get('/', (req, res) => {
     res.render('home.njk', {
@@ -10,9 +95,54 @@ router.get('/', (req, res) => {
 
 router.get('/elu/:slug', (req, res) => {
     const { slug } = req.params;
+    const deputeRaw = deputes.find(d => toSlug(`${d.prenom} ${d.nom}`) === slug);
+
+    if (!deputeRaw) {
+        return res.status(404).render('elu.njk', {
+            title: 'Élu introuvable — Consilium',
+            slug,
+            depute: null,
+            groupe: null,
+            hatvpUrl: null,
+            mandatPrincipal: null,
+            commissions: []
+        });
+    }
+
+    let hatvpUrl = null;
+    let mandatPrincipal = null;
+    let commissions = [];
+    try {
+        const eluPath = path.join(__dirname, '../../front/helpers/brut/elu', `${deputeRaw.id}.json`);
+        const eluBrut = JSON.parse(readFileSync(eluPath, 'utf8'));
+        hatvpUrl = eluBrut?.acteur?.uri_hatvp || null;
+        ({ mandatPrincipal, commissions } = extractMandatsInfo(eluBrut));
+    } catch (e) {
+        // fichier brut absent
+    }
+
+    const groupe = groupes[deputeRaw.groupeAbrev] || null;
+
+    const depute = {
+        ...deputeRaw,
+        naissanceFormatee: formatDate(deputeRaw.naissance),
+        priseFonctionFormatee: formatDate(deputeRaw.datePriseFonction),
+        scoreParticipationPct: deputeRaw.scoreParticipation != null
+            ? Math.round(deputeRaw.scoreParticipation * 100)
+            : null,
+        scoreLoyautePct: deputeRaw.scoreLoyaute != null
+            ? Math.round(deputeRaw.scoreLoyaute * 100)
+            : null
+    };
+
     res.render('elu.njk', {
-        title: `Élu — ${slug}`,
-        slug
+        title: `${depute.civ} ${depute.prenom} ${depute.nom} — Consilium`,
+        slug,
+        depute,
+        groupe,
+        hatvpUrl,
+        mandatPrincipal,
+        commissions
     });
 });
 

@@ -12,7 +12,8 @@ const PORT = process.env.PORT || 3000;
 
 nunjucks.configure(path.join(__dirname, '../views'), {
     autoescape: true,
-    express: app
+    express: app,
+    noCache: true
 });
 
 app.use(express.static(path.join(__dirname, '../public')));

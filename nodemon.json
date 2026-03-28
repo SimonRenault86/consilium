@@ -1,5 +1,6 @@
 {
     "watch": ["back", "views"],
     "ext": "js,njk",
-    "ignore": ["public", "front"]
+    "ignore": ["public", "front"],
+    "legacyWatch": true
 }
