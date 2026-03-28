@@ -1,23 +1,24 @@
 import { Router } from 'express';
 import { groupes, groupeOrdreGaucheaDroite } from '../../../front/helpers/partis.js';
-import { getDeputes, toSlug } from './_shared.js';
+import { toSlug } from './_shared.js';
+import Depute from '../../db/models/Depute.js';
 
 const router = Router();
 
 router.get('/partis', async (req, res) => {
-    const deputes = await getDeputes();
+    const rows = await Depute.findAll();
     const groupesData = Object.keys(groupeOrdreGaucheaDroite)
         .sort((a, b) => groupeOrdreGaucheaDroite[a] - groupeOrdreGaucheaDroite[b])
         .map(abrev => {
             const info = groupes[abrev];
-            const membres = deputes
-                .filter(d => d.groupeAbrev === abrev)
+            const membres = rows
+                .filter(d => d.groupe_abrev === abrev)
                 .map(d => ({
                     id: d.id,
                     prenom: d.prenom,
                     nom: d.nom,
-                    departementNom: d.departementNom,
-                    slug: toSlug(`${d.prenom} ${d.nom}`),
+                    departementNom: d.departement_nom,
+                    slug: d.slug,
                     initiales: `${d.prenom[0]}${d.nom[0]}`
                 }));
             if (!membres.length) return null;

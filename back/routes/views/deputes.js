@@ -3,7 +3,8 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { groupes } from '../../../front/helpers/partis.js';
-import { getDeputes, toSlug, formatDate } from './_shared.js';
+import { toSlug, formatDate } from './_shared.js';
+import Depute from '../../db/models/Depute.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -61,8 +62,15 @@ const router = Router();
 
 router.get('/depute/:slug', async (req, res) => {
     const { slug } = req.params;
-    const deputes = await getDeputes();
-    const deputeRaw = deputes.find(d => toSlug(`${d.prenom} ${d.nom}`) === slug);
+    const rows = await Depute.findAll();
+    const deputeRaw = rows.map(r => ({
+        id: r.id, prenom: r.prenom, nom: r.nom, civ: r.civ,
+        naissance: r.naissance, groupeAbrev: r.groupe_abrev,
+        departementCode: r.departement_code, departementNom: r.departement_nom,
+        circo: r.circo, slug: r.slug, datePriseFonction: r.date_prise_fonction,
+        scoreParticipation: r.score_participation, scoreLoyaute: r.score_loyaute,
+        nombreMandats: r.nombre_mandats,
+    })).find(d => d.slug === slug);
 
     if (!deputeRaw) {
         return res.status(404).render('depute.njk', {
@@ -103,10 +111,10 @@ router.get('/depute/:slug', async (req, res) => {
             : null
     };
 
-    let memeZone = deputes.filter(d => d.departementCode === deputeRaw.departementCode && d.id !== deputeRaw.id);
+    let memeZone = rows.filter(d => d.departement_code === deputeRaw.departementCode && d.id !== deputeRaw.id);
     if (memeZone.length < 3) {
-        const memeRegion = deputes.filter(d =>
-            d.departementCode !== deputeRaw.departementCode
+        const memeRegion = rows.filter(d =>
+            d.departement_code !== deputeRaw.departementCode
             && d.id !== deputeRaw.id
             && !memeZone.some(x => x.id === d.id)
         );
@@ -119,7 +127,7 @@ router.get('/depute/:slug', async (req, res) => {
     const deputesSimilaires = memeZone.slice(0, 3).map(d => ({
         prenom: d.prenom,
         nom: d.nom,
-        slug: toSlug(`${d.prenom} ${d.nom}`),
+        slug: d.slug,
         photoUrl: `/elus/${d.id}.jpg`,
         initiales: `${d.prenom[0]}${d.nom[0]}`
     }));
