@@ -257,8 +257,20 @@ const clearSearch = () => {
     load();
 };
 
-const toggleVote = vote => {
-    selectedVote.value = selectedVote.value?.uid === vote.uid ? null : vote;
+const toggleVote = async vote => {
+    if (selectedVote.value?.uid === vote.uid) {
+        selectedVote.value = null;
+        return;
+    }
+    // On sélectionne d'abord le vote de la liste pour un affichage immédiat
+    selectedVote.value = vote;
+    // Puis on enrichit avec le votantsMap pour colorer la carte
+    try {
+        const res = await fetch(`/api/votes/${vote.uid}`);
+        if (res.ok) selectedVote.value = await res.json();
+    } catch {
+        // en cas d'erreur on garde le vote sans votantsMap
+    }
 };
 
 const clearVote = () => {

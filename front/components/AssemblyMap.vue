@@ -1,7 +1,7 @@
 <template>
     <div
         ref="containerEl"
-        class="relative flex items-end justify-center px-4 pt-6"
+        class="relative flex items-end justify-center px-4 py-6"
     >
         <div class="w-full">
             <HemicycleFilters v-model="vueActive" />
