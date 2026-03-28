@@ -1,0 +1,44 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-slate-900">Groupes politiques</h1>
+        <p class="text-slate-400 text-sm mt-1">{{ totalDeputes }} député{{ 's' if totalDeputes > 1 }} répartis en {{ groupes.length }} groupe{{ 's' if groupes.length > 1 }}</p>
+    </div>
+
+    {% for groupe in groupes %}
+    <section class="mb-10" id="{{ groupe.abrev }}">
+        <div class="flex items-center gap-3 mb-4">
+            {% if groupe.logo %}
+                <img src="{{ groupe.logo }}" alt="{{ groupe.nom }}" class="h-7 object-contain">
+            {% else %}
+                <span class="text-xs font-bold px-2 py-1 rounded bg-slate-100 text-slate-600">{{ groupe.abrev }}</span>
+            {% endif %}
+            <div>
+                <h2 class="text-lg font-bold text-slate-900">{{ groupe.nom }}</h2>
+                <span class="text-xs text-slate-400">{{ groupe.deputes.length }} député{{ 's' if groupe.deputes.length > 1 }}</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {% for depute in groupe.deputes %}
+            <a href="/elu/{{ depute.slug }}" class="bg-white rounded-xl border border-slate-200 p-3 flex flex-col items-center gap-2 hover:border-slate-300 hover:shadow-sm transition text-center">
+                <div class="relative w-12 h-12 flex-shrink-0">
+                    <img
+                        src="/elus/{{ depute.id }}.jpg"
+                        alt="{{ depute.prenom }} {{ depute.nom }}"
+                        class="w-12 h-12 rounded-full object-cover border border-slate-100"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+                    >
+                    <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-600 font-bold absolute inset-0 hidden items-center justify-center text-sm">{{ depute.initiales }}</div>
+                </div>
+                <span class="text-xs font-medium text-slate-800 leading-tight">{{ depute.prenom }} {{ depute.nom }}</span>
+                {% if depute.departementNom %}
+                <span class="text-xs text-slate-400 leading-tight">{{ depute.departementNom }}</span>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endfor %}
+{% endblock %}

@@ -5,9 +5,10 @@
             v-if="vueActive === 'standard'"
             class="flex flex-wrap justify-center gap-2"
         >
-            <div
+            <a
                 v-for="g in stats"
                 :key="g.abrev"
+                :href="`/partis#${g.abrev}`"
                 class="flex items-center gap-2 rounded-xl border border-slate-100 bg-white px-3 py-2 shadow-sm cursor-pointer transition-opacity duration-150"
                 :class="hoveredGroupe && hoveredGroupe !== g.abrev ? 'opacity-30' : 'opacity-100'"
                 @mouseenter="emit('update:hoveredGroupe', g.abrev)"
@@ -29,7 +30,7 @@
                     <span class="text-xs font-semibold text-slate-800">{{ g.nombreDeputes }}</span>
                     <span class="text-xs text-slate-400">députés</span>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- Filtres scores : barre par groupe -->
