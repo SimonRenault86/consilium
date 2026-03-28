@@ -38,5 +38,6 @@ const vues = [
     { id: 'standard', label: 'Groupes', couleur: '#64748b', gradient: false },
     { id: 'loyaute', label: 'Loyauté', gradient: true },
     { id: 'participation', label: 'Participation', gradient: true },
+    { id: 'vote', label: 'Vote', couleur: '#10b981', gradient: false },
 ];
 </script>

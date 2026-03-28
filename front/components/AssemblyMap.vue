@@ -128,7 +128,7 @@
 
             <!-- Légende dégradé pour les vues score -->
             <div
-                v-if="vueActive !== 'standard'"
+                v-if="vueActive === 'loyaute' || vueActive === 'participation'"
                 class="mt-3 flex items-center justify-center gap-3"
             >
                 <span class="text-xs text-slate-500">0 %</span>
@@ -139,9 +139,29 @@
                 <span class="text-xs text-slate-500">100 %</span>
             </div>
 
+            <!-- Légende mode vote -->
+            <div
+                v-if="vueActive === 'vote'"
+                class="mt-3 flex items-center justify-center gap-4"
+            >
+                <div class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-full bg-emerald-500" />
+                    <span class="text-xs text-slate-500">Pour</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-full bg-red-500" />
+                    <span class="text-xs text-slate-500">Contre</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-full bg-slate-400" />
+                    <span class="text-xs text-slate-500">Abstention</span>
+                </div>
+            </div>
+
             <AssemblyStats
                 v-model:hovered-groupe="hoveredGroupe"
                 :vue-active="vueActive"
+                :selected-vote="props.selectedVote"
             />
         </div>
     </div>
@@ -150,11 +170,20 @@
 <script setup>
 import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue';
 import seats, { VIEWBOX_WIDTH, VIEWBOX_HEIGHT, SEAT_RADIUS } from '@/helpers/hemicycle.js';
-import { getDepute, getCouleurSiege, getCouleur2Siege, getCouleurScoreSiege, getPhotoUrl } from '@/helpers/deputes.js';
+import deputesMap, { getDepute, getCouleurSiege, getCouleur2Siege, getCouleurScoreSiege, getPhotoUrl } from '@/helpers/deputes.js';
 import { groupes, getLogoUrl } from '@/helpers/partis.js';
 import HemicycleFilters from '@/components/HemicycleFilters.vue';
 import AssemblyStats from '@/components/AssemblyStats.vue';
 import DeputeSearchBar from '@/components/DeputeSearchBar.vue';
+
+const props = defineProps({
+    selectedVote: {
+        type: Object,
+        default: null
+    }
+});
+
+const emit = defineEmits(['update:vueActive']);
 
 const svgEl = ref(null);
 const containerEl = ref(null);
@@ -165,17 +194,58 @@ const vueActive = ref('standard');
 
 const CHAMP_SCORE = { loyaute: 'scoreLoyaute', participation: 'scoreParticipation' };
 
+// Map acteurRef (id) → seatId pour le mode vote
+const acteurToSeat = computed(() => {
+    const map = {};
+    for (const [seatId, depute] of deputesMap.entries()) {
+        map[depute.id] = seatId;
+    }
+    return map;
+});
+
+// Map seatId → 'pour'|'contre'|'abstention' pour le vote sélectionné
+const voteParSiege = computed(() => {
+    if (!props.selectedVote?.votantsMap) return {};
+    const map = {};
+    for (const [acteurRef, position] of Object.entries(props.selectedVote.votantsMap)) {
+        const seatId = acteurToSeat.value[acteurRef];
+        if (seatId) map[seatId] = position;
+    }
+    return map;
+});
+
+const COULEURS_VOTE = {
+    pour: '#10b981',
+    contre: '#ef4444',
+    abstention: '#94a3b8',
+};
+
 const getCouleurSiegeActive = seatId => {
+    if (vueActive.value === 'vote') {
+        return COULEURS_VOTE[voteParSiege.value[seatId]] || '#e2e8f0';
+    }
     if (vueActive.value === 'standard') return getCouleurSiege(seatId);
     return getCouleurScoreSiege(seatId, CHAMP_SCORE[vueActive.value]);
 };
 
 const isSeatDimmed = seatId => {
+    if (vueActive.value === 'vote' && props.selectedVote) {
+        return !voteParSiege.value[seatId];
+    }
     if (pinnedSeat.value) return pinnedSeat.value !== seatId;
     if (hoveredSeat.value) return hoveredSeat.value !== seatId;
     if (hoveredGroupe.value) return getDepute(seatId)?.groupe !== hoveredGroupe.value;
     return false;
 };
+
+// Bascule automatique en mode vote quand un vote est sélectionné
+watch(() => props.selectedVote, vote => {
+    if (vote) {
+        vueActive.value = 'vote';
+    } else if (vueActive.value === 'vote') {
+        vueActive.value = 'standard';
+    }
+});
 
 const onPin = seatId => {
     pinnedSeat.value = seatId;
