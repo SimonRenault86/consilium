@@ -1,12 +1,30 @@
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import pool from '../../db/dbManager.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-export const deputes = JSON.parse(
-    readFileSync(path.join(__dirname, '../../../front/helpers/brut/deputes.json'), 'utf8')
-);
+// Charge tous les députés depuis la DB (résultat mis en cache au premier appel)
+let _deputes = null;
+export const getDeputes = async () => {
+    if (_deputes) return _deputes;
+    const { rows } = await pool.query('SELECT * FROM deputes ORDER BY nom, prenom');
+    // Normalise les colonnes snake_case → camelCase attendu par la vue
+    _deputes = rows.map(r => ({
+        id: r.id,
+        prenom: r.prenom,
+        nom: r.nom,
+        civ: r.civ,
+        naissance: r.naissance,
+        groupeAbrev: r.groupe_abrev,
+        groupe: r.groupe_abrev,
+        departementCode: r.departement_code,
+        departementNom: r.departement_nom,
+        circo: r.circo,
+        slug: r.slug,
+        datePriseFonction: r.date_prise_fonction,
+        scoreParticipation: r.score_participation,
+        scoreLoyaute: r.score_loyaute,
+        nombreMandats: r.nombre_mandats,
+    }));
+    return _deputes;
+};
 
 export const toSlug = text =>
     text

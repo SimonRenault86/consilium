@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { groupes, groupeOrdreGaucheaDroite } from '../../../front/helpers/partis.js';
-import { deputes, toSlug } from './_shared.js';
+import { getDeputes, toSlug } from './_shared.js';
 
 const router = Router();
 
-router.get('/partis', (req, res) => {
+router.get('/partis', async (req, res) => {
+    const deputes = await getDeputes();
     const groupesData = Object.keys(groupeOrdreGaucheaDroite)
         .sort((a, b) => groupeOrdreGaucheaDroite[a] - groupeOrdreGaucheaDroite[b])
         .map(abrev => {

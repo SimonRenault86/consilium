@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { groupes } from '../../../front/helpers/partis.js';
-import { deputes, toSlug, formatDate } from './_shared.js';
+import { getDeputes, toSlug, formatDate } from './_shared.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -59,8 +59,9 @@ const extractMandatsInfo = eluBrut => {
 
 const router = Router();
 
-router.get('/depute/:slug', (req, res) => {
+router.get('/depute/:slug', async (req, res) => {
     const { slug } = req.params;
+    const deputes = await getDeputes();
     const deputeRaw = deputes.find(d => toSlug(`${d.prenom} ${d.nom}`) === slug);
 
     if (!deputeRaw) {
