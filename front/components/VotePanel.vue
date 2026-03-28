@@ -2,16 +2,15 @@
     <div class="flex flex-col h-full">
         <!-- En-tête -->
         <div class="flex items-center justify-between mb-3">
-            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest py-3">
                 Derniers votes
             </h2>
-            <button
+            <ButtonBase
                 v-if="selectedVote"
-                class="text-xs text-slate-400 hover:text-slate-700 transition"
                 @click="clearVote"
             >
-                ✕ Réinitialiser
-            </button>
+                <i class="fa-solid fa-xmark" /> Réinitialiser
+            </ButtonBase>
         </div>
 
         <!-- Recherche par mot-clé -->
@@ -175,13 +174,12 @@
                         />
                     </div>
                     <div class="mt-3">
-                        <a
+                        <ButtonLink
                             :href="`/scrutin/${vote.uid}`"
-                            class="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 hover:underline"
                             @click.stop
                         >
                             Voir le scrutin <i class="fa-solid fa-arrow-right" />
-                        </a>
+                        </ButtonLink>
                     </div>
                 </div>
             </div>
@@ -192,6 +190,8 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import { fetchVotes } from '@/helpers/votes.js';
+import ButtonLink from '@components/ButtonLink.vue';
+import ButtonBase from '@components/ButtonBase.vue';
 
 const emit = defineEmits(['select']);
 
