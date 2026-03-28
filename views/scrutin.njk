@@ -25,8 +25,7 @@
         </h1>
     </section>
 
-    {# Composant Vue ScrutinInfo #}
-    <div id="scrutin-info" data-scrutin-uid="{{ vote.uid }}" class="mb-6"></div>
+    <scrutin-info data-scrutin-uid="{{ vote.uid }}" class="mb-6 block"></scrutin-info>
 
     {% endif %}
 {% endblock %}

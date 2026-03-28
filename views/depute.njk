@@ -44,11 +44,9 @@
         </div>
     </section>
 
-    {# Composant Vue DeputeInfo (Mandat, Identité, Commissions, Activité, Contact) #}
-    <div id="depute-info" data-depute-id="{{ depute.id }}" class="mb-6"></div>
+    <depute-info data-depute-id="{{ depute.id }}" class="mb-6 block"></depute-info>
 
-    {# Votes au scrutin public (composant Vue) #}
-    <div id="votes-stats" data-depute-id="{{ depute.id }}" class="mb-6"></div>
+    <votes-stats data-depute-id="{{ depute.id }}" class="mb-6 block"></votes-stats>
 
     {# Députés de la même circonscription #}
     {% if deputesSimilaires.length %}
