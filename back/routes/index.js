@@ -145,7 +145,7 @@ const parseVoteFile = filename => {
 };
 
 router.get('/api/votes', (req, res) => {
-    const { from, to, limit = '10' } = req.query;
+    const { from, to, limit = '10', q } = req.query;
 
     // Validation basique des dates pour éviter toute injection de chemin
     const dateRe = /^\d{4}-\d{2}-\d{2}$/;
@@ -154,33 +154,17 @@ router.get('/api/votes', (req, res) => {
     }
 
     const maxLimit = Math.min(parseInt(limit, 10) || 10, 200);
+    const search = q ? String(q).toLowerCase().trim() : null;
 
-    const files = allVoteFiles;
-
-    // Si plage de dates : on filtre en lisant uniquement les métadonnées nécessaires
-    if (from || to) {
-        const results = [];
-        for (const f of files) {
-            if (results.length >= maxLimit) break;
-            try {
-                const vote = parseVoteFile(f);
-                if (from && vote.dateScrutin < from) continue;
-                if (to && vote.dateScrutin > to) continue;
-                results.push(vote);
-            } catch (e) {
-                // fichier corrompu, on saute
-            }
-        }
-        return res.json(results);
-    }
-
-    // Pas de filtre : on prend les N derniers
     const results = [];
-    for (const f of files.slice(0, maxLimit * 3)) {
-        // on prend un peu plus pour absorber d'éventuels fichiers corrompus
+    for (const f of allVoteFiles) {
         if (results.length >= maxLimit) break;
         try {
-            results.push(parseVoteFile(f));
+            const vote = parseVoteFile(f);
+            if (from && vote.dateScrutin < from) continue;
+            if (to && vote.dateScrutin > to) continue;
+            if (search && !vote.titre.toLowerCase().includes(search)) continue;
+            results.push(vote);
         } catch (e) {
             // fichier corrompu, on saute
         }

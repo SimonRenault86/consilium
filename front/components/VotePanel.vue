@@ -14,6 +14,27 @@
             </button>
         </div>
 
+        <!-- Recherche par mot-clé -->
+        <div class="relative mb-2">
+            <input
+                v-model="search"
+                type="text"
+                placeholder="Rechercher un vote…"
+                class="w-full rounded-lg border border-slate-200 bg-white pl-8 pr-7 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400"
+                @input="onSearchInput"
+            >
+            <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            </svg>
+            <button
+                v-if="search"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                @click="clearSearch"
+            >
+                ✕
+            </button>
+        </div>
+
         <!-- Filtre par dates -->
         <div class="flex items-center gap-2 mb-3">
             <input
@@ -56,7 +77,7 @@
             v-else-if="!votes.length"
             class="flex-1 flex items-center justify-center text-xs text-slate-400"
         >
-            Aucun vote sur cette période
+            Aucun résultat
         </div>
 
         <!-- Liste des votes -->
@@ -160,6 +181,8 @@ const loading = ref(false);
 const error = ref(false);
 const dateFrom = ref('');
 const dateTo = ref('');
+const search = ref('');
+let searchTimer = null;
 
 const mois = ['jan.', 'fév.', 'mars', 'avr.', 'mai', 'juin',
     'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
@@ -178,8 +201,8 @@ const load = async () => {
         votes.value = await fetchVotes({
             from: dateFrom.value || undefined,
             to: dateTo.value || undefined,
-            // Quand il y a un filtre de date, on charge plus de résultats
-            limit: (dateFrom.value || dateTo.value) ? 100 : 10
+            q: search.value.trim() || undefined,
+            limit: (dateFrom.value || dateTo.value || search.value.trim()) ? 50 : 10
         });
     } catch (e) {
         error.value = true;
@@ -196,6 +219,20 @@ const applyFilter = () => {
 const clearFilter = () => {
     dateFrom.value = '';
     dateTo.value = '';
+    selectedVote.value = null;
+    load();
+};
+
+const onSearchInput = () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        selectedVote.value = null;
+        load();
+    }, 350);
+};
+
+const clearSearch = () => {
+    search.value = '';
     selectedVote.value = null;
     load();
 };
