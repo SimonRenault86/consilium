@@ -7,10 +7,6 @@ public/dist/
 # Données brutes (seed local uniquement)
 front/helpers/brut/
 
-# Photos et logos (assets statiques lourds)
-public/elus/
-public/partis/
-
 # Variables d'environnement
 .env
 
