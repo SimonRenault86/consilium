@@ -1,5 +1,6 @@
 <template>
     <div class="flex flex-col h-full">
+        <!-- En-tête -->
         <div class="flex items-center justify-between mb-3">
             <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest">
                 Derniers votes
@@ -13,7 +14,56 @@
             </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto space-y-2 pr-1">
+        <!-- Filtre par dates -->
+        <div class="flex items-center gap-2 mb-3">
+            <input
+                v-model="dateFrom"
+                type="date"
+                class="flex-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400"
+                @change="applyFilter"
+            >
+            <span class="text-xs text-slate-400">→</span>
+            <input
+                v-model="dateTo"
+                type="date"
+                class="flex-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400"
+                @change="applyFilter"
+            >
+            <button
+                v-if="dateFrom || dateTo"
+                class="text-xs text-slate-400 hover:text-slate-700"
+                title="Effacer le filtre"
+                @click="clearFilter"
+            >
+                ✕
+            </button>
+        </div>
+
+        <!-- États de chargement / erreur / vide -->
+        <div
+            v-if="loading"
+            class="flex-1 flex items-center justify-center text-xs text-slate-400"
+        >
+            Chargement…
+        </div>
+        <div
+            v-else-if="error"
+            class="flex-1 flex items-center justify-center text-xs text-red-400"
+        >
+            Erreur de chargement
+        </div>
+        <div
+            v-else-if="!votes.length"
+            class="flex-1 flex items-center justify-center text-xs text-slate-400"
+        >
+            Aucun vote sur cette période
+        </div>
+
+        <!-- Liste des votes -->
+        <div
+            v-else
+            class="flex-1 overflow-y-auto space-y-2 pr-1"
+        >
             <div
                 v-for="vote in votes"
                 :key="vote.uid"
@@ -29,6 +79,7 @@
                         {{ vote.titre }}
                     </div>
                 </div>
+
                 <div class="px-4 py-3 flex items-start gap-3">
                     <span
                         class="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold uppercase"
@@ -98,13 +149,17 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import allVotes from '@/helpers/votes.js';
+import { ref, watch, onMounted } from 'vue';
+import { fetchVotes } from '@/helpers/votes.js';
 
 const emit = defineEmits(['select']);
 
-const votes = allVotes;
+const votes = ref([]);
 const selectedVote = ref(null);
+const loading = ref(false);
+const error = ref(false);
+const dateFrom = ref('');
+const dateTo = ref('');
 
 const mois = ['jan.', 'fév.', 'mars', 'avr.', 'mai', 'juin',
     'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
@@ -116,19 +171,44 @@ const formatDate = dateStr => {
 
 const pct = (value, total) => total ? Math.round((value / total) * 100) : 0;
 
-const toggleVote = vote => {
-    if (selectedVote.value?.uid === vote.uid) {
-        selectedVote.value = null;
-    } else {
-        selectedVote.value = vote;
+const load = async () => {
+    loading.value = true;
+    error.value = false;
+    try {
+        votes.value = await fetchVotes({
+            from: dateFrom.value || undefined,
+            to: dateTo.value || undefined,
+            // Quand il y a un filtre de date, on charge plus de résultats
+            limit: (dateFrom.value || dateTo.value) ? 100 : 10
+        });
+    } catch (e) {
+        error.value = true;
+    } finally {
+        loading.value = false;
     }
+};
+
+const applyFilter = () => {
+    selectedVote.value = null;
+    load();
+};
+
+const clearFilter = () => {
+    dateFrom.value = '';
+    dateTo.value = '';
+    selectedVote.value = null;
+    load();
+};
+
+const toggleVote = vote => {
+    selectedVote.value = selectedVote.value?.uid === vote.uid ? null : vote;
 };
 
 const clearVote = () => {
     selectedVote.value = null;
 };
 
-watch(selectedVote, vote => {
-    emit('select', vote);
-});
+watch(selectedVote, vote => emit('select', vote));
+
+onMounted(load);
 </script>
