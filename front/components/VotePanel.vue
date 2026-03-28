@@ -180,7 +180,7 @@
                             class="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 hover:underline"
                             @click.stop
                         >
-                            Voir le scrutin →
+                            Voir le scrutin <i class="fa-solid fa-arrow-right" />
                         </a>
                     </div>
                 </div>

@@ -135,7 +135,7 @@
                             :key="commission.nom"
                             class="flex items-start gap-2"
                         >
-                            <span class="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-blue-400" />
+                            <i class="fa-solid fa-circle mt-1.5 flex-shrink-0 text-blue-400 text-[6px]" />
                             <span class="text-slate-800 text-sm">
                                 {{ commission.nom }}
                                 <span
@@ -160,7 +160,7 @@
                             :key="collaborateur"
                             class="flex items-center gap-2 text-sm text-slate-800"
                         >
-                            <span class="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-300" />
+                            <i class="fa-solid fa-circle flex-shrink-0 text-slate-300 text-[6px]" />
                             {{ collaborateur }}
                         </li>
                     </ul>
@@ -216,35 +216,35 @@
                         v-if="depute.mail"
                         :href="`mailto:${depute.mail}`"
                         class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5"
-                    >✉ {{ depute.mail }}</a>
+                    ><i class="fa-solid fa-envelope" /> {{ depute.mail }}</a>
                     <a
                         v-if="depute.twitter"
                         :href="`https://twitter.com/${depute.twitter.replace('@', '')}`"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5"
-                    >𝕏 {{ depute.twitter }}</a>
+                    ><i class="fa-brands fa-x-twitter" /> {{ depute.twitter }}</a>
                     <a
                         v-if="depute.facebook"
                         :href="`https://facebook.com/${depute.facebook}`"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5"
-                    >Facebook</a>
+                    ><i class="fa-brands fa-facebook" /> Facebook</a>
                     <a
                         v-if="depute.website"
                         :href="`https://${depute.website}`"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5"
-                    >🌐 Site web</a>
+                    ><i class="fa-solid fa-globe" /> Site web</a>
                     <a
                         v-if="depute.hatvpUrl"
                         :href="depute.hatvpUrl"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5"
-                    >📋 Déclaration HATVP</a>
+                    ><i class="fa-solid fa-file-lines" /> Déclaration HATVP</a>
                 </div>
             </section>
         </template>

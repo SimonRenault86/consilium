@@ -62,7 +62,7 @@
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-sm text-slate-600 flex items-center gap-1.5">
-                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500" />Pour
+                                <i class="fa-solid fa-circle text-emerald-500 text-xs" />Pour
                             </span>
                             <span class="text-sm font-semibold text-slate-800">{{ scrutin.synthese.pour }}</span>
                         </div>
@@ -76,7 +76,7 @@
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-sm text-slate-600 flex items-center gap-1.5">
-                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500" />Contre
+                                <i class="fa-solid fa-circle text-red-500 text-xs" />Contre
                             </span>
                             <span class="text-sm font-semibold text-slate-800">{{ scrutin.synthese.contre }}</span>
                         </div>
@@ -90,7 +90,7 @@
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-sm text-slate-600 flex items-center gap-1.5">
-                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-300" />Abstentions
+                                <i class="fa-solid fa-circle text-slate-300 text-xs" />Abstentions
                             </span>
                             <span class="text-sm font-semibold text-slate-800">{{ scrutin.synthese.abstentions }}</span>
                         </div>
