@@ -1,7 +1,4 @@
 import 'dotenv/config';
-import dns from 'dns';
-// Heroku ne supporte pas IPv6 → forcer la résolution DNS en IPv4
-dns.setDefaultResultOrder('ipv4first');
 import express from 'express';
 import nunjucks from 'nunjucks';
 import { fileURLToPath } from 'url';

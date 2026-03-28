@@ -1,5 +1,9 @@
+import dns from 'dns';
 import pg from 'pg';
 import 'dotenv/config';
+
+// Forcer la résolution IPv4 — Heroku ne supporte pas IPv6
+dns.setDefaultResultOrder('ipv4first');
 
 const { Pool } = pg;
 
