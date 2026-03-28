@@ -197,7 +197,7 @@ const CHAMP_SCORE = { loyaute: 'scoreLoyaute', participation: 'scoreParticipatio
 // Map acteurRef (id) → seatId pour le mode vote
 const acteurToSeat = computed(() => {
     const map = {};
-    for (const [seatId, depute] of deputesMap.entries()) {
+    for (const [seatId, depute] of deputesMap.value.entries()) {
         map[depute.id] = seatId;
     }
     return map;

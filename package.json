@@ -8,6 +8,7 @@
         "dev": "concurrently \"npm run dev:back\" \"npm run dev:front\"",
         "build": "vite build",
         "start": "node back/server.js",
+        "seed:deputes": "node back/db/seeds/deputes.js",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix"
     },
@@ -15,6 +16,7 @@
         "dotenv": "^17.3.1",
         "express": "^4.19.2",
         "nunjucks": "^3.2.4",
+        "pg": "^8.20.0",
         "vue": "^3.5.0"
     },
     "devDependencies": {

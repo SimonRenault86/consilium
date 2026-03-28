@@ -98,7 +98,7 @@ const suggestions = computed(() => {
     if (isSelectionMode.value) return [];
     const q = normaliser(displayQuery.value.trim());
     if (!q) return [];
-    return tousLesDeputes
+    return tousLesDeputes.value
         .filter(d => normaliser(`${d.prenom} ${d.nom}`).includes(q))
         .slice(0, 8);
 });

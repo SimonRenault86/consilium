@@ -1,9 +1,8 @@
+import { shallowRef, computed } from 'vue';
 import { groupes, getLogoUrl, groupeOrdreGaucheaDroite } from '@/helpers/partis.js';
-import deputesBrut from '@/helpers/brut/deputes.json';
 
 export { groupes, getLogoUrl };
 
-// Génère un slug URL-friendly à partir du prénom et du nom
 const toSlug = text =>
     text
         .normalize('NFD')
@@ -12,31 +11,63 @@ const toSlug = text =>
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '');
 
-// Retourne l'URL de la photo d'un élu selon son id (/elus/{id}.jpg)
-// Retourne null si l'id est absent — le composant affichera les initiales
 export const getPhotoUrl = depute => depute?.id ? `/elus/${depute.id}.jpg` : null;
 
-// Construit la map seatId → député à partir du JSON
-// On trie par groupe (gauche → droite) pour que les sièges reflètent l'hémicycle réel
-const deputesTries = [...deputesBrut].sort((a, b) => {
-    const ordreA = groupeOrdreGaucheaDroite[a.groupeAbrev] ?? 99;
-    const ordreB = groupeOrdreGaucheaDroite[b.groupeAbrev] ?? 99;
-    return ordreA - ordreB;
-});
+// Store réactif : shallowRef sur la Map pour que les computed Vue se mettent à jour
+const _map = shallowRef(new Map());
 
-const deputesMap = new Map();
+export const deputesMap = _map;
 
-deputesTries.forEach((d, index) => {
-    const seatId = index + 1;
-    deputesMap.set(seatId, {
-        ...d,
-        seatId,
-        slug: toSlug(`${d.prenom} ${d.nom}`),
-        groupe: d.groupeAbrev,
+// Charge les députés depuis l'API et peuple la Map (appelé au démarrage)
+export const initDeputes = async () => {
+    const res = await fetch('/api/deputes');
+    const brut = await res.json();
+
+    const tries = [...brut].sort((a, b) => {
+        const ordreA = groupeOrdreGaucheaDroite[a.groupe_abrev] ?? 99;
+        const ordreB = groupeOrdreGaucheaDroite[b.groupe_abrev] ?? 99;
+        return ordreA - ordreB;
     });
-});
 
-export const getDepute = seatId => deputesMap.get(seatId) || null;
+    const newMap = new Map();
+    tries.forEach((d, index) => {
+        const seatId = index + 1;
+        newMap.set(seatId, {
+            id: d.id,
+            legislature: d.legislature,
+            civ: d.civ,
+            nom: d.nom,
+            prenom: d.prenom,
+            villeNaissance: d.ville_naissance,
+            naissance: d.naissance,
+            age: d.age,
+            groupe: d.groupe_abrev,
+            groupeAbrev: d.groupe_abrev,
+            departementNom: d.departement_nom,
+            departementCode: d.departement_code,
+            circo: d.circo,
+            datePriseFonction: d.date_prise_fonction,
+            job: d.job,
+            mail: d.mail,
+            twitter: d.twitter,
+            facebook: d.facebook,
+            website: d.website,
+            nombreMandats: d.nombre_mandats,
+            experienceDepute: d.experience_depute,
+            scoreParticipation: d.score_participation !== null ? parseFloat(d.score_participation) : null,
+            scoreParticipationSpecialite: d.score_participation_specialite !== null ? parseFloat(d.score_participation_specialite) : null,
+            scoreLoyaute: d.score_loyaute !== null ? parseFloat(d.score_loyaute) : null,
+            scoreMajorite: d.score_majorite !== null ? parseFloat(d.score_majorite) : null,
+            dateMaj: d.date_maj,
+            seatId,
+            slug: toSlug(`${d.prenom} ${d.nom}`),
+        });
+    });
+
+    _map.value = newMap;
+};
+
+export const getDepute = seatId => _map.value.get(seatId) || null;
 
 export const getCouleurSiege = seatId => {
     const depute = getDepute(seatId);
@@ -50,9 +81,6 @@ export const getCouleur2Siege = seatId => {
     return groupes[depute.groupe]?.couleur2 || '#9ca3af';
 };
 
-// Normalise un score brut selon les seuils propres à chaque champ (résultat entre 0 et 1)
-// - scoreLoyaute   : >= 95 % → loyal (1), en dessous dégradé vers rouge
-// - scoreParticipation : < 25 % → faible (0), > 40 % → haute (1), dégradé entre les deux
 const normaliserScore = (score, champ) => {
     if (score === null || score === undefined) return null;
     if (champ === 'scoreLoyaute') return Math.min(1, Math.pow(score / 0.95, 3));
@@ -79,31 +107,32 @@ export const getCouleurScoreSiege = (seatId, champ) => {
     return scoreToCouleur(normaliserScore(depute[champ], champ));
 };
 
-// Statistiques agrégées par groupe, triées gauche → droite
-export const statsParGroupe = Object.keys(groupeOrdreGaucheaDroite).map(abrev => {
-    const deputes = [...deputesMap.values()].filter(d => d.groupe === abrev);
-    if (!deputes.length) return null;
+// computed → se recalcule automatiquement quand _map.value change
+export const tousLesDeputes = computed(() => [..._map.value.values()]);
 
-    const moyenne = champ => {
-        const valeurs = deputes.map(d => d[champ]).filter(v => v !== null && v !== undefined);
-        if (!valeurs.length) return null;
-        return valeurs.reduce((acc, v) => acc + v, 0) / valeurs.length;
-    };
+export const statsParGroupe = computed(() =>
+    Object.keys(groupeOrdreGaucheaDroite).map(abrev => {
+        const deputes = [..._map.value.values()].filter(d => d.groupe === abrev);
+        if (!deputes.length) return null;
 
-    return {
-        abrev,
-        nom: groupes[abrev]?.nom,
-        couleur: groupes[abrev]?.couleur,
-        logo: groupes[abrev]?.logo,
-        nombreDeputes: deputes.length,
-        scoreLoyaute: moyenne('scoreLoyaute'),
-        scoreParticipation: moyenne('scoreParticipation'),
-    };
-}).filter(Boolean);
+        const moyenne = champ => {
+            const valeurs = deputes.map(d => d[champ]).filter(v => v !== null && v !== undefined);
+            if (!valeurs.length) return null;
+            return valeurs.reduce((acc, v) => acc + v, 0) / valeurs.length;
+        };
+
+        return {
+            abrev,
+            nom: groupes[abrev]?.nom,
+            couleur: groupes[abrev]?.couleur,
+            logo: groupes[abrev]?.logo,
+            nombreDeputes: deputes.length,
+            scoreLoyaute: moyenne('scoreLoyaute'),
+            scoreParticipation: moyenne('scoreParticipation'),
+        };
+    }).filter(Boolean)
+);
 
 export { normaliserScore, scoreToCouleur };
-
-// Liste plate de tous les députés (utile pour la recherche)
-export const tousLesDeputes = [...deputesMap.values()];
 
 export default deputesMap;

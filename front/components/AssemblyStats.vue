@@ -169,7 +169,7 @@ const champ = computed(() => CHAMP_SCORE[props.vueActive] ?? null);
 
 const stats = computed(() => {
     const tri = champ.value;
-    return [...statsParGroupe].sort((a, b) => {
+    return [...statsParGroupe.value].sort((a, b) => {
         if (!tri) return b.nombreDeputes - a.nombreDeputes;
         const va = a[tri] ?? -1;
         const vb = b[tri] ?? -1;
@@ -182,7 +182,7 @@ const statsVoteParGroupe = computed(() => {
     if (!props.selectedVote?.votantsMap) return [];
     const { votantsMap } = props.selectedVote;
     const parGroupe = {};
-    for (const depute of tousLesDeputes) {
+    for (const depute of tousLesDeputes.value) {
         const position = votantsMap[depute.id];
         if (!position) continue;
         const g = depute.groupe;

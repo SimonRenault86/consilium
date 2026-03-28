@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { groupes, groupeOrdreGaucheaDroite } from '../../front/helpers/partis.js';
+import Depute from '../db/models/Depute.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = Router();
@@ -143,6 +144,17 @@ const parseVoteFile = filename => {
         votantsMap,
     };
 };
+
+// --- API députés ---
+router.get('/api/deputes', async (req, res) => {
+    try {
+        const deputes = await Depute.findAll();
+        res.json(deputes);
+    } catch (err) {
+        console.error('Erreur /api/deputes :', err);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
 
 router.get('/api/votes', (req, res) => {
     const { from, to, limit = '10', q } = req.query;
