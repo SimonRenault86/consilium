@@ -174,6 +174,15 @@
                             :style="{ width: pct(vote.synthese.abstentions, vote.synthese.votants) + '%' }"
                         />
                     </div>
+                    <div class="mt-3">
+                        <a
+                            :href="`/scrutin/${vote.uid}`"
+                            class="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 hover:underline"
+                            @click.stop
+                        >
+                            Voir le scrutin →
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

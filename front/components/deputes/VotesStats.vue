@@ -95,30 +95,34 @@
                 <li
                     v-for="vote in stats.derniersVotes"
                     :key="vote.uid"
-                    class="flex items-start gap-3"
                 >
-                    <span
-                        class="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold uppercase"
-                        :class="{
-                            'bg-emerald-100 text-emerald-700': vote.position === 'pour',
-                            'bg-red-100 text-red-700': vote.position === 'contre',
-                            'bg-slate-100 text-slate-600': vote.position === 'abstention',
-                        }"
+                    <a
+                        :href="`/scrutin/${vote.uid}`"
+                        class="flex items-start gap-3 rounded-xl p-2 -mx-2 hover:bg-slate-50 hover:shadow-sm transition"
                     >
-                        {{ positionLabel(vote.position) }}
-                    </span>
-                    <div class="min-w-0">
-                        <p class="text-sm text-slate-800 leading-snug line-clamp-2">
-                            {{ vote.titre }}
-                        </p>
-                        <p class="text-xs text-slate-400 mt-0.5">
-                            Scrutin n°{{ vote.numero }} · {{ formatDate(vote.dateScrutin) }}
-                            <span
-                                class="ml-1"
-                                :class="vote.sort === 'adopté' ? 'text-emerald-600' : 'text-red-500'"
-                            >· {{ vote.sort }}</span>
-                        </p>
-                    </div>
+                        <span
+                            class="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold uppercase"
+                            :class="{
+                                'bg-emerald-100 text-emerald-700': vote.position === 'pour',
+                                'bg-red-100 text-red-700': vote.position === 'contre',
+                                'bg-slate-100 text-slate-600': vote.position === 'abstention',
+                            }"
+                        >
+                            {{ positionLabel(vote.position) }}
+                        </span>
+                        <div class="min-w-0">
+                            <p class="text-sm text-slate-800 leading-snug line-clamp-2">
+                                {{ vote.titre }}
+                            </p>
+                            <p class="text-xs text-slate-400 mt-0.5">
+                                Scrutin n°{{ vote.numero }} · {{ formatDate(vote.dateScrutin) }}
+                                <span
+                                    class="ml-1"
+                                    :class="vote.sort === 'adopté' ? 'text-emerald-600' : 'text-red-500'"
+                                >· {{ vote.sort }}</span>
+                            </p>
+                        </div>
+                    </a>
                 </li>
             </ul>
         </section>
@@ -167,3 +171,9 @@ onMounted(async () => {
     }
 });
 </script>
+
+<style scoped>
+a:hover {
+    text-decoration: none;
+}
+</style>
