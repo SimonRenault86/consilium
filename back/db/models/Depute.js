@@ -13,9 +13,13 @@ export default class Depute {
         return rows[0] || null;
     }
 
-    // Retourne un député par son slug
+    // Retourne un député par son slug calculé depuis prenom + nom
     static async findBySlug (slug) {
-        const { rows } = await pool.query('SELECT * FROM deputes WHERE slug = $1', [slug]);
+        const { rows } = await pool.query(
+            `SELECT * FROM deputes
+            WHERE lower(regexp_replace(regexp_replace(unaccent(prenom || ' ' || nom), '[^a-zA-Z0-9]+', '-', 'g'), '^-|-$', '', 'g')) = $1`,
+            [slug]
+        );
         return rows[0] || null;
     }
 

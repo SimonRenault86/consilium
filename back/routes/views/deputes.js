@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { groupes } from '../../../front/helpers/partis.js';
-import { formatDate } from './_shared.js';
+import { toSlug, formatDate } from './_shared.js';
 import Depute from '../../db/models/Depute.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -128,7 +128,7 @@ router.get('/depute/:slug', async (req, res) => {
     const deputesSimilaires = memeZone.slice(0, 3).map(d => ({
         prenom: d.prenom,
         nom: d.nom,
-        slug: d.slug,
+        slug: toSlug(`${d.prenom} ${d.nom}`),
         photoUrl: `/elus/${d.id}.jpg`,
         initiales: `${d.prenom[0]}${d.nom[0]}`
     }));
