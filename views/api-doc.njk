@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ title }}</title>
+        <link rel="stylesheet" href="/dist/main.css">
+        <style>
+            body { margin: 0; }
+            redoc-container a { color: inherit; }
+        </style>
+    </head>
+    <body class="min-h-screen bg-white">
+
+        {% include "menu.njk" %}
+
+        <redoc spec-url="/api/openapi.json" suppress-warnings></redoc>
+
+        <script src="https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js"></script>
+    </body>
+</html>
