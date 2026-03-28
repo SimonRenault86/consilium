@@ -15,10 +15,7 @@
         <template v-else-if="depute">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <!-- Mandat -->
-                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
-                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
-                        Mandat
-                    </h2>
+                <Panel title="Mandat">
                     <dl class="space-y-3">
                         <div>
                             <dt class="text-xs text-slate-400 mb-0.5">
@@ -81,13 +78,10 @@
                             </dd>
                         </div>
                     </dl>
-                </section>
+                </Panel>
 
                 <!-- Identité -->
-                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
-                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
-                        Identité
-                    </h2>
+                <Panel title="Identité">
                     <dl class="space-y-3">
                         <div v-if="depute.naissance">
                             <dt class="text-xs text-slate-400 mb-0.5">
@@ -114,7 +108,7 @@
                             </dd>
                         </div>
                     </dl>
-                </section>
+                </Panel>
             </div>
 
             <!-- Commissions & collaborateurs -->
@@ -122,13 +116,10 @@
                 v-if="depute.commissions?.length || depute.mandatPrincipal?.collaborateurs?.length"
                 class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"
             >
-                <section
+                <Panel
                     v-if="depute.commissions?.length"
-                    class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6"
+                    :title="`Commission${depute.commissions.length > 1 ? 's' : ''} permanente${depute.commissions.length > 1 ? 's' : ''}`"
                 >
-                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
-                        Commission{{ depute.commissions.length > 1 ? 's' : '' }} permanente{{ depute.commissions.length > 1 ? 's' : '' }}
-                    </h2>
                     <ul class="space-y-2">
                         <li
                             v-for="commission in depute.commissions"
@@ -145,15 +136,12 @@
                             </span>
                         </li>
                     </ul>
-                </section>
+                </Panel>
 
-                <section
+                <Panel
                     v-if="depute.mandatPrincipal?.collaborateurs?.length"
-                    class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6"
+                    title="Collaborateurs parlementaires"
                 >
-                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
-                        Collaborateurs parlementaires
-                    </h2>
                     <ul class="space-y-2">
                         <li
                             v-for="collaborateur in depute.mandatPrincipal.collaborateurs"
@@ -164,17 +152,15 @@
                             {{ collaborateur }}
                         </li>
                     </ul>
-                </section>
+                </Panel>
             </div>
 
             <!-- Activité parlementaire -->
-            <section
+            <Panel
                 v-if="depute.scoreParticipation != null || depute.scoreLoyaute != null"
-                class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 mb-6"
+                title="Activité parlementaire"
+                class="mb-6"
             >
-                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
-                    Activité parlementaire
-                </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div v-if="depute.scoreParticipation != null">
                         <div class="flex justify-between items-center mb-1.5">
@@ -201,16 +187,14 @@
                         </div>
                     </div>
                 </div>
-            </section>
+            </Panel>
 
             <!-- Contact & liens -->
-            <section
+            <Panel
                 v-if="depute.mail || depute.twitter || depute.facebook || depute.website || depute.hatvpUrl"
-                class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 mb-6"
+                title="Contact & liens"
+                class="mb-6"
             >
-                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
-                    Contact & liens
-                </h2>
                 <div class="flex flex-wrap gap-3">
                     <a
                         v-if="depute.mail"
@@ -246,13 +230,14 @@
                         class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5"
                     ><i class="fa-solid fa-file-lines" /> Déclaration HATVP</a>
                 </div>
-            </section>
+            </Panel>
         </template>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import Panel from '@components/Panel.vue';
 
 const props = defineProps({
     deputeId: { type: String, required: true },

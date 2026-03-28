@@ -1,10 +1,7 @@
 <template>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <!-- Récapitulatif -->
-        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
-            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
-                Votes au scrutin public
-            </h2>
+        <Panel title="Votes au scrutin public">
 
             <div
                 v-if="loading"
@@ -81,16 +78,13 @@
                     </div>
                 </div>
             </template>
-        </section>
+        </Panel>
 
         <!-- 5 derniers scrutins -->
-        <section
+        <Panel
             v-if="stats && stats.derniersVotes.length"
-            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6"
+            title="5 derniers scrutins"
         >
-            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
-                5 derniers scrutins
-            </h2>
             <ul class="space-y-3">
                 <li
                     v-for="vote in stats.derniersVotes"
@@ -125,12 +119,13 @@
                     </a>
                 </li>
             </ul>
-        </section>
+        </Panel>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import Panel from '@components/Panel.vue';
 
 const props = defineProps({
     deputeId: { type: String, required: true },

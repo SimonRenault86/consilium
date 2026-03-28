@@ -14,10 +14,7 @@
         </div>
         <template v-else-if="scrutin">
             <!-- Titre complet -->
-            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 mb-6">
-                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">
-                    Objet du scrutin
-                </h2>
+            <Panel title="Objet du scrutin" class="mb-6">
                 <p class="text-slate-800 leading-relaxed">
                     {{ scrutin.titre }}
                 </p>
@@ -39,13 +36,10 @@
                         </dd>
                     </div>
                 </dl>
-            </section>
+            </Panel>
 
             <!-- Résultat du vote -->
-            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 mb-6">
-                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
-                    Résultat
-                </h2>
+            <Panel title="Résultat" class="mb-6">
                 <div class="flex items-center gap-3 mb-4">
                     <span
                         class="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-bold uppercase"
@@ -121,13 +115,14 @@
                         :style="{ width: pct(scrutin.synthese.abstentions) + '%' }"
                     />
                 </div>
-            </section>
+            </Panel>
         </template>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import Panel from '@components/Panel.vue';
 
 const props = defineProps({
     scrutinUid: { type: String, required: true },
