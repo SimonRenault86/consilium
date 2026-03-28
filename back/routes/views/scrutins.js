@@ -3,6 +3,10 @@ import Vote from '../../db/models/Vote.js';
 
 const router = Router();
 
+router.get('/scrutins', (req, res) => {
+    res.render('scrutins.njk', { title: 'Scrutins — Consilium' });
+});
+
 router.get('/scrutin/:uid', async (req, res) => {
     const { uid } = req.params;
     try {

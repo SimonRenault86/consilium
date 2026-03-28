@@ -5,6 +5,7 @@ import HomePage from '@components/HomePage.vue';
 import DeputeInfo from '@components/deputes/DeputeInfo.vue';
 import VotesStats from '@components/deputes/VotesStats.vue';
 import ScrutinInfo from '@components/scrutins/ScrutinInfo.vue';
+import ScrutinsList from '@components/scrutins/ScrutinsList.vue';
 import { initDeputes } from '@/helpers/deputes.js';
 import { initPartis } from '@/helpers/partis.js';
 
@@ -29,4 +30,9 @@ if (votesStatsEl) {
 const scrutinInfoEl = document.querySelector('scrutin-info');
 if (scrutinInfoEl) {
     createVueApp(ScrutinInfo, { scrutinUid: scrutinInfoEl.dataset.scrutinUid }).mount(scrutinInfoEl);
+}
+
+const scrutinsListEl = document.querySelector('scrutins-list');
+if (scrutinsListEl) {
+    createVueApp(ScrutinsList).mount(scrutinsListEl);
 }
