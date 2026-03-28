@@ -4,8 +4,14 @@
         class="relative flex items-end justify-center px-4 py-6"
     >
         <div class="w-full">
-            <HemicycleFilters v-model="vueActive" />
-            <DeputeSearchBar @pin="onPin" />
+            <HemicycleFilters
+                v-if="!hideFilters"
+                v-model="vueActive"
+            />
+            <DeputeSearchBar
+                v-if="!hideFilters"
+                @pin="onPin"
+            />
             <svg
                 ref="svgEl"
                 :viewBox="`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`"
@@ -180,7 +186,11 @@ const props = defineProps({
     selectedVote: {
         type: Object,
         default: null
-    }
+    },
+    hideFilters: {
+        type: Boolean,
+        default: false
+    },
 });
 
 const emit = defineEmits(['update:vueActive']);

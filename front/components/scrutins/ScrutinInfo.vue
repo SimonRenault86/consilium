@@ -14,7 +14,10 @@
         </div>
         <template v-else-if="scrutin">
             <!-- Titre complet -->
-            <Panel title="Objet du scrutin" class="mb-6">
+            <Panel
+                title="Objet du scrutin"
+                class="mb-6"
+            >
                 <p class="text-slate-800 leading-relaxed">
                     {{ scrutin.titre }}
                 </p>
@@ -38,8 +41,22 @@
                 </dl>
             </Panel>
 
+            <!-- Carte de l'hémicycle -->
+            <section
+                v-if="scrutin.votantsMap"
+                class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6"
+            >
+                <AssemblyMap
+                    :selected-vote="scrutin"
+                    hide-filters
+                />
+            </section>
+
             <!-- Résultat du vote -->
-            <Panel title="Résultat" class="mb-6">
+            <Panel
+                title="Résultat"
+                class="mb-6"
+            >
                 <div class="flex items-center gap-3 mb-4">
                     <span
                         class="inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-bold uppercase"
@@ -123,6 +140,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import Panel from '@components/Panel.vue';
+import AssemblyMap from '@components/AssemblyMap.vue';
+import { initDeputes } from '@/helpers/deputes.js';
+import { initPartis } from '@/helpers/partis.js';
 
 const props = defineProps({
     scrutinUid: { type: String, required: true },
@@ -146,6 +166,7 @@ const pct = value => scrutin.value?.synthese?.votants
     : 0;
 
 onMounted(async () => {
+    await Promise.all([initPartis(), initDeputes()]);
     try {
         const res = await fetch(`/api/votes/${props.scrutinUid}`);
         if (!res.ok) throw new Error();
