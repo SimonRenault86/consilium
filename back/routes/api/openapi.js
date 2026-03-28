@@ -93,6 +93,78 @@ export default {
                 },
             },
         },
+        '/deputes/{id}': {
+            get: {
+                tags: ['Députés'],
+                summary: 'Détail d\'un député',
+                description: 'Retourne toutes les informations d\'un député : identité, mandat, commissions, collaborateurs, scores d\'activité et liens de contact.',
+                operationId: 'getDeputeById',
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        description: 'Identifiant Assemblée Nationale (ex: PA1008)',
+                        schema: { type: 'string', example: 'PA1008' },
+                    },
+                ],
+                responses: {
+                    '200': {
+                        description: 'Informations du député',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/DeputeDetail' },
+                            },
+                        },
+                    },
+                    '404': {
+                        description: 'Député introuvable',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/Erreur' },
+                            },
+                        },
+                    },
+                    '500': { description: 'Erreur serveur' },
+                },
+            },
+        },
+        '/deputes/{id}/votes-stats': {
+            get: {
+                tags: ['Députés'],
+                summary: 'Stats de vote d\'un député',
+                description: 'Retourne le total des votes du député ainsi que sa répartition (pour / contre / abstentions) et ses 5 derniers scrutins.',
+                operationId: 'getDeputeVotesStats',
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        description: 'Identifiant Assemblée Nationale du député (ex: PA1008)',
+                        schema: { type: 'string', example: 'PA1008' },
+                    },
+                ],
+                responses: {
+                    '200': {
+                        description: 'Statistiques de vote',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/VotesStats' },
+                            },
+                        },
+                    },
+                    '404': {
+                        description: 'Aucun vote pour ce député',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/Erreur' },
+                            },
+                        },
+                    },
+                    '500': { description: 'Erreur serveur' },
+                },
+            },
+        },
         '/votes/{uid}': {
             get: {
                 tags: ['Votes'],
@@ -253,10 +325,86 @@ export default {
                     },
                 },
             },
+            DeputeDetail: {
+                type: 'object',
+                properties: {
+                    id: { type: 'string', example: 'PA1008' },
+                    civ: { type: 'string', example: 'M.' },
+                    nom: { type: 'string', example: 'David' },
+                    prenom: { type: 'string', example: 'Alain' },
+                    age: { type: 'integer', example: 76 },
+                    naissance: { type: 'string', format: 'date', example: '1949-06-02' },
+                    villeNaissance: { type: 'string', example: 'Libourne' },
+                    job: { type: 'string', nullable: true },
+                    groupe: { type: 'string', example: 'Socialistes et apparentés' },
+                    groupeAbrev: { type: 'string', example: 'SOC' },
+                    groupeLogo: { type: 'string', nullable: true },
+                    groupeCouleur: { type: 'string', nullable: true },
+                    departementNom: { type: 'string', example: 'Gironde' },
+                    departementCode: { type: 'string', example: '33' },
+                    circo: { type: 'integer', example: 4 },
+                    datePriseFonction: { type: 'string', format: 'date', example: '2024-07-08' },
+                    nombreMandats: { type: 'integer', example: 3 },
+                    experienceDepute: { type: 'string', example: '9 ans' },
+                    scoreParticipation: { type: 'number', nullable: true, example: 0.07 },
+                    scoreLoyaute: { type: 'number', nullable: true, example: 0.912 },
+                    mail: { type: 'string', nullable: true },
+                    twitter: { type: 'string', nullable: true },
+                    facebook: { type: 'string', nullable: true },
+                    website: { type: 'string', nullable: true },
+                    hatvpUrl: { type: 'string', nullable: true },
+                    mandatPrincipal: {
+                        type: 'object',
+                        nullable: true,
+                        properties: {
+                            legislature: { type: 'integer', example: 17 },
+                            region: { type: 'string', nullable: true },
+                            causeMandat: { type: 'string', nullable: true },
+                            placeHemicycle: { type: 'integer', nullable: true },
+                            premiereElection: { type: 'boolean' },
+                            collaborateurs: { type: 'array', items: { type: 'string' } },
+                        },
+                    },
+                    commissions: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                nom: { type: 'string' },
+                                role: { type: 'string', example: 'Membre' },
+                            },
+                        },
+                    },
+                },
+            },
             Erreur: {
                 type: 'object',
                 properties: {
                     error: { type: 'string', example: 'Format de date invalide' },
+                },
+            },
+            VotesStats: {
+                type: 'object',
+                properties: {
+                    total: { type: 'integer', example: 312, description: 'Nombre total de scrutins auxquels le député a participé' },
+                    pour: { type: 'integer', example: 198 },
+                    contre: { type: 'integer', example: 87 },
+                    abstentions: { type: 'integer', example: 27 },
+                    derniersVotes: {
+                        type: 'array',
+                        description: '5 scrutins les plus récents',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                uid: { type: 'string', example: 'VTANR5L17V312' },
+                                numero: { type: 'integer', example: 312 },
+                                titre: { type: 'string' },
+                                sort: { type: 'string', example: 'adopté' },
+                                position: { type: 'string', enum: ['pour', 'contre', 'abstention'] },
+                                dateScrutin: { type: 'string', format: 'date', example: '2025-11-14' },
+                            },
+                        },
+                    },
                 },
             },
         },

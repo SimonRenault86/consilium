@@ -15,7 +15,7 @@
                 <a
                     v-for="seat in seats"
                     :key="seat.seatId"
-                    :href="getDepute(seat.seatId) ? `/elu/${getDepute(seat.seatId).slug}` : undefined"
+                    :href="getDepute(seat.seatId) ? `/depute/${getDepute(seat.seatId).slug}` : undefined"
                     class="seat-link"
                 >
                     <!-- Anneau couleur2 visible au hover ou pin -->

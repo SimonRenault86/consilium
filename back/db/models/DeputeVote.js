@@ -15,6 +15,51 @@ export default class DeputeVote {
         return rows;
     }
 
+    // Stats agrégées + 5 derniers votes d'un député
+    static async findStatsByDepute (idDepute) {
+        const [statsResult, recentsResult] = await Promise.all([
+            pool.query(
+                `SELECT
+                    COUNT(*) AS total,
+                    COUNT(*) FILTER (WHERE position = 'pour') AS pour,
+                    COUNT(*) FILTER (WHERE position = 'contre') AS contre,
+                    COUNT(*) FILTER (WHERE position = 'abstention') AS abstentions,
+                    (SELECT COUNT(*) FROM votes) - COUNT(*) AS non_participation
+                 FROM deputes_votes
+                 WHERE id_depute = $1`,
+                [idDepute]
+            ),
+            pool.query(
+                `SELECT dv.id_vote, dv.position,
+                        v.numero, v.date_scrutin, v.titre, v.sort
+                 FROM deputes_votes dv
+                 JOIN votes v ON v.uid = dv.id_vote
+                 WHERE dv.id_depute = $1
+                 ORDER BY v.numero DESC
+                 LIMIT 5`,
+                [idDepute]
+            ),
+        ]);
+        const s = statsResult.rows[0];
+        return {
+            total: parseInt(s.total, 10),
+            pour: parseInt(s.pour, 10),
+            contre: parseInt(s.contre, 10),
+            abstentions: parseInt(s.abstentions, 10),
+            nonParticipation: parseInt(s.non_participation, 10),
+            derniersVotes: recentsResult.rows.map(v => ({
+                uid: v.id_vote,
+                numero: v.numero,
+                titre: v.titre,
+                sort: v.sort,
+                position: v.position,
+                dateScrutin: v.date_scrutin instanceof Date
+                    ? v.date_scrutin.toISOString().slice(0, 10)
+                    : String(v.date_scrutin).slice(0, 10),
+            })),
+        };
+    }
+
     // Insère les positions de vote en bulk pour un scrutin donné
     // votants : [{ id_depute, position }]
     static async insertBulk (idVote, votants, client) {

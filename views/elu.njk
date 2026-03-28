@@ -196,9 +196,81 @@
         </div>
     </section>
 
+    {# Récapitulatif des votes #}
+    {% if votesStats %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Votes au scrutin public</h2>
+            <p class="text-3xl font-bold text-slate-900 mb-4">{{ votesStats.total }}</p>
+            <div class="space-y-3">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm text-slate-600 flex items-center gap-1.5">
+                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500"></span>Pour
+                        </span>
+                        <span class="text-sm font-semibold text-slate-800">{{ votesStats.pour }}</span>
+                    </div>
+                    <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-emerald-500 rounded-full" style="width: {{ (votesStats.pour / votesStats.total * 100) | round }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm text-slate-600 flex items-center gap-1.5">
+                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500"></span>Contre
+                        </span>
+                        <span class="text-sm font-semibold text-slate-800">{{ votesStats.contre }}</span>
+                    </div>
+                    <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-red-500 rounded-full" style="width: {{ (votesStats.contre / votesStats.total * 100) | round }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm text-slate-600 flex items-center gap-1.5">
+                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-300"></span>Abstentions
+                        </span>
+                        <span class="text-sm font-semibold text-slate-800">{{ votesStats.abstentions }}</span>
+                    </div>
+                    <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-slate-300 rounded-full" style="width: {{ (votesStats.abstentions / votesStats.total * 100) | round }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {% if derniersVotes.length %}
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">5 derniers scrutins</h2>
+            <ul class="space-y-3">
+                {% for vote in derniersVotes %}
+                <li class="flex items-start gap-3">
+                    <span class="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold uppercase
+                        {% if vote.position === 'pour' %}bg-emerald-100 text-emerald-700
+                        {% elif vote.position === 'contre' %}bg-red-100 text-red-700
+                        {% else %}bg-slate-100 text-slate-600{% endif %}">
+                        {% if vote.position === 'pour' %}Pour
+                        {% elif vote.position === 'contre' %}Contre
+                        {% else %}Abst.{% endif %}
+                    </span>
+                    <div class="min-w-0">
+                        <p class="text-sm text-slate-800 leading-snug line-clamp-2">{{ vote.titre }}</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Scrutin n°{{ vote.numero }} · {{ vote.dateScrutin }}
+                            <span class="ml-1 {% if vote.sort === 'adopté' %}text-emerald-600{% else %}text-red-500{% endif %}">· {{ vote.sort }}</span>
+                        </p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+    </div>
+    {% endif %}
+
     {# Contact & liens #}
-    {% if depute.mail or depute.twitter or depute.facebook or depute.website or hatvpUrl %}
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+    {% if depute.mail or depute.twitter or depute.facebook or depute.website or hatvpUrl %}    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
         <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Contact & liens</h2>
         <div class="flex flex-wrap gap-3">
             {% if depute.mail %}

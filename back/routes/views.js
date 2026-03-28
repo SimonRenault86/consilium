@@ -120,13 +120,13 @@ router.get('/partis', (req, res) => {
     });
 });
 
-router.get('/elu/:slug', (req, res) => {
+router.get('/depute/:slug', (req, res) => {
     const { slug } = req.params;
     const deputeRaw = deputes.find(d => toSlug(`${d.prenom} ${d.nom}`) === slug);
 
     if (!deputeRaw) {
-        return res.status(404).render('elu.njk', {
-            title: 'Élu introuvable — Consilium',
+        return res.status(404).render('depute.njk', {
+            title: 'Député introuvable — Consilium',
             slug,
             depute: null,
             groupe: null,
@@ -184,7 +184,7 @@ router.get('/elu/:slug', (req, res) => {
         initiales: `${d.prenom[0]}${d.nom[0]}`
     }));
 
-    res.render('elu.njk', {
+    res.render('depute.njk', {
         title: `${depute.civ} ${depute.prenom} ${depute.nom} — Consilium`,
         slug,
         depute,
