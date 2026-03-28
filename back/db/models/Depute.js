@@ -13,6 +13,12 @@ export default class Depute {
         return rows[0] || null;
     }
 
+    // Retourne un député par son slug
+    static async findBySlug (slug) {
+        const { rows } = await pool.query('SELECT * FROM deputes WHERE slug = $1', [slug]);
+        return rows[0] || null;
+    }
+
     // Retourne tous les députés d'un groupe politique (ex: "SOC")
     static async findByGroupe (groupeAbrev) {
         const { rows } = await pool.query(

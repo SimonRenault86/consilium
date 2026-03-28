@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { groupes } from '../../../front/helpers/partis.js';
-import { toSlug, formatDate } from './_shared.js';
+import { formatDate } from './_shared.js';
 import Depute from '../../db/models/Depute.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,17 +62,9 @@ const router = Router();
 
 router.get('/depute/:slug', async (req, res) => {
     const { slug } = req.params;
-    const rows = await Depute.findAll();
-    const deputeRaw = rows.map(r => ({
-        id: r.id, prenom: r.prenom, nom: r.nom, civ: r.civ,
-        naissance: r.naissance, groupeAbrev: r.groupe_abrev,
-        departementCode: r.departement_code, departementNom: r.departement_nom,
-        circo: r.circo, slug: r.slug, datePriseFonction: r.date_prise_fonction,
-        scoreParticipation: r.score_participation, scoreLoyaute: r.score_loyaute,
-        nombreMandats: r.nombre_mandats,
-    })).find(d => d.slug === slug);
+    const r = await Depute.findBySlug(slug);
 
-    if (!deputeRaw) {
+    if (!r) {
         return res.status(404).render('depute.njk', {
             title: 'Député introuvable — Consilium',
             slug,
@@ -84,6 +76,15 @@ router.get('/depute/:slug', async (req, res) => {
             deputesSimilaires: []
         });
     }
+
+    const deputeRaw = {
+        id: r.id, prenom: r.prenom, nom: r.nom, civ: r.civ,
+        naissance: r.naissance, groupeAbrev: r.groupe_abrev,
+        departementCode: r.departement_code, departementNom: r.departement_nom,
+        circo: r.circo, slug: r.slug, datePriseFonction: r.date_prise_fonction,
+        scoreParticipation: r.score_participation, scoreLoyaute: r.score_loyaute,
+        nombreMandats: r.nombre_mandats,
+    };
 
     let hatvpUrl = null;
     let mandatPrincipal = null;
@@ -111,12 +112,12 @@ router.get('/depute/:slug', async (req, res) => {
             : null
     };
 
-    let memeZone = rows.filter(d => d.departement_code === deputeRaw.departementCode && d.id !== deputeRaw.id);
+    const similairesRows = await Depute.findByDepartement(r.departement_code);
+    let memeZone = similairesRows.filter(d => d.id !== r.id);
     if (memeZone.length < 3) {
-        const memeRegion = rows.filter(d =>
-            d.departement_code !== deputeRaw.departementCode
-            && d.id !== deputeRaw.id
-            && !memeZone.some(x => x.id === d.id)
+        const autresRows = await Depute.findAll();
+        const memeRegion = autresRows.filter(d =>
+            d.departement_code !== r.departement_code && d.id !== r.id
         );
         memeZone = [...memeZone, ...memeRegion];
     }

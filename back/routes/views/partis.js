@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { groupes, groupeOrdreGaucheaDroite } from '../../../front/helpers/partis.js';
-import { toSlug } from './_shared.js';
 import Depute from '../../db/models/Depute.js';
 
 const router = Router();
