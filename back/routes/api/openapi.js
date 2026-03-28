@@ -10,10 +10,67 @@ export default {
     },
     servers: [{ url: '/api', description: 'Serveur principal' }],
     tags: [
+        { name: 'Partis', description: 'Groupes politiques de la 17e législature' },
         { name: 'Députés', description: 'Données sur les députés de la 17e législature' },
         { name: 'Votes', description: 'Scrutins publics de l\'Assemblée Nationale' },
     ],
     paths: {
+        '/partis': {
+            get: {
+                tags: ['Partis'],
+                summary: 'Liste tous les groupes politiques',
+                description: 'Retourne la liste des groupes politiques de la 17e législature, triés de gauche à droite.',
+                operationId: 'getPartis',
+                responses: {
+                    '200': {
+                        description: 'Liste des groupes politiques',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'array',
+                                    items: { $ref: '#/components/schemas/Parti' },
+                                },
+                            },
+                        },
+                    },
+                    '500': { description: 'Erreur serveur' },
+                },
+            },
+        },
+        '/partis/{abrev}': {
+            get: {
+                tags: ['Partis'],
+                summary: 'Récupère un groupe politique par son abréviation',
+                operationId: 'getPartiByAbrev',
+                parameters: [
+                    {
+                        name: 'abrev',
+                        in: 'path',
+                        required: true,
+                        description: 'Abréviation du groupe (ex: SOC, RN, EPR)',
+                        schema: { type: 'string', example: 'SOC' },
+                    },
+                ],
+                responses: {
+                    '200': {
+                        description: 'Groupe politique',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/Parti' },
+                            },
+                        },
+                    },
+                    '404': {
+                        description: 'Parti introuvable',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/Erreur' },
+                            },
+                        },
+                    },
+                },
+            },
+        },
         '/deputes': {
             get: {
                 tags: ['Députés'],
@@ -94,6 +151,17 @@ export default {
     },
     components: {
         schemas: {
+            Parti: {
+                type: 'object',
+                properties: {
+                    abrev: { type: 'string', example: 'SOC', description: 'Abréviation officielle du groupe' },
+                    nom: { type: 'string', example: 'Socialistes et apparentés' },
+                    couleur: { type: 'string', example: '#e4032e', description: 'Couleur principale (hex)' },
+                    couleur2: { type: 'string', example: '#f7a1b0', description: 'Couleur secondaire (hex)' },
+                    logo: { type: 'string', nullable: true, example: '/partis/soc.jpeg', description: 'Chemin vers le logo' },
+                    ordre: { type: 'integer', example: 4, description: 'Position sur l\'échiquier politique (1 = extrême gauche)' },
+                },
+            },
             Depute: {
                 type: 'object',
                 properties: {

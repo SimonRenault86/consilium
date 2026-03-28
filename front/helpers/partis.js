@@ -32,3 +32,20 @@ export const groupeOrdreGaucheaDroite = {
 
 // Retourne l'URL du logo d'un groupe — null si absent
 export const getLogoUrl = groupe => groupes[groupe]?.logo || null;
+
+// Charge les partis depuis l'API et met à jour les objets en place
+// Les données statiques ci-dessus servent de fallback si l'API est indisponible
+export const initPartis = async () => {
+    const res = await fetch('/api/partis');
+    const partis = await res.json();
+
+    for (const parti of partis) {
+        groupes[parti.abrev] = {
+            nom: parti.nom,
+            couleur: parti.couleur,
+            couleur2: parti.couleur2,
+            logo: parti.logo,
+        };
+        groupeOrdreGaucheaDroite[parti.abrev] = parti.ordre;
+    }
+};
