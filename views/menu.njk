@@ -4,7 +4,9 @@
             <span>🏛</span>
             <span>Consilium</span>
         </a>
-        <div class="flex items-center gap-6">
+
+        <!-- Liens desktop -->
+        <div class="hidden md:flex items-center gap-6">
             <a href="/" class="text-sm text-slate-600 hover:text-slate-900">Hémicycle</a>
             <a href="/scrutins" class="text-sm text-slate-600 hover:text-slate-900">Scrutins</a>
             <a href="/partis" class="text-sm text-slate-600 hover:text-slate-900">Groupes</a>
@@ -22,5 +24,33 @@
                 </div>
             </div>
         </div>
+
+        <!-- Burger mobile -->
+        <button
+            id="burger-btn"
+            class="md:hidden flex flex-col justify-center items-center gap-1.5 w-8 h-8"
+            aria-label="Menu"
+            onclick="
+                const open = document.getElementById('mobile-menu').classList.toggle('hidden');
+                this.setAttribute('aria-expanded', !open);
+            "
+        >
+            <span class="block w-5 h-0.5 bg-slate-700 transition-all duration-200"></span>
+            <span class="block w-5 h-0.5 bg-slate-700 transition-all duration-200"></span>
+            <span class="block w-5 h-0.5 bg-slate-700 transition-all duration-200"></span>
+        </button>
     </nav>
+
+    <!-- Menu mobile -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-100">
+        <div class="flex flex-col px-4 py-3 gap-0.5">
+            <a href="/" class="px-3 py-2.5 text-sm text-slate-700 rounded-lg hover:bg-slate-50">Hémicycle</a>
+            <a href="/scrutins" class="px-3 py-2.5 text-sm text-slate-700 rounded-lg hover:bg-slate-50">Scrutins</a>
+            <a href="/partis" class="px-3 py-2.5 text-sm text-slate-700 rounded-lg hover:bg-slate-50">Groupes</a>
+            <div class="mt-2 border-t border-slate-100 pt-2">
+                <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Outils</p>
+                <a href="/outils/majorite-builder" class="px-3 py-2.5 text-sm text-slate-700 rounded-lg hover:bg-slate-50 block">Majorité Builder</a>
+            </div>
+        </div>
+    </div>
 </header>
