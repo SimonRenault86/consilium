@@ -111,26 +111,28 @@ export const getCouleurScoreSiege = (seatId, champ) => {
 export const tousLesDeputes = computed(() => [..._map.value.values()]);
 
 export const statsParGroupe = computed(() =>
-    Object.keys(groupeOrdreGaucheaDroite).map(abrev => {
-        const deputes = [..._map.value.values()].filter(d => d.groupe === abrev);
-        if (!deputes.length) return null;
+    Object.keys(groupeOrdreGaucheaDroite)
+        .sort((a, b) => groupeOrdreGaucheaDroite[a] - groupeOrdreGaucheaDroite[b])
+        .map(abrev => {
+            const deputes = [..._map.value.values()].filter(d => d.groupe === abrev);
+            if (!deputes.length) return null;
 
-        const moyenne = champ => {
-            const valeurs = deputes.map(d => d[champ]).filter(v => v !== null && v !== undefined);
-            if (!valeurs.length) return null;
-            return valeurs.reduce((acc, v) => acc + v, 0) / valeurs.length;
-        };
+            const moyenne = champ => {
+                const valeurs = deputes.map(d => d[champ]).filter(v => v !== null && v !== undefined);
+                if (!valeurs.length) return null;
+                return valeurs.reduce((acc, v) => acc + v, 0) / valeurs.length;
+            };
 
-        return {
-            abrev,
-            nom: groupes[abrev]?.nom,
-            couleur: groupes[abrev]?.couleur,
-            logo: groupes[abrev]?.logo,
-            nombreDeputes: deputes.length,
-            scoreLoyaute: moyenne('scoreLoyaute'),
-            scoreParticipation: moyenne('scoreParticipation'),
-        };
-    }).filter(Boolean)
+            return {
+                abrev,
+                nom: groupes[abrev]?.nom,
+                couleur: groupes[abrev]?.couleur,
+                logo: groupes[abrev]?.logo,
+                nombreDeputes: deputes.length,
+                scoreLoyaute: moyenne('scoreLoyaute'),
+                scoreParticipation: moyenne('scoreParticipation'),
+            };
+        }).filter(Boolean)
 );
 
 export { normaliserScore, scoreToCouleur };

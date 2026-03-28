@@ -6,6 +6,7 @@ import DeputeInfo from '@components/deputes/DeputeInfo.vue';
 import VotesStats from '@components/deputes/VotesStats.vue';
 import ScrutinInfo from '@components/scrutins/ScrutinInfo.vue';
 import ScrutinsList from '@components/scrutins/ScrutinsList.vue';
+import MajoriteBuilder from '@components/outils/MajoriteBuilder.vue';
 import { initDeputes } from '@/helpers/deputes.js';
 import { initPartis } from '@/helpers/partis.js';
 
@@ -35,4 +36,9 @@ if (scrutinInfoEl) {
 const scrutinsListEl = document.querySelector('scrutins-list');
 if (scrutinsListEl) {
     createVueApp(ScrutinsList).mount(scrutinsListEl);
+}
+
+const majoriteBuilderEl = document.querySelector('majorite-builder');
+if (majoriteBuilderEl) {
+    createVueApp(MajoriteBuilder).mount(majoriteBuilderEl);
 }

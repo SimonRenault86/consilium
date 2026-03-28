@@ -3,6 +3,7 @@ import homeRouter from './views/home.js';
 import partisRouter from './views/partis.js';
 import deputesRouter from './views/deputes.js';
 import scrutinsRouter from './views/scrutins.js';
+import outilsRouter from './views/outils.js';
 
 const router = Router();
 
@@ -10,5 +11,6 @@ router.use('/', homeRouter);
 router.use('/', partisRouter);
 router.use('/', deputesRouter);
 router.use('/', scrutinsRouter);
+router.use('/', outilsRouter);
 
 export default router;

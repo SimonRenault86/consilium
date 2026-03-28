@@ -8,6 +8,19 @@
             <a href="/" class="text-sm text-slate-600 hover:text-slate-900">Hémicycle</a>
             <a href="/scrutins" class="text-sm text-slate-600 hover:text-slate-900">Scrutins</a>
             <a href="/partis" class="text-sm text-slate-600 hover:text-slate-900">Groupes</a>
+            <div class="group relative">
+                <button class="flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900">
+                    Outils
+                    <svg class="h-3.5 w-3.5 transition-transform duration-150 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div class="absolute right-0 top-full hidden pt-1 group-hover:block">
+                    <div class="w-52 rounded-xl border border-slate-200 bg-white py-1.5 shadow-lg">
+                        <a href="/outils/majorite-builder" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Majorité Builder</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 </header>
