@@ -63,6 +63,12 @@ const allFiles = readdirSync(VOTES_DIR)
 const BATCH_SIZE = 50;
 
 const run = async () => {
+    // Précharger les IDs des députés connus pour filtrer les votants
+    // (les fichiers votes contiennent des acteurRef d'autres législatures absents de notre table)
+    const { rows: deputeRows } = await pool.query('SELECT id FROM deputes');
+    const deputesConnus = new Set(deputeRows.map(r => r.id));
+    console.log(`${deputesConnus.size} députés chargés pour filtrage.`);
+
     console.log(`Import de ${allFiles.length} votes...`);
     let done = 0;
     let errors = 0;
@@ -75,8 +81,9 @@ const run = async () => {
             for (const filename of batch) {
                 try {
                     const { vote, votants } = parseVoteFile(filename);
+                    const votantsConnus = votants.filter(v => deputesConnus.has(v.id_depute));
                     await Vote.upsert(vote);
-                    await DeputeVote.insertBulk(vote.uid, votants, client);
+                    await DeputeVote.insertBulk(vote.uid, votantsConnus, client);
                     done++;
                 } catch (e) {
                     errors++;
