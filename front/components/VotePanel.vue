@@ -118,6 +118,12 @@
                     >
                         Demandé par : {{ vote.demandeur }}
                     </p>
+                    <p
+                        v-if="vote.typeVote"
+                        class="text-xs text-slate-500 mb-3"
+                    >
+                        Type : <span class="font-medium">{{ vote.typeVote.libelle }}</span>
+                    </p>
 
                     <div class="flex items-center gap-4 text-sm">
                         <div class="flex items-center gap-1.5">

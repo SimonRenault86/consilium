@@ -31,9 +31,11 @@ export default class DeputeVote {
             ),
             pool.query(
                 `SELECT dv.id_vote, dv.position,
-                        v.numero, v.date_scrutin, v.titre, v.sort
+                        v.numero, v.date_scrutin, v.titre, v.sort,
+                        v.code_type_vote, tv.libelle AS type_vote_libelle
                  FROM deputes_votes dv
                  JOIN votes v ON v.uid = dv.id_vote
+                 LEFT JOIN type_votes tv ON tv.code = v.code_type_vote
                  WHERE dv.id_depute = $1
                  ORDER BY v.numero DESC
                  LIMIT 5`,
@@ -53,6 +55,7 @@ export default class DeputeVote {
                 titre: v.titre,
                 sort: v.sort,
                 position: v.position,
+                typeVote: v.code_type_vote ? { code: v.code_type_vote, libelle: v.type_vote_libelle } : null,
                 dateScrutin: v.date_scrutin instanceof Date
                     ? v.date_scrutin.toISOString().slice(0, 10)
                     : String(v.date_scrutin).slice(0, 10),

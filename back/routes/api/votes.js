@@ -12,6 +12,8 @@ const serialize = row => ({
     titre: row.titre,
     sort: row.sort,
     demandeur: row.demandeur,
+    typeVote: row.code_type_vote ? { code: row.code_type_vote, libelle: row.type_vote_libelle } : null,
+    typeMajorite: row.type_majorite || null,
     synthese: {
         votants: row.nb_votants,
         pour: row.nb_pour,

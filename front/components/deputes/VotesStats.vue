@@ -2,7 +2,6 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <!-- Récapitulatif -->
         <Panel title="Votes au scrutin public">
-
             <div
                 v-if="loading"
                 class="text-sm text-slate-400"
@@ -85,40 +84,17 @@
             v-if="stats && stats.derniersVotes.length"
             title="5 derniers scrutins"
         >
-            <ul class="space-y-3">
-                <li
+            <div class="space-y-2">
+                <ScrutinCard
                     v-for="vote in stats.derniersVotes"
                     :key="vote.uid"
-                >
-                    <a
-                        :href="`/scrutin/${vote.uid}`"
-                        class="flex items-start gap-3 rounded-xl p-2 -mx-2 hover:bg-slate-50 hover:shadow-sm transition"
-                    >
-                        <span
-                            class="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold uppercase"
-                            :class="{
-                                'bg-emerald-100 text-emerald-700': vote.position === 'pour',
-                                'bg-red-100 text-red-700': vote.position === 'contre',
-                                'bg-slate-100 text-slate-600': vote.position === 'abstention',
-                            }"
-                        >
-                            {{ positionLabel(vote.position) }}
-                        </span>
-                        <div class="min-w-0">
-                            <p class="text-sm text-slate-800 leading-snug line-clamp-2">
-                                {{ vote.titre }}
-                            </p>
-                            <p class="text-xs text-slate-400 mt-0.5">
-                                Scrutin n°{{ vote.numero }} · {{ formatDate(vote.dateScrutin) }}
-                                <span
-                                    class="ml-1"
-                                    :class="vote.sort === 'adopté' ? 'text-emerald-600' : 'text-red-500'"
-                                >· {{ vote.sort }}</span>
-                            </p>
-                        </div>
-                    </a>
-                </li>
-            </ul>
+                    :scrutin="vote"
+                    :position="vote.position"
+                    :href="`/scrutin/${vote.uid}`"
+                    :show-stats="false"
+                    compact
+                />
+            </div>
         </Panel>
     </div>
 </template>
@@ -126,6 +102,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import Panel from '@components/Panel.vue';
+import ScrutinCard from '@components/scrutins/ScrutinCard.vue';
 
 const props = defineProps({
     deputeId: { type: String, required: true },
@@ -147,12 +124,6 @@ const pct = value => stats.value?.total ? Math.round((value / stats.value.total)
 
 const totalScrutins = () => (stats.value?.total ?? 0) + (stats.value?.nonParticipation ?? 0);
 const pctTotal = value => totalScrutins() ? Math.round((value / totalScrutins()) * 100) : 0;
-
-const positionLabel = position => {
-    if (position === 'pour') return 'Pour';
-    if (position === 'contre') return 'Contre';
-    return 'Abst.';
-};
 
 onMounted(async () => {
     try {

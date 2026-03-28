@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import pool from '../dbManager.js';
 import Vote from '../models/Vote.js';
+import TypeVote from '../models/TypeVote.js';
 import DeputeVote from '../models/DeputeVote.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -33,6 +34,10 @@ const parseVoteFile = filename => {
 
     const decompte = s.syntheseVote?.decompte || {};
     return {
+        typeVote: {
+            code: s.typeVote?.codeTypeVote || null,
+            libelle: s.typeVote?.libelleTypeVote || null,
+        },
         vote: {
             uid: s.uid,
             numero: parseInt(s.numero, 10),
@@ -41,7 +46,7 @@ const parseVoteFile = filename => {
             titre: s.titre,
             sort: s.sort?.code || null,
             demandeur: s.demandeur?.texte || null,
-            type_vote: s.typeVote?.libelleTypeVote || null,
+            code_type_vote: s.typeVote?.codeTypeVote || null,
             type_majorite: s.typeVote?.typeMajorite || null,
             nb_votants: parseInt(s.syntheseVote?.nombreVotants || '0', 10),
             suffrages_exprimes: parseInt(s.syntheseVote?.suffragesExprimes || '0', 10),
@@ -80,8 +85,9 @@ const run = async () => {
             await client.query('BEGIN');
             for (const filename of batch) {
                 try {
-                    const { vote, votants } = parseVoteFile(filename);
+                    const { typeVote, vote, votants } = parseVoteFile(filename);
                     const votantsConnus = votants.filter(v => deputesConnus.has(v.id_depute));
+                    if (typeVote.code) await TypeVote.upsert(typeVote);
                     await Vote.upsert(vote);
                     await DeputeVote.insertBulk(vote.uid, votantsConnus, client);
                     done++;
