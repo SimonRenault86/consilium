@@ -139,13 +139,6 @@
                 <span class="text-xs text-slate-500">100 %</span>
             </div>
 
-            <div
-                v-if="!hoveredDepute"
-                class="mt-2 text-center text-xs text-slate-400"
-            >
-                Survolez un siège pour afficher le député
-            </div>
-
             <AssemblyStats
                 v-model:hovered-groupe="hoveredGroupe"
                 :vue-active="vueActive"
