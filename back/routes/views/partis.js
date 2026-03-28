@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { groupes, groupeOrdreGaucheaDroite } from '../../../front/helpers/partis.js';
+import { toSlug } from './_shared.js';
 import Depute from '../../db/models/Depute.js';
 
 const router = Router();
@@ -17,7 +18,7 @@ router.get('/partis', async (req, res) => {
                     prenom: d.prenom,
                     nom: d.nom,
                     departementNom: d.departement_nom,
-                    slug: d.slug,
+                    slug: toSlug(`${d.prenom} ${d.nom}`),
                     initiales: `${d.prenom[0]}${d.nom[0]}`
                 }));
             if (!membres.length) return null;
