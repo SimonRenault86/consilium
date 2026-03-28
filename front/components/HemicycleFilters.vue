@@ -1,9 +1,9 @@
 <template>
-    <div class="flex items-center justify-center gap-2 mb-4">
+    <div class="flex flex-wrap items-center justify-center gap-2 mb-4">
         <button
             v-for="vue in vues"
             :key="vue.id"
-            class="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-150 border"
+            class="flex items-center gap-1.5 rounded-full px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all duration-150 border"
             :class="modelValue === vue.id
                 ? 'bg-slate-900 text-white border-slate-900'
                 : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'"

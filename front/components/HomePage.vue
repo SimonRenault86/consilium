@@ -4,10 +4,7 @@
             <AssemblyMap :selected-vote="selectedVote" />
         </section>
 
-        <section
-            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col"
-            style="height: calc(100vh - 8rem); position: sticky; top: 5rem;"
-        >
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col h-[26rem] sm:h-[30rem] lg:h-[calc(100vh-8rem)] lg:sticky lg:top-20">
             <VotePanel @select="onVoteSelect" />
         </section>
     </div>

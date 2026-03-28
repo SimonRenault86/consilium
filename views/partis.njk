@@ -1,8 +1,8 @@
 {% extends "layout.njk" %}
 
 {% block content %}
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-slate-900">Groupes politiques</h1>
+    <div class="mb-5 sm:mb-6">
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">Groupes politiques</h1>
         <p class="text-slate-400 text-sm mt-1">{{ totalDeputes }} député{{ 's' if totalDeputes > 1 }} répartis en {{ groupes.length }} groupe{{ 's' if groupes.length > 1 }}</p>
     </div>
 

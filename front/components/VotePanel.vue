@@ -46,28 +46,29 @@
         </div>
 
         <!-- Filtre par dates -->
-        <div class="flex items-center gap-2 mb-3">
+        <div class="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-1.5 mb-3">
             <input
                 v-model="dateFrom"
                 type="date"
-                class="flex-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400"
+                class="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400 min-w-0"
                 @change="applyFilter"
             >
-            <span class="text-xs text-slate-400">→</span>
+            <span class="text-xs text-slate-400 px-0.5">→</span>
             <input
                 v-model="dateTo"
                 type="date"
-                class="flex-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400"
+                class="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400 min-w-0"
                 @change="applyFilter"
             >
             <button
                 v-if="dateFrom || dateTo"
-                class="text-xs text-slate-400 hover:text-slate-700"
+                class="text-xs text-slate-400 hover:text-slate-700 px-0.5"
                 title="Effacer le filtre"
                 @click="clearFilter"
             >
                 ✕
             </button>
+            <div v-else />
         </div>
 
         <!-- États de chargement / erreur / vide -->
