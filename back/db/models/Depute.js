@@ -2,19 +2,19 @@ import pool from '../dbManager.js';
 
 export default class Depute {
     // Retourne tous les députés
-    static async findAll() {
+    static async findAll () {
         const { rows } = await pool.query('SELECT * FROM deputes ORDER BY nom, prenom');
         return rows;
     }
 
     // Retourne un député par son id (ex: "PA1008")
-    static async findById(id) {
+    static async findById (id) {
         const { rows } = await pool.query('SELECT * FROM deputes WHERE id = $1', [id]);
         return rows[0] || null;
     }
 
     // Retourne tous les députés d'un groupe politique (ex: "SOC")
-    static async findByGroupe(groupeAbrev) {
+    static async findByGroupe (groupeAbrev) {
         const { rows } = await pool.query(
             'SELECT * FROM deputes WHERE groupe_abrev = $1 ORDER BY nom, prenom',
             [groupeAbrev]
@@ -23,7 +23,7 @@ export default class Depute {
     }
 
     // Retourne tous les députés d'un département (ex: "33")
-    static async findByDepartement(departementCode) {
+    static async findByDepartement (departementCode) {
         const { rows } = await pool.query(
             'SELECT * FROM deputes WHERE departement_code = $1 ORDER BY circo',
             [departementCode]
@@ -32,7 +32,7 @@ export default class Depute {
     }
 
     // Insère ou met à jour un député (upsert sur l'id)
-    static async upsert(depute) {
+    static async upsert (depute) {
         const { rows } = await pool.query(
             `INSERT INTO deputes (
                 id, legislature, civ, nom, prenom, ville_naissance, naissance, age,
@@ -91,7 +91,7 @@ export default class Depute {
     }
 
     // Insère ou met à jour plusieurs députés en une seule transaction
-    static async upsertMany(deputes) {
+    static async upsertMany (deputes) {
         const client = await pool.connect();
         try {
             await client.query('BEGIN');
