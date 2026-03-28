@@ -7,6 +7,7 @@
         "dev:front": "vite build --watch",
         "dev": "concurrently \"npm run dev:back\" \"npm run dev:front\"",
         "build": "vite build",
+        "heroku-postbuild": "vite build",
         "start": "node back/server.js",
         "seed:deputes": "node back/db/seeds/deputes.js",
         "seed:partis": "node back/db/seeds/partis.js",
