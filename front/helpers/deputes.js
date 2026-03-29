@@ -15,8 +15,10 @@ export const getPhotoUrl = depute => depute?.id ? `/elus/${depute.id}.jpg` : nul
 
 // Store réactif : shallowRef sur la Map pour que les computed Vue se mettent à jour
 const _map = shallowRef(new Map());
-
 export const deputesMap = _map;
+
+import { ref } from 'vue';
+export const isDeputesReady = ref(false);
 
 // Charge les députés depuis l'API et peuple la Map (appelé au démarrage)
 export const initDeputes = async () => {
@@ -65,6 +67,7 @@ export const initDeputes = async () => {
     });
 
     _map.value = newMap;
+    isDeputesReady.value = true;
 };
 
 export const getDepute = seatId => _map.value.get(seatId) || null;

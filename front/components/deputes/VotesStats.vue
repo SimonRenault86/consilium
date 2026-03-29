@@ -2,18 +2,15 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <!-- Récapitulatif -->
         <Panel title="Votes au scrutin public">
-            <div
+            <LoadingState
                 v-if="loading"
-                class="text-sm text-slate-400"
-            >
-                Chargement…
-            </div>
-            <div
+                class="py-6"
+            />
+            <ErrorState
                 v-else-if="error"
-                class="text-sm text-red-400"
-            >
-                Données indisponibles
-            </div>
+                class="py-6"
+                message="Données indisponibles"
+            />
             <template v-else-if="stats">
                 <p class="text-3xl font-bold text-slate-900 mb-4">
                     {{ stats.total }}
@@ -130,6 +127,8 @@
 import { ref, onMounted } from 'vue';
 import Panel from '@components/Panel.vue';
 import ScrutinCard from '@components/scrutins/ScrutinCard.vue';
+import LoadingState from '@components/LoadingState.vue';
+import ErrorState from '@components/ErrorState.vue';
 
 const props = defineProps({
     deputeId: { type: String, required: true },

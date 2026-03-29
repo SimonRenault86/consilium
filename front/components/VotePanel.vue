@@ -3,7 +3,7 @@
         <!-- En-tête -->
         <div class="flex items-center justify-between mb-3">
             <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest py-3">
-                Derniers votes
+                Derniers scrutins
             </h2>
             <ButtonBase
                 v-if="selectedVote"
@@ -49,24 +49,18 @@
         </div>
 
         <!-- États de chargement / erreur / vide -->
-        <div
+        <LoadingState
             v-if="loading"
-            class="flex-1 flex items-center justify-center text-xs text-slate-400"
-        >
-            Chargement…
-        </div>
-        <div
+            class="flex-1 py-8"
+        />
+        <ErrorState
             v-else-if="error"
-            class="flex-1 flex items-center justify-center text-xs text-red-400"
-        >
-            Erreur de chargement
-        </div>
-        <div
+            class="flex-1 py-8"
+        />
+        <EmptyState
             v-else-if="!votes.length"
-            class="flex-1 flex items-center justify-center text-xs text-slate-400"
-        >
-            Aucun résultat
-        </div>
+            class="flex-1 py-8"
+        />
 
         <!-- Liste des votes -->
         <div
@@ -176,6 +170,9 @@ import ButtonLink from '@components/ButtonLink.vue';
 import ButtonBase from '@components/ButtonBase.vue';
 import SearchBar from '@components/SearchBar.vue';
 import ScrutinCategorie from '@components/scrutins/ScrutinCategorie.vue';
+import LoadingState from '@components/LoadingState.vue';
+import ErrorState from '@components/ErrorState.vue';
+import EmptyState from '@components/EmptyState.vue';
 
 const emit = defineEmits(['select']);
 

@@ -2,15 +2,15 @@
     <div>
         <div
             v-if="loading"
-            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6 text-sm text-slate-400"
+            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6"
         >
-            Chargement…
+            <LoadingState />
         </div>
         <div
             v-else-if="error"
-            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6 text-sm text-red-400"
+            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6"
         >
-            Impossible de charger les informations.
+            <ErrorState message="Impossible de charger les informations." />
         </div>
         <template v-else-if="depute">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -238,6 +238,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import Panel from '@components/Panel.vue';
+import LoadingState from '@components/LoadingState.vue';
+import ErrorState from '@components/ErrorState.vue';
 
 const props = defineProps({
     deputeId: { type: String, required: true },

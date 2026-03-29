@@ -9,24 +9,19 @@
             />
         </div>
 
-        <div
+        <LoadingState
             v-if="loading"
-            class="flex items-center justify-center py-16 text-slate-400 text-sm"
-        >
-            Chargement…
-        </div>
-        <div
+            class="py-16"
+        />
+        <ErrorState
             v-else-if="error"
-            class="flex items-center justify-center py-16 text-red-400 text-sm"
-        >
-            Erreur de chargement
-        </div>
-        <div
+            class="py-16"
+        />
+        <EmptyState
             v-else-if="!scrutins.length"
-            class="flex items-center justify-center py-16 text-slate-400 text-sm"
-        >
-            Aucun scrutin trouvé
-        </div>
+            class="py-16"
+            message="Aucun scrutin trouvé"
+        />
 
         <div
             v-else
@@ -47,6 +42,9 @@
 import { ref, onMounted } from 'vue';
 import SearchBar from '@components/SearchBar.vue';
 import ScrutinCard from '@components/scrutins/ScrutinCard.vue';
+import LoadingState from '@components/LoadingState.vue';
+import ErrorState from '@components/ErrorState.vue';
+import EmptyState from '@components/EmptyState.vue';
 
 const scrutins = ref([]);
 const loading = ref(false);

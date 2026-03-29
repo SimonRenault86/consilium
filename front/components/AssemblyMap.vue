@@ -3,7 +3,14 @@
         ref="containerEl"
         class="relative flex items-end justify-center px-4 py-6"
     >
-        <div class="w-full">
+        <LoadingState
+            v-if="!isDeputesReady"
+            class="py-16 w-full"
+        />
+        <div
+            v-else
+            class="w-full"
+        >
             <HemicycleFilters
                 v-if="!hideFilters"
                 v-model="vueActive"
@@ -58,7 +65,7 @@
             <Transition name="tooltip">
                 <div
                     v-if="hoveredDepute"
-                    class="pointer-events-none absolute z-50 w-60 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden"
+                    class="pointer-events-none fixed z-50 w-60 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden"
                     :style="tooltipStyle"
                 >
                     <!-- Bannière parti -->
@@ -176,7 +183,8 @@
 <script setup>
 import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue';
 import seats, { VIEWBOX_WIDTH, VIEWBOX_HEIGHT, SEAT_RADIUS } from '@/helpers/hemicycle.js';
-import deputesMap, { getDepute, getCouleurSiege, getCouleur2Siege, getCouleurScoreSiege, getPhotoUrl } from '@/helpers/deputes.js';
+import deputesMap, { getDepute, getCouleurSiege, getCouleur2Siege, getCouleurScoreSiege, getPhotoUrl, isDeputesReady } from '@/helpers/deputes.js';
+import LoadingState from '@components/LoadingState.vue';
 import { groupes, getLogoUrl } from '@/helpers/partis.js';
 import HemicycleFilters from '@/components/HemicycleFilters.vue';
 import AssemblyStats from '@/components/AssemblyStats.vue';
@@ -334,18 +342,15 @@ const tooltipStyle = computed(() => ({
 const onSeatHover = (seat, event) => {
     hoveredGroupe.value = null;
     hoveredSeat.value = seat.seatId;
-    if (!svgEl.value) return;
+    if (!containerEl.value) return;
 
-    // Convertit les coords SVG en coords DOM relatives au conteneur parent
-    const svgRect = svgEl.value.getBoundingClientRect();
-    const scaleX = svgRect.width / VIEWBOX_WIDTH;
-    const scaleY = svgRect.height / VIEWBOX_HEIGHT;
-    const domX = seat.x * scaleX;
-    const domY = seat.y * scaleY;
+    // Utilise la position réelle de l'élément survolé en coords viewport (fixed)
+    const circleRect = event.target.getBoundingClientRect();
+    const domX = (circleRect.left + circleRect.right) / 2;
+    const domY = (circleRect.top + circleRect.bottom) / 2;
 
-    // Décalage pour que le tooltip apparaisse au-dessus et centré
     tooltipPos.x = domX - 120; // moitié de w-60 (240px / 2)
-    tooltipPos.y = domY - 110;
+    tooltipPos.y = domY - 220; // au-dessus du siège
 };
 </script>
 

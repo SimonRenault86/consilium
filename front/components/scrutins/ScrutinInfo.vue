@@ -2,15 +2,15 @@
     <div>
         <div
             v-if="loading"
-            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6 text-sm text-slate-400"
+            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6"
         >
-            Chargement…
+            <LoadingState />
         </div>
         <div
             v-else-if="error"
-            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6 text-sm text-red-400"
+            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6"
         >
-            Impossible de charger les informations du scrutin.
+            <ErrorState message="Impossible de charger les informations du scrutin." />
         </div>
         <template v-else-if="scrutin">
             <!-- Titre complet -->
@@ -147,6 +147,8 @@ import { ref, onMounted } from 'vue';
 import Panel from '@components/Panel.vue';
 import AssemblyMap from '@components/AssemblyMap.vue';
 import ScrutinCategorie from '@components/scrutins/ScrutinCategorie.vue';
+import LoadingState from '@components/LoadingState.vue';
+import ErrorState from '@components/ErrorState.vue';
 import { initDeputes } from '@/helpers/deputes.js';
 import { initPartis } from '@/helpers/partis.js';
 
