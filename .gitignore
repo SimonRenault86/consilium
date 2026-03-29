@@ -7,6 +7,9 @@ public/dist/
 # Données brutes (seed local uniquement)
 front/helpers/brut/
 
+# Fichiers temporaires de seed
+tmp/
+
 # Variables d'environnement
 .env
 

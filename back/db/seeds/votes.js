@@ -1,16 +1,65 @@
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync, readdirSync, rmSync, mkdirSync, createWriteStream } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import http from 'http';
+import https from 'https';
+import { execSync } from 'child_process';
+import 'dotenv/config';
 import pool from '../dbManager.js';
 import Vote from '../models/Vote.js';
 import TypeVote from '../models/TypeVote.js';
 import DeputeVote from '../models/DeputeVote.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const VOTES_DIR = path.join(__dirname, '../../../front/helpers/brut/votes');
+const LEGISLATURE = process.env.CURRENT_LEGISLATURE || '17';
+const ZIP_URL = `http://data.assemblee-nationale.fr/static/openData/repository/${LEGISLATURE}/loi/scrutins/Scrutins.json.zip`;
+const TMP_DIR = path.join(__dirname, '../../../tmp/votes');
+const ZIP_PATH = path.join(TMP_DIR, 'Scrutins.json.zip');
+const EXTRACT_DIR = path.join(TMP_DIR, 'extracted');
 
-const parseVoteFile = filename => {
-    const raw = JSON.parse(readFileSync(path.join(VOTES_DIR, filename), 'utf8'));
+const downloadFile = (url, dest) => new Promise((resolve, reject) => {
+    const protocol = url.startsWith('https') ? https : http;
+    const file = createWriteStream(dest);
+
+    const req = protocol.get(url, response => {
+        if (response.statusCode === 301 || response.statusCode === 302) {
+            file.close();
+            rmSync(dest, { force: true });
+            downloadFile(response.headers.location, dest).then(resolve).catch(reject);
+            return;
+        }
+        if (response.statusCode !== 200) {
+            file.close();
+            rmSync(dest, { force: true });
+            reject(new Error(`Téléchargement échoué : status ${response.statusCode}`));
+            return;
+        }
+        response.pipe(file);
+        file.on('finish', () => file.close(resolve));
+        file.on('error', reject);
+    });
+
+    req.on('error', err => {
+        rmSync(dest, { force: true });
+        reject(err);
+    });
+});
+
+const findJsonFiles = dir => {
+    const results = [];
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            results.push(...findJsonFiles(fullPath));
+        } else if (entry.name.endsWith('.json')) {
+            results.push(fullPath);
+        }
+    }
+    return results;
+};
+
+const parseVoteFile = filepath => {
+    const raw = JSON.parse(readFileSync(filepath, 'utf8'));
     const s = raw.scrutin;
 
     const groupesArr = (() => {
@@ -60,56 +109,111 @@ const parseVoteFile = filename => {
     };
 };
 
-const allFiles = readdirSync(VOTES_DIR)
-    .filter(f => f.endsWith('.json'))
-    .sort();
-
 // Traitement par batch pour ne pas saturer la mémoire ni le pool PG
 const BATCH_SIZE = 50;
 
 const run = async () => {
-    // Précharger les IDs des députés connus pour filtrer les votants
-    // (les fichiers votes contiennent des acteurRef d'autres législatures absents de notre table)
-    const { rows: deputeRows } = await pool.query('SELECT id FROM deputes');
-    const deputesConnus = new Set(deputeRows.map(r => r.id));
-    console.log(`${deputesConnus.size} députés chargés pour filtrage.`);
+    mkdirSync(TMP_DIR, { recursive: true });
+    mkdirSync(EXTRACT_DIR, { recursive: true });
 
-    console.log(`Import de ${allFiles.length} votes...`);
-    let done = 0;
-    let errors = 0;
+    try {
+        // 1. Télécharger le zip
+        console.log(`Téléchargement depuis ${ZIP_URL}...`);
+        await downloadFile(ZIP_URL, ZIP_PATH);
+        console.log('Téléchargement terminé.');
 
-    for (let i = 0; i < allFiles.length; i += BATCH_SIZE) {
-        const batch = allFiles.slice(i, i + BATCH_SIZE);
-        const client = await pool.connect();
-        try {
-            await client.query('BEGIN');
-            for (const filename of batch) {
-                try {
-                    const { typeVote, vote, votants } = parseVoteFile(filename);
-                    const votantsConnus = votants.filter(v => deputesConnus.has(v.id_depute));
-                    if (typeVote.code) await TypeVote.upsert(typeVote);
-                    await Vote.upsert(vote);
-                    await DeputeVote.insertBulk(vote.uid, votantsConnus, client);
-                    done++;
-                } catch (e) {
-                    errors++;
-                    // On continue sur le fichier suivant
-                }
+        // 2. Dézipper
+        console.log('Décompression...');
+        execSync(`unzip -o "${ZIP_PATH}" -d "${EXTRACT_DIR}"`);
+        console.log('Décompression terminée.');
+
+        // 3. Récupérer le dernier vote enregistré en base par date
+        const { rows: lastVoteRows } = await pool.query(
+            'SELECT MAX(numero) as max_numero, MAX(date_scrutin) as last_date FROM votes WHERE legislature = $1',
+            [parseInt(LEGISLATURE)]
+        );
+        const lastNumero = lastVoteRows[0].max_numero || 0;
+        const lastDate = lastVoteRows[0].last_date;
+
+        console.log(lastDate
+            ? `Dernier vote en base : date ${lastDate.toISOString().split('T')[0]}, numéro ${lastNumero}`
+            : 'Aucun vote en base, import complet.'
+        );
+
+        // 4. Trouver tous les fichiers JSON extraits
+        const allFilePaths = findJsonFiles(EXTRACT_DIR).sort();
+
+        // 5. Supprimer les fichiers dont le numéro est <= au dernier vote en base (déjà importés)
+        let filesDeleted = 0;
+        const filesToProcess = [];
+        for (const filepath of allFilePaths) {
+            const filename = path.basename(filepath);
+            const match = filename.match(/V(\d+)\.json$/i);
+            const numero = match ? parseInt(match[1]) : null;
+
+            if (numero !== null && numero <= lastNumero) {
+                rmSync(filepath);
+                filesDeleted++;
+                continue;
             }
-            await client.query('COMMIT');
-        } catch (e) {
-            await client.query('ROLLBACK');
-            console.error('Erreur batch :', e.message);
-        } finally {
-            client.release();
+            filesToProcess.push(filepath);
         }
 
-        if ((i / BATCH_SIZE) % 10 === 0) {
-            console.log(`  ${done}/${allFiles.length} votes insérés...`);
+        console.log(`${filesDeleted} fichiers supprimés (déjà en base), ${filesToProcess.length} fichiers à importer.`);
+
+        if (filesToProcess.length === 0) {
+            console.log('Aucun nouveau vote à importer.');
+            return;
         }
+
+        // 6. Précharger les IDs des députés connus pour filtrer les votants
+        // (les fichiers votes contiennent des acteurRef d'autres législatures absents de notre table)
+        const { rows: deputeRows } = await pool.query('SELECT id FROM deputes');
+        const deputesConnus = new Set(deputeRows.map(r => r.id));
+        console.log(`${deputesConnus.size} députés chargés pour filtrage.`);
+
+        // 7. Import par batch
+        console.log(`Import de ${filesToProcess.length} votes...`);
+        let done = 0;
+        let errors = 0;
+
+        for (let i = 0; i < filesToProcess.length; i += BATCH_SIZE) {
+            const batch = filesToProcess.slice(i, i + BATCH_SIZE);
+            const client = await pool.connect();
+            try {
+                await client.query('BEGIN');
+                for (const filepath of batch) {
+                    try {
+                        const { typeVote, vote, votants } = parseVoteFile(filepath);
+                        const votantsConnus = votants.filter(v => deputesConnus.has(v.id_depute));
+                        if (typeVote.code) await TypeVote.upsert(typeVote);
+                        await Vote.upsert(vote);
+                        await DeputeVote.insertBulk(vote.uid, votantsConnus, client);
+                        done++;
+                    } catch (e) {
+                        errors++;
+                        // On continue sur le fichier suivant
+                    }
+                }
+                await client.query('COMMIT');
+            } catch (e) {
+                await client.query('ROLLBACK');
+                console.error('Erreur batch :', e.message);
+            } finally {
+                client.release();
+            }
+
+            if ((i / BATCH_SIZE) % 10 === 0) {
+                console.log(`  ${done}/${filesToProcess.length} votes insérés...`);
+            }
+        }
+
+        console.log(`Import terminé : ${done} votes insérés, ${errors} erreurs.`);
+    } finally {
+        // 8. Nettoyer les fichiers temporaires
+        rmSync(TMP_DIR, { recursive: true, force: true });
+        console.log('Fichiers temporaires supprimés.');
     }
-
-    console.log(`Import terminé : ${done} votes insérés, ${errors} erreurs.`);
 };
 
 run().finally(() => pool.end());
