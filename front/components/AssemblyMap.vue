@@ -255,7 +255,7 @@ watch(() => props.selectedVote, vote => {
     } else if (vueActive.value === 'vote') {
         vueActive.value = 'standard';
     }
-});
+}, { immediate: true });
 
 const onPin = seatId => {
     pinnedSeat.value = seatId;
