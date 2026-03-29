@@ -12,7 +12,7 @@ export default {
     tags: [
         { name: 'Partis', description: 'Groupes politiques de la 17e législature' },
         { name: 'Députés', description: 'Données sur les députés de la 17e législature' },
-        { name: 'Votes', description: 'Scrutins publics de l\'Assemblée Nationale' },
+        { name: 'Scrutins', description: 'Scrutins publics de l\'Assemblée Nationale' },
     ],
     paths: {
         '/partis': {
@@ -68,6 +68,74 @@ export default {
                             },
                         },
                     },
+                },
+            },
+        },
+        '/partis/{abrev}/scrutins': {
+            get: {
+                tags: ['Partis'],
+                summary: 'Scrutins récents d\'un groupe politique',
+                description: 'Retourne les scrutins les plus récents avec le détail des votes du groupe. Le paramètre `limit` est plafonné à 100.',
+                operationId: 'getPartisScrutins',
+                parameters: [
+                    {
+                        name: 'abrev',
+                        in: 'path',
+                        required: true,
+                        description: 'Abréviation du groupe (ex: SOC, RN, EPR)',
+                        schema: { type: 'string', example: 'SOC' },
+                    },
+                    {
+                        name: 'limit',
+                        in: 'query',
+                        description: 'Nombre maximum de résultats (défaut : 20, max : 100)',
+                        schema: { type: 'integer', minimum: 1, maximum: 100, default: 20 },
+                    },
+                ],
+                responses: {
+                    '200': {
+                        description: 'Liste des scrutins récents du groupe',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'array',
+                                    items: { $ref: '#/components/schemas/ScrutinGroupe' },
+                                },
+                            },
+                        },
+                    },
+                    '500': { description: 'Erreur serveur' },
+                },
+            },
+        },
+        '/partis/{abrev}/stats': {
+            get: {
+                tags: ['Partis'],
+                summary: 'Statistiques de vote par thématique pour un groupe',
+                description: 'Retourne, pour chaque catégorie de scrutins, le cumul des votes pour/contre/abstentions/non-participation du groupe.',
+                operationId: 'getPartisStats',
+                parameters: [
+                    {
+                        name: 'abrev',
+                        in: 'path',
+                        required: true,
+                        description: 'Abréviation du groupe (ex: SOC, RN, EPR)',
+                        schema: { type: 'string', example: 'SOC' },
+                    },
+                ],
+                responses: {
+                    '200': {
+                        description: 'Stats par catégorie',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'array',
+                                    items: { $ref: '#/components/schemas/StatsByGroupe' },
+                                },
+                            },
+                        },
+                    },
+                    '500': { description: 'Erreur serveur' },
                 },
             },
         },
@@ -129,12 +197,12 @@ export default {
                 },
             },
         },
-        '/deputes/{id}/votes-stats': {
+        '/deputes/{id}/scrutins-stats': {
             get: {
                 tags: ['Députés'],
                 summary: 'Stats de vote d\'un député',
-                description: 'Retourne le total des votes du député ainsi que sa répartition (pour / contre / abstentions) et ses 5 derniers scrutins.',
-                operationId: 'getDeputeVotesStats',
+                description: 'Retourne le total des scrutins auxquels le député a participé, sa répartition (pour / contre / abstentions / non-participation), ses catégories principales et ses 5 derniers scrutins.',
+                operationId: 'getDeputeScrutinsStats',
                 parameters: [
                     {
                         name: 'id',
@@ -149,12 +217,12 @@ export default {
                         description: 'Statistiques de vote',
                         content: {
                             'application/json': {
-                                schema: { $ref: '#/components/schemas/VotesStats' },
+                                schema: { $ref: '#/components/schemas/ScrutinsStats' },
                             },
                         },
                     },
                     '404': {
-                        description: 'Aucun vote pour ce député',
+                        description: 'Aucun scrutin pour ce député',
                         content: {
                             'application/json': {
                                 schema: { $ref: '#/components/schemas/Erreur' },
@@ -165,11 +233,11 @@ export default {
                 },
             },
         },
-        '/votes/{uid}': {
+        '/scrutins/{uid}': {
             get: {
-                tags: ['Votes'],
+                tags: ['Scrutins'],
                 summary: 'Détail d\'un scrutin avec les votes nominatifs',
-                operationId: 'getVoteByUid',
+                operationId: 'getScrutinByUid',
                 parameters: [
                     {
                         name: 'uid',
@@ -184,12 +252,12 @@ export default {
                         description: 'Scrutin avec la map des votants',
                         content: {
                             'application/json': {
-                                schema: { $ref: '#/components/schemas/Vote' },
+                                schema: { $ref: '#/components/schemas/Scrutin' },
                             },
                         },
                     },
                     '404': {
-                        description: 'Vote introuvable',
+                        description: 'Scrutin introuvable',
                         content: {
                             'application/json': {
                                 schema: { $ref: '#/components/schemas/Erreur' },
@@ -199,12 +267,12 @@ export default {
                 },
             },
         },
-        '/votes': {
+        '/scrutins': {
             get: {
-                tags: ['Votes'],
+                tags: ['Scrutins'],
                 summary: 'Liste les scrutins',
                 description: 'Retourne les scrutins publics, triés par numéro décroissant (plus récents en premier). Le paramètre `limit` est plafonné à 200.',
-                operationId: 'getVotes',
+                operationId: 'getScrutins',
                 parameters: [
                     {
                         name: 'from',
@@ -238,7 +306,7 @@ export default {
                             'application/json': {
                                 schema: {
                                     type: 'array',
-                                    items: { $ref: '#/components/schemas/Vote' },
+                                    items: { $ref: '#/components/schemas/Scrutin' },
                                 },
                             },
                         },
@@ -299,7 +367,7 @@ export default {
                     date_maj: { type: 'string', format: 'date', example: '2026-03-25' },
                 },
             },
-            Vote: {
+            Scrutin: {
                 type: 'object',
                 properties: {
                     uid: { type: 'string', example: 'VTANR5L17V78' },
@@ -308,6 +376,66 @@ export default {
                     titre: { type: 'string', example: "l'amendement n° 3556 de Mme Louwagie après l'article 3 du projet de loi de finances pour 2025." },
                     sort: { type: 'string', example: 'adopté', description: 'Résultat : adopté ou rejeté' },
                     demandeur: { type: 'string', nullable: true, example: 'Président du groupe "Droite Républicaine"' },
+                    categorie: {
+                        type: 'object',
+                        nullable: true,
+                        properties: {
+                            nom: { type: 'string', example: 'Budget' },
+                            couleur: { type: 'string', example: '#3b82f6' },
+                        },
+                    },
+                    sousCategorie: {
+                        type: 'object',
+                        nullable: true,
+                        properties: {
+                            nom: { type: 'string', example: 'PLF 2025' },
+                        },
+                    },
+                    typeMajorite: { type: 'string', nullable: true, example: 'simple' },
+                    synthese: {
+                        type: 'object',
+                        properties: {
+                            votants: { type: 'integer', example: 177 },
+                            pour: { type: 'integer', example: 110 },
+                            contre: { type: 'integer', example: 65 },
+                            abstentions: { type: 'integer', example: 2 },
+                            nonVotants: { type: 'integer', example: 3, description: 'Présents qui n\'ont pas voté' },
+                        },
+                    },
+                    votantsMap: {
+                        type: 'object',
+                        description: 'Map acteurRef → position du député lors du vote (présent uniquement sur GET /scrutins/{uid})',
+                        additionalProperties: { type: 'string', enum: ['pour', 'contre', 'abstention'] },
+                        example: { PA1008: 'pour', PA1592: 'contre', PA2155: 'abstention' },
+                    },
+                },
+            },
+            ScrutinGroupe: {
+                type: 'object',
+                description: 'Scrutin enrichi avec le vote agrégé du groupe politique',
+                properties: {
+                    uid: { type: 'string', example: 'VTANR5L17V78' },
+                    numero: { type: 'integer', example: 78 },
+                    dateScrutin: { type: 'string', format: 'date', example: '2024-10-24' },
+                    titre: { type: 'string' },
+                    sort: { type: 'string', example: 'adopté' },
+                    categorie: {
+                        type: 'object',
+                        nullable: true,
+                        properties: {
+                            nom: { type: 'string', example: 'Budget' },
+                            couleur: { type: 'string', example: '#3b82f6' },
+                        },
+                    },
+                    groupeVote: {
+                        type: 'object',
+                        description: 'Votes des membres du groupe pour ce scrutin',
+                        properties: {
+                            pour: { type: 'integer', example: 42 },
+                            contre: { type: 'integer', example: 3 },
+                            abstentions: { type: 'integer', example: 1 },
+                        },
+                    },
                     synthese: {
                         type: 'object',
                         properties: {
@@ -317,12 +445,19 @@ export default {
                             abstentions: { type: 'integer', example: 2 },
                         },
                     },
-                    votantsMap: {
-                        type: 'object',
-                        description: 'Map acteurRef → position du député lors du vote',
-                        additionalProperties: { type: 'string', enum: ['pour', 'contre', 'abstention'] },
-                        example: { PA1008: 'pour', PA1592: 'contre', PA2155: 'abstention' },
-                    },
+                },
+            },
+            StatsByGroupe: {
+                type: 'object',
+                description: 'Statistiques de vote d\'un groupe par catégorie de scrutins',
+                properties: {
+                    categorie: { type: 'string', example: 'Budget' },
+                    couleur: { type: 'string', example: '#3b82f6' },
+                    nbScrutins: { type: 'integer', example: 45 },
+                    nbPour: { type: 'integer', example: 1823 },
+                    nbContre: { type: 'integer', example: 142 },
+                    nbAbstentions: { type: 'integer', example: 38 },
+                    nbNonParticipation: { type: 'integer', example: 512 },
                 },
             },
             DeputeDetail: {
@@ -383,13 +518,36 @@ export default {
                     error: { type: 'string', example: 'Format de date invalide' },
                 },
             },
-            VotesStats: {
+            ScrutinsStats: {
                 type: 'object',
                 properties: {
                     total: { type: 'integer', example: 312, description: 'Nombre total de scrutins auxquels le député a participé' },
                     pour: { type: 'integer', example: 198 },
                     contre: { type: 'integer', example: 87 },
                     abstentions: { type: 'integer', example: 27 },
+                    nonParticipation: { type: 'integer', example: 450, description: 'Scrutins où le député était absent' },
+                    categoriesPrincipales: {
+                        type: 'array',
+                        description: '3 catégories les plus votées',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                nom: { type: 'string', example: 'Budget' },
+                                couleur: { type: 'string', example: '#3b82f6' },
+                            },
+                        },
+                    },
+                    sousCategoriesPrincipales: {
+                        type: 'array',
+                        description: '3 sous-catégories les plus votées',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                nom: { type: 'string', example: 'PLF 2025' },
+                                couleur: { type: 'string', example: '#3b82f6' },
+                            },
+                        },
+                    },
                     derniersVotes: {
                         type: 'array',
                         description: '5 scrutins les plus récents',
@@ -401,6 +559,14 @@ export default {
                                 titre: { type: 'string' },
                                 sort: { type: 'string', example: 'adopté' },
                                 position: { type: 'string', enum: ['pour', 'contre', 'abstention'] },
+                                categorie: {
+                                    type: 'object',
+                                    nullable: true,
+                                    properties: {
+                                        nom: { type: 'string', example: 'Budget' },
+                                        couleur: { type: 'string', example: '#3b82f6' },
+                                    },
+                                },
                                 dateScrutin: { type: 'string', format: 'date', example: '2025-11-14' },
                             },
                         },
