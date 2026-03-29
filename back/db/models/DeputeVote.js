@@ -17,7 +17,7 @@ export default class DeputeVote {
 
     // Stats agrégées + 5 derniers votes d'un député
     static async findStatsByDepute (idDepute) {
-        const [statsResult, recentsResult] = await Promise.all([
+        const [statsResult, recentsResult, topCatResult, topSousCatResult] = await Promise.all([
             pool.query(
                 `SELECT
                     COUNT(*) AS total,
@@ -44,6 +44,29 @@ export default class DeputeVote {
                  LIMIT 5`,
                 [idDepute]
             ),
+            pool.query(
+                `SELECT c1.nom, c1.couleur, COUNT(*) AS nb
+                 FROM deputes_votes dv
+                 JOIN scrutins v ON v.uid = dv.id_vote
+                 JOIN scrutin_categories c1 ON c1.id = v.scrutin_categorie_id
+                 WHERE dv.id_depute = $1
+                 GROUP BY c1.id, c1.nom, c1.couleur
+                 ORDER BY nb DESC
+                 LIMIT 3`,
+                [idDepute]
+            ),
+            pool.query(
+                `SELECT sc.nom, c1.couleur, COUNT(*) AS nb
+                 FROM deputes_votes dv
+                 JOIN scrutins v ON v.uid = dv.id_vote
+                 JOIN scrutin_sous_categories sc ON sc.id = v.scrutin_sous_categorie_id
+                 JOIN scrutin_categories c1 ON c1.id = sc.categorie_id
+                 WHERE dv.id_depute = $1
+                 GROUP BY sc.id, sc.nom, c1.couleur
+                 ORDER BY nb DESC
+                 LIMIT 3`,
+                [idDepute]
+            ),
         ]);
         const s = statsResult.rows[0];
         return {
@@ -52,6 +75,8 @@ export default class DeputeVote {
             contre: parseInt(s.contre, 10),
             abstentions: parseInt(s.abstentions, 10),
             nonParticipation: parseInt(s.non_participation, 10),
+            categoriesPrincipales: topCatResult.rows.map(r => ({ nom: r.nom, couleur: r.couleur })),
+            sousCategoriesPrincipales: topSousCatResult.rows.map(r => ({ nom: r.nom, couleur: r.couleur })),
             derniersVotes: recentsResult.rows.map(v => ({
                 uid: v.id_vote,
                 numero: v.numero,

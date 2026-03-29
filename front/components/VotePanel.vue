@@ -91,14 +91,18 @@
 
                 <div class="px-4 py-3 flex items-start gap-3">
                     <span
-                        class="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold uppercase"
+                        class="flex-shrink-0 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold uppercase"
                         :class="vote.sort === 'adopté'
                             ? 'bg-emerald-100 text-emerald-700'
                             : 'bg-red-100 text-red-700'"
                     >
                         {{ vote.sort === 'adopté' ? 'Adopté' : 'Rejeté' }}
                     </span>
-                    <div class="min-w-0">
+                    <div class="flex flex-col gap-1">
+                        <ScrutinCategorie
+                            :categorie="vote.categorie"
+                            class="mb-1"
+                        />
                         <p class="text-sm font-medium text-slate-800 leading-snug line-clamp-2">
                             {{ vote.titre }}
                         </p>
@@ -117,12 +121,6 @@
                         class="text-xs text-slate-500 mb-3"
                     >
                         Demandé par : {{ vote.demandeur }}
-                    </p>
-                    <p
-                        v-if="vote.categorie"
-                        class="text-xs text-slate-500 mb-3"
-                    >
-                        Type : <span class="font-medium">{{ vote.categorie.nom }}</span>
                     </p>
 
                     <div class="flex items-center gap-4 text-sm">
@@ -177,6 +175,7 @@ import { fetchScrutins } from '@/helpers/scrutins.js';
 import ButtonLink from '@components/ButtonLink.vue';
 import ButtonBase from '@components/ButtonBase.vue';
 import SearchBar from '@components/SearchBar.vue';
+import ScrutinCategorie from '@components/scrutins/ScrutinCategorie.vue';
 
 const emit = defineEmits(['select']);
 

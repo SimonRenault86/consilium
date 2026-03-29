@@ -18,9 +18,7 @@
                     v-if="scrutin.categorie"
                     class="mb-1"
                 >
-                    <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs text-slate-500 font-medium">
-                        {{ scrutin.categorie.nom }}
-                    </span>
+                    <ScrutinCategorie :categorie="scrutin.categorie" />
                 </div>
                 <p
                     class="text-sm font-medium text-slate-800 leading-snug"
@@ -77,6 +75,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import ScrutinCategorie from '@components/scrutins/ScrutinCategorie.vue';
 
 const props = defineProps({
     scrutin: { type: Object, required: true },

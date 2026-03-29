@@ -76,6 +76,33 @@
                         </div>
                     </div>
                 </div>
+                <div
+                    v-if="stats.categoriesPrincipales && stats.categoriesPrincipales.length"
+                    class="mt-4 pt-4 border-t border-slate-100 space-y-3"
+                >
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide block mb-1.5">Thèmes principaux</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span
+                                v-for="cat in stats.categoriesPrincipales"
+                                :key="cat.nom"
+                                class="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
+                                :style="{ backgroundColor: cat.couleur }"
+                            >{{ cat.nom }}</span>
+                        </div>
+                    </div>
+                    <div v-if="stats.sousCategoriesPrincipales && stats.sousCategoriesPrincipales.length">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide block mb-1.5">Sujets spécifiques</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span
+                                v-for="cat in stats.sousCategoriesPrincipales"
+                                :key="cat.nom"
+                                class="text-xs font-medium px-2 py-0.5 rounded-full border"
+                                :style="{ borderColor: cat.couleur, color: cat.couleur }"
+                            >{{ cat.nom }}</span>
+                        </div>
+                    </div>
+                </div>
             </template>
         </Panel>
 

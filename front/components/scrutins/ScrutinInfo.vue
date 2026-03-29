@@ -21,6 +21,11 @@
                 <p class="text-slate-800 leading-relaxed">
                     {{ scrutin.titre }}
                 </p>
+                <ScrutinCategorie
+                    :categorie="scrutin.categorie"
+                    :sous-categorie="scrutin.sousCategorie"
+                    class="mt-3"
+                />
                 <dl class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div v-if="scrutin.demandeur">
                         <dt class="text-xs text-slate-400 mb-0.5">
@@ -141,6 +146,7 @@
 import { ref, onMounted } from 'vue';
 import Panel from '@components/Panel.vue';
 import AssemblyMap from '@components/AssemblyMap.vue';
+import ScrutinCategorie from '@components/scrutins/ScrutinCategorie.vue';
 import { initDeputes } from '@/helpers/deputes.js';
 import { initPartis } from '@/helpers/partis.js';
 

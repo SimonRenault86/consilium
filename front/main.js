@@ -3,6 +3,7 @@ import '@styles/main.scss';
 import { createApp } from 'vue';
 import HomePage from '@components/HomePage.vue';
 import DeputeInfo from '@components/deputes/DeputeInfo.vue';
+import DeputeHeader from '@components/deputes/DeputeHeader.vue';
 import VotesStats from '@components/deputes/VotesStats.vue';
 import ScrutinInfo from '@components/scrutins/ScrutinInfo.vue';
 import ScrutinsList from '@components/scrutins/ScrutinsList.vue';
@@ -16,6 +17,11 @@ const mapEl = document.getElementById('assembly-map');
 if (mapEl) {
     createVueApp(HomePage).mount(mapEl);
     initPartis().then(() => initDeputes());
+}
+
+const deputeHeaderEl = document.querySelector('depute-header');
+if (deputeHeaderEl) {
+    createVueApp(DeputeHeader, { deputeId: deputeHeaderEl.dataset.deputeId }).mount(deputeHeaderEl);
 }
 
 const deputeInfoEl = document.querySelector('depute-info');

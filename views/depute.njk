@@ -12,37 +12,7 @@
     {% else %}
 
     {# En-tête #}
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-8 mb-6">
-        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left">
-            <div class="flex-shrink-0 relative w-20 h-20 sm:w-24 sm:h-24">
-                <img
-                    src="/elus/{{ depute.id }}.jpg"
-                    alt="Photo de {{ depute.prenom }} {{ depute.nom }}"
-                    class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-slate-100"
-                    onerror="this.style.display='none'; document.getElementById('initiales').style.display='flex'"
-                >
-                <div
-                    id="initiales"
-                    class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-slate-200 text-slate-600 text-2xl font-bold absolute inset-0 hidden items-center justify-center"
-                >
-                    {{ depute.prenom[0] }}{{ depute.nom[0] }}
-                </div>
-            </div>
-            <div>
-                <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">{{ depute.civ }} {{ depute.prenom }} {{ depute.nom }}</h1>
-                {% if groupe %}
-                <div class="flex items-center gap-2 mt-2">
-                    {% if groupe.logo %}
-                        <img src="{{ groupe.logo }}" alt="{{ groupe.nom }}" class="h-5 object-contain">
-                    {% else %}
-                        <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">{{ depute.groupeAbrev }}</span>
-                    {% endif %}
-                    <span class="text-slate-600 text-sm">{{ groupe.nom }}</span>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </section>
+    <depute-header data-depute-id="{{ depute.id }}" class="block"></depute-header>
 
     <depute-info data-depute-id="{{ depute.id }}" class="mb-6 block"></depute-info>
 
