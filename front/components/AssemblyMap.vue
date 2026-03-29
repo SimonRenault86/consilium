@@ -14,6 +14,7 @@
             <HemicycleFilters
                 v-if="!hideFilters"
                 v-model="vueActive"
+                :vote-disabled="!props.selectedVote"
             />
             <DeputeSearchBar
                 v-if="!hideFilters"

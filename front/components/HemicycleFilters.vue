@@ -6,8 +6,11 @@
             class="flex items-center gap-1.5 rounded-full px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all duration-150 border"
             :class="modelValue === vue.id
                 ? 'bg-slate-900 text-white border-slate-900'
-                : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'"
-            @click="$emit('update:modelValue', vue.id)"
+                : (vue.id === 'vote' && voteDisabled)
+                    ? 'bg-white text-slate-300 border-slate-100 cursor-not-allowed'
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'"
+            :disabled="vue.id === 'vote' && voteDisabled"
+            @click="vue.id === 'vote' && voteDisabled ? null : $emit('update:modelValue', vue.id)"
         >
             <span
                 v-if="vue.gradient"
@@ -29,7 +32,11 @@ defineProps({
     modelValue: {
         type: String,
         required: true
-    }
+    },
+    voteDisabled: {
+        type: Boolean,
+        default: false
+    },
 });
 
 defineEmits(['update:modelValue']);
