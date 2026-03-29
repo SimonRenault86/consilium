@@ -12,7 +12,13 @@ const serialize = row => ({
     titre: row.titre,
     sort: row.sort,
     demandeur: row.demandeur,
-    typeVote: row.code_type_vote ? { code: row.code_type_vote, libelle: row.type_vote_libelle } : null,
+    categorie: row.categorie_nom ? {
+        nom: row.categorie_nom,
+        couleur: row.categorie_couleur,
+    } : null,
+    sousCategorie: row.sous_categorie_nom ? {
+        nom: row.sous_categorie_nom,
+    } : null,
     typeMajorite: row.type_majorite || null,
     synthese: {
         votants: row.nb_votants,
@@ -22,7 +28,7 @@ const serialize = row => ({
     },
 });
 
-// GET /api/votes?from=&to=&limit=&q=
+// GET /api/scrutins?from=&to=&limit=&q=
 router.get('/', async (req, res) => {
     const { from, to, limit = '10', q } = req.query;
 
@@ -40,19 +46,19 @@ router.get('/', async (req, res) => {
         });
         res.json(rows.map(serialize));
     } catch (err) {
-        console.error('Erreur GET /api/votes :', err);
+        console.error('Erreur GET /api/scrutins :', err);
         res.status(500).json({ error: 'Erreur serveur' });
     }
 });
 
-// GET /api/votes/:uid — détail d'un scrutin avec la map des votants
+// GET /api/scrutins/:uid — détail d'un scrutin avec la map des votants
 router.get('/:uid', async (req, res) => {
     try {
         const row = await Vote.findByUidWithVotants(req.params.uid);
-        if (!row) return res.status(404).json({ error: 'Vote introuvable' });
+        if (!row) return res.status(404).json({ error: 'Scrutin introuvable' });
         res.json({ ...serialize(row), votantsMap: row.votantsMap });
     } catch (err) {
-        console.error('Erreur GET /api/votes/:uid :', err);
+        console.error('Erreur GET /api/scrutins/:uid :', err);
         res.status(500).json({ error: 'Erreur serveur' });
     }
 });

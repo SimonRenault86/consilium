@@ -60,7 +60,7 @@ const load = async () => {
     try {
         const params = new URLSearchParams({ limit: search.value.trim() ? 50 : 10 });
         if (search.value.trim()) params.set('q', search.value.trim());
-        const res = await fetch(`/api/votes?${params}`);
+        const res = await fetch(`/api/scrutins?${params}`);
         if (!res.ok) throw new Error();
         scrutins.value = await res.json();
     } catch {

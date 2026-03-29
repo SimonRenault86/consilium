@@ -15,11 +15,11 @@
 
             <div class="min-w-0 flex-1">
                 <div
-                    v-if="scrutin.typeVote"
+                    v-if="scrutin.categorie"
                     class="mb-1"
                 >
                     <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs text-slate-500 font-medium">
-                        {{ scrutin.typeVote.libelle }}
+                        {{ scrutin.categorie.nom }}
                     </span>
                 </div>
                 <p

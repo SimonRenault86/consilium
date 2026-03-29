@@ -7,7 +7,7 @@ export default class DeputeVote {
             `SELECT dv.id_vote, dv.position,
                     v.numero, v.date_scrutin, v.titre, v.sort
              FROM deputes_votes dv
-             JOIN votes v ON v.uid = dv.id_vote
+             JOIN scrutins v ON v.uid = dv.id_vote
              WHERE dv.id_depute = $1
              ORDER BY v.numero DESC`,
             [idDepute]
@@ -24,7 +24,7 @@ export default class DeputeVote {
                     COUNT(*) FILTER (WHERE position = 'pour') AS pour,
                     COUNT(*) FILTER (WHERE position = 'contre') AS contre,
                     COUNT(*) FILTER (WHERE position = 'abstention') AS abstentions,
-                    (SELECT COUNT(*) FROM votes) - COUNT(*) AS non_participation
+                    (SELECT COUNT(*) FROM scrutins) - COUNT(*) AS non_participation
                  FROM deputes_votes
                  WHERE id_depute = $1`,
                 [idDepute]
@@ -32,10 +32,13 @@ export default class DeputeVote {
             pool.query(
                 `SELECT dv.id_vote, dv.position,
                         v.numero, v.date_scrutin, v.titre, v.sort,
-                        v.code_type_vote, tv.libelle AS type_vote_libelle
+                        COALESCE(c2.nom, c1.nom) AS categorie_nom,
+                        COALESCE(c2.couleur, c1.couleur) AS categorie_couleur
                  FROM deputes_votes dv
-                 JOIN votes v ON v.uid = dv.id_vote
-                 LEFT JOIN type_votes tv ON tv.code = v.code_type_vote
+                 JOIN scrutins v ON v.uid = dv.id_vote
+                 LEFT JOIN scrutin_categories c1 ON c1.id = v.scrutin_categorie_id
+                 LEFT JOIN scrutin_sous_categories sc ON sc.id = v.scrutin_sous_categorie_id
+                 LEFT JOIN scrutin_categories c2 ON c2.id = sc.categorie_id
                  WHERE dv.id_depute = $1
                  ORDER BY v.numero DESC
                  LIMIT 5`,
@@ -55,7 +58,7 @@ export default class DeputeVote {
                 titre: v.titre,
                 sort: v.sort,
                 position: v.position,
-                typeVote: v.code_type_vote ? { code: v.code_type_vote, libelle: v.type_vote_libelle } : null,
+                categorie: v.categorie_nom ? { nom: v.categorie_nom, couleur: v.categorie_couleur } : null,
                 dateScrutin: v.date_scrutin instanceof Date
                     ? v.date_scrutin.toISOString().slice(0, 10)
                     : String(v.date_scrutin).slice(0, 10),

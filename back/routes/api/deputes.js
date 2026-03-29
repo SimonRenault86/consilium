@@ -121,13 +121,13 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.get('/:id/votes-stats', async (req, res) => {
+router.get('/:id/scrutins-stats', async (req, res) => {
     try {
         const stats = await DeputeVote.findStatsByDepute(req.params.id);
-        if (stats.total === 0) return res.status(404).json({ error: 'Aucun vote trouvé pour ce député' });
+        if (stats.total === 0) return res.status(404).json({ error: 'Aucun scrutin trouvé pour ce député' });
         res.json(stats);
     } catch (err) {
-        console.error('Erreur GET /api/deputes/:id/votes-stats :', err);
+        console.error('Erreur GET /api/deputes/:id/scrutins-stats :', err);
         res.status(500).json({ error: 'Erreur serveur' });
     }
 });

@@ -168,7 +168,7 @@ const pct = value => scrutin.value?.synthese?.votants
 onMounted(async () => {
     await Promise.all([initPartis(), initDeputes()]);
     try {
-        const res = await fetch(`/api/votes/${props.scrutinUid}`);
+        const res = await fetch(`/api/scrutins/${props.scrutinUid}`);
         if (!res.ok) throw new Error();
         scrutin.value = await res.json();
     } catch {

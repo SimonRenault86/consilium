@@ -30,7 +30,7 @@ const loading = ref(true);
 onMounted(async () => {
     await Promise.all([initPartis(), initDeputes()]);
     try {
-        const res = await fetch(`/api/votes/${props.scrutinUid}`);
+        const res = await fetch(`/api/scrutins/${props.scrutinUid}`);
         if (res.ok) vote.value = await res.json();
     } catch {
         // carte non affichée en cas d'erreur

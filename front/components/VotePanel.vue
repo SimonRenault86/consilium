@@ -119,10 +119,10 @@
                         Demandé par : {{ vote.demandeur }}
                     </p>
                     <p
-                        v-if="vote.typeVote"
+                        v-if="vote.categorie"
                         class="text-xs text-slate-500 mb-3"
                     >
-                        Type : <span class="font-medium">{{ vote.typeVote.libelle }}</span>
+                        Type : <span class="font-medium">{{ vote.categorie.nom }}</span>
                     </p>
 
                     <div class="flex items-center gap-4 text-sm">
@@ -173,7 +173,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { fetchVotes } from '@/helpers/votes.js';
+import { fetchScrutins } from '@/helpers/scrutins.js';
 import ButtonLink from '@components/ButtonLink.vue';
 import ButtonBase from '@components/ButtonBase.vue';
 import SearchBar from '@components/SearchBar.vue';
@@ -203,7 +203,7 @@ const load = async () => {
     loading.value = true;
     error.value = false;
     try {
-        votes.value = await fetchVotes({
+        votes.value = await fetchScrutins({
             from: dateFrom.value || undefined,
             to: dateTo.value || undefined,
             q: search.value.trim() || undefined,
@@ -245,7 +245,7 @@ const toggleVote = async vote => {
     selectedVote.value = vote;
     // Puis on enrichit avec le votantsMap pour colorer la carte
     try {
-        const res = await fetch(`/api/votes/${vote.uid}`);
+        const res = await fetch(`/api/scrutins/${vote.uid}`);
         if (res.ok) selectedVote.value = await res.json();
     } catch {
         // en cas d'erreur on garde le vote sans votantsMap

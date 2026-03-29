@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS votes (
+CREATE TABLE IF NOT EXISTS scrutins (
     uid                 VARCHAR(30)     PRIMARY KEY,
     numero              INTEGER         NOT NULL,
     legislature         INTEGER,
@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS votes (
     titre               TEXT,
     sort                VARCHAR(20),
     demandeur           TEXT,
-    code_type_vote      VARCHAR(20)     REFERENCES type_votes(code),
     type_majorite       VARCHAR(200),
     nb_votants          INTEGER,
     suffrages_exprimes  INTEGER,
@@ -17,6 +16,3 @@ CREATE TABLE IF NOT EXISTS votes (
     nb_non_votants      INTEGER,
     created_at          TIMESTAMP       DEFAULT NOW()
 );
-
-ALTER TABLE votes DROP COLUMN IF EXISTS type_vote;
-ALTER TABLE votes ADD COLUMN IF NOT EXISTS code_type_vote VARCHAR(20) REFERENCES type_votes(code);

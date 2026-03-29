@@ -7,8 +7,8 @@ import { execSync } from 'child_process';
 import 'dotenv/config';
 import pool from '../dbManager.js';
 import Vote from '../models/Vote.js';
-import TypeVote from '../models/TypeVote.js';
 import DeputeVote from '../models/DeputeVote.js';
+import { categoriseVotes, OPENAI_BATCH_SIZE } from './helpers/categorise.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LEGISLATURE = process.env.CURRENT_LEGISLATURE || '17';
@@ -83,10 +83,6 @@ const parseVoteFile = filepath => {
 
     const decompte = s.syntheseVote?.decompte || {};
     return {
-        typeVote: {
-            code: s.typeVote?.codeTypeVote || null,
-            libelle: s.typeVote?.libelleTypeVote || null,
-        },
         vote: {
             uid: s.uid,
             numero: parseInt(s.numero, 10),
@@ -95,7 +91,6 @@ const parseVoteFile = filepath => {
             titre: s.titre,
             sort: s.sort?.code || null,
             demandeur: s.demandeur?.texte || null,
-            code_type_vote: s.typeVote?.codeTypeVote || null,
             type_majorite: s.typeVote?.typeMajorite || null,
             nb_votants: parseInt(s.syntheseVote?.nombreVotants || '0', 10),
             suffrages_exprimes: parseInt(s.syntheseVote?.suffragesExprimes || '0', 10),
@@ -129,7 +124,7 @@ const run = async () => {
 
         // 3. Récupérer le dernier vote enregistré en base par date
         const { rows: lastVoteRows } = await pool.query(
-            'SELECT MAX(numero) as max_numero, MAX(date_scrutin) as last_date FROM votes WHERE legislature = $1',
+            'SELECT MAX(numero) as max_numero, MAX(date_scrutin) as last_date FROM scrutins WHERE legislature = $1',
             [parseInt(LEGISLATURE)]
         );
         const lastNumero = lastVoteRows[0].max_numero || 0;
@@ -176,6 +171,7 @@ const run = async () => {
         console.log(`Import de ${filesToProcess.length} votes...`);
         let done = 0;
         let errors = 0;
+        const votesToCategorise = [];
 
         for (let i = 0; i < filesToProcess.length; i += BATCH_SIZE) {
             const batch = filesToProcess.slice(i, i + BATCH_SIZE);
@@ -184,11 +180,11 @@ const run = async () => {
                 await client.query('BEGIN');
                 for (const filepath of batch) {
                     try {
-                        const { typeVote, vote, votants } = parseVoteFile(filepath);
+                        const { vote, votants } = parseVoteFile(filepath);
                         const votantsConnus = votants.filter(v => deputesConnus.has(v.id_depute));
-                        if (typeVote.code) await TypeVote.upsert(typeVote);
                         await Vote.upsert(vote);
                         await DeputeVote.insertBulk(vote.uid, votantsConnus, client);
+                        votesToCategorise.push({ uid: vote.uid, titre: vote.titre });
                         done++;
                     } catch (e) {
                         errors++;
@@ -209,6 +205,39 @@ const run = async () => {
         }
 
         console.log(`Import terminé : ${done} votes insérés, ${errors} erreurs.`);
+
+        // 8. Catégoriser les nouveaux scrutins via OpenAI
+        if (process.env.OPENAI_API_KEY && votesToCategorise.length > 0) {
+            console.log(`Catégorisation de ${votesToCategorise.length} scrutins via OpenAI...`);
+            let catDone = 0;
+            for (let i = 0; i < votesToCategorise.length; i += OPENAI_BATCH_SIZE) {
+                const batch = votesToCategorise.slice(i, i + OPENAI_BATCH_SIZE);
+                try {
+                    const catMap = await categoriseVotes(batch);
+                    const entries = Object.entries(catMap);
+                    if (entries.length > 0) {
+                        const uids = entries.map(([uid]) => uid);
+                        const catIds = entries.map(([, v]) => v.categorieId);
+                        const sousIds = entries.map(([, v]) => v.sousCategorieId || null);
+                        await pool.query(
+                            `UPDATE scrutins SET scrutin_categorie_id = data.cat_id, scrutin_sous_categorie_id = data.sous_id
+                            FROM unnest($1::text[], $2::int[], $3::int[]) AS data(uid, cat_id, sous_id)
+                            WHERE scrutins.uid = data.uid`,
+                            [uids, catIds, sousIds]
+                        );
+                        catDone += entries.length;
+                    }
+                } catch (e) {
+                    console.error('Erreur catégorisation batch :', e.message);
+                }
+                if (i + OPENAI_BATCH_SIZE < votesToCategorise.length) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
+            console.log(`${catDone}/${votesToCategorise.length} scrutins catégorisés.`);
+        } else if (votesToCategorise.length > 0) {
+            console.log('OPENAI_API_KEY absent : catégorisation ignorée. Lancez npm run seed:categorise-scrutins pour catégoriser.');
+        }
     } finally {
         // 8. Nettoyer les fichiers temporaires
         rmSync(TMP_DIR, { recursive: true, force: true });

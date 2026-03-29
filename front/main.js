@@ -23,7 +23,7 @@ if (deputeInfoEl) {
     createVueApp(DeputeInfo, { deputeId: deputeInfoEl.dataset.deputeId }).mount(deputeInfoEl);
 }
 
-const votesStatsEl = document.querySelector('votes-stats');
+const votesStatsEl = document.querySelector('scrutins-stats');
 if (votesStatsEl) {
     createVueApp(VotesStats, { deputeId: votesStatsEl.dataset.deputeId }).mount(votesStatsEl);
 }

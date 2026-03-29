@@ -127,7 +127,7 @@ const pctTotal = value => totalScrutins() ? Math.round((value / totalScrutins())
 
 onMounted(async () => {
     try {
-        const res = await fetch(`/api/deputes/${props.deputeId}/votes-stats`);
+        const res = await fetch(`/api/deputes/${props.deputeId}/scrutins-stats`);
         if (!res.ok) throw new Error();
         stats.value = await res.json();
     } catch {
