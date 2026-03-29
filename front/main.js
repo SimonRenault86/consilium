@@ -8,6 +8,7 @@ import VotesStats from '@components/deputes/VotesStats.vue';
 import ScrutinInfo from '@components/scrutins/ScrutinInfo.vue';
 import ScrutinsList from '@components/scrutins/ScrutinsList.vue';
 import MajoriteBuilder from '@components/outils/MajoriteBuilder.vue';
+import PartiPage from '@components/partis/PartiPage.vue';
 import { initDeputes } from '@/helpers/deputes.js';
 import { initPartis } from '@/helpers/partis.js';
 
@@ -47,4 +48,10 @@ if (scrutinsListEl) {
 const majoriteBuilderEl = document.querySelector('majorite-builder');
 if (majoriteBuilderEl) {
     createVueApp(MajoriteBuilder).mount(majoriteBuilderEl);
+}
+
+const partiPageEl = document.querySelector('parti-page');
+if (partiPageEl) {
+    initPartis().then(() => initDeputes());
+    createVueApp(PartiPage, { abrev: partiPageEl.dataset.abrev }).mount(partiPageEl);
 }

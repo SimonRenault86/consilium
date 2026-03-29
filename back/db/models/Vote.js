@@ -96,4 +96,55 @@ export default class Vote {
             ]
         );
     }
+
+    // Retourne les derniers scrutins avec le décompte de votes du groupe
+    static async findByGroupe (groupeAbrev, { limit = 20 } = {}) {
+        const { rows } = await pool.query(
+            `SELECT v.uid, v.numero, v.titre, v.sort, v.date_scrutin,
+                    COALESCE(c2.nom, c1.nom) AS categorie_nom,
+                    COALESCE(c2.couleur, c1.couleur) AS categorie_couleur,
+                    COUNT(dv.id_depute) FILTER (WHERE dv.position = 'pour') AS groupe_pour,
+                    COUNT(dv.id_depute) FILTER (WHERE dv.position = 'contre') AS groupe_contre,
+                    COUNT(dv.id_depute) FILTER (WHERE dv.position = 'abstention') AS groupe_abstentions,
+                    v.nb_votants, v.nb_pour, v.nb_contre, v.nb_abstentions
+             FROM scrutins v
+             JOIN deputes_votes dv ON dv.id_vote = v.uid
+             JOIN deputes d ON d.id = dv.id_depute AND d.groupe_abrev = $1
+             LEFT JOIN scrutin_categories c1 ON c1.id = v.scrutin_categorie_id
+             LEFT JOIN scrutin_sous_categories sc ON sc.id = v.scrutin_sous_categorie_id
+             LEFT JOIN scrutin_categories c2 ON c2.id = sc.categorie_id
+             GROUP BY v.uid, v.numero, v.titre, v.sort, v.date_scrutin,
+                      categorie_nom, categorie_couleur,
+                      v.nb_votants, v.nb_pour, v.nb_contre, v.nb_abstentions
+             ORDER BY v.numero DESC
+             LIMIT $2`,
+            [groupeAbrev, limit]
+        );
+        return rows;
+    }
+
+    // Retourne les stats de votes par catégorie pour un groupe
+    static async findStatsByGroupe (groupeAbrev) {
+        const { rows } = await pool.query(
+            `SELECT
+                    COALESCE(c2.nom, c1.nom) AS categorie,
+                    COALESCE(c2.couleur, c1.couleur) AS couleur,
+                    COUNT(DISTINCT v.uid) AS nb_scrutins,
+                    COUNT(*) FILTER (WHERE dv.position = 'pour') AS nb_pour,
+                    COUNT(*) FILTER (WHERE dv.position = 'contre') AS nb_contre,
+                    COUNT(*) FILTER (WHERE dv.position = 'abstention') AS nb_abstentions,
+                    (COUNT(DISTINCT v.uid) * (SELECT COUNT(*) FROM deputes WHERE groupe_abrev = $1)) - COUNT(*) AS nb_non_participation
+             FROM deputes_votes dv
+             JOIN scrutins v ON v.uid = dv.id_vote
+             JOIN deputes d ON d.id = dv.id_depute AND d.groupe_abrev = $1
+             LEFT JOIN scrutin_categories c1 ON c1.id = v.scrutin_categorie_id
+             LEFT JOIN scrutin_sous_categories sc ON sc.id = v.scrutin_sous_categorie_id
+             LEFT JOIN scrutin_categories c2 ON c2.id = sc.categorie_id
+             WHERE COALESCE(c2.nom, c1.nom) IS NOT NULL
+             GROUP BY 1, 2
+             ORDER BY nb_scrutins DESC`,
+            [groupeAbrev]
+        );
+        return rows;
+    }
 }

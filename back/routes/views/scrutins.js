@@ -1,10 +1,20 @@
 import { Router } from 'express';
 import Vote from '../../db/models/Vote.js';
+import { groupes, groupeOrdreGaucheaDroite } from '../../../front/helpers/partis.js';
 
 const router = Router();
 
 router.get('/scrutins', (req, res) => {
-    res.render('scrutins.njk', { title: 'Scrutins — Consilium' });
+    const groupesList = Object.keys(groupeOrdreGaucheaDroite)
+        .sort((a, b) => groupeOrdreGaucheaDroite[a] - groupeOrdreGaucheaDroite[b])
+        .map(abrev => ({
+            abrev,
+            nom: groupes[abrev]?.nom || abrev,
+            logo: groupes[abrev]?.logo || null,
+            couleur: groupes[abrev]?.couleur || '#aaaaaa',
+        }));
+
+    res.render('scrutins.njk', { title: 'Scrutins — Consilium', groupes: groupesList });
 });
 
 router.get('/scrutin/:uid', async (req, res) => {

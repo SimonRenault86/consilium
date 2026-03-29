@@ -166,12 +166,13 @@
                     <span class="text-xs text-slate-500">Contre</span>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <span class="inline-block w-3 h-3 rounded-full bg-slate-400" />
+                    <span class="inline-block w-3 h-3 rounded-full bg-amber-400" />
                     <span class="text-xs text-slate-500">Abstention</span>
                 </div>
             </div>
 
             <AssemblyStats
+                v-if="!hideStats && !filterGroupe"
                 v-model:hovered-groupe="hoveredGroupe"
                 :vue-active="vueActive"
                 :selected-vote="props.selectedVote"
@@ -196,6 +197,14 @@ const props = defineProps({
         default: null
     },
     hideFilters: {
+        type: Boolean,
+        default: false
+    },
+    filterGroupe: {
+        type: String,
+        default: null
+    },
+    hideStats: {
         type: Boolean,
         default: false
     },
@@ -235,7 +244,7 @@ const voteParSiege = computed(() => {
 const COULEURS_VOTE = {
     pour: '#10b981',
     contre: '#ef4444',
-    abstention: '#94a3b8',
+    abstention: '#fbbf24',
 };
 
 const getCouleurSiegeActive = seatId => {
@@ -250,6 +259,8 @@ const isSeatDimmed = seatId => {
     if (vueActive.value === 'vote' && props.selectedVote) {
         return !voteParSiege.value[seatId];
     }
+    // Si un groupe est filtré, les autres groupes sont toujours atténués
+    if (props.filterGroupe && getDepute(seatId)?.groupe !== props.filterGroupe) return true;
     if (pinnedSeat.value) return pinnedSeat.value !== seatId;
     if (hoveredSeat.value) return hoveredSeat.value !== seatId;
     if (hoveredGroupe.value) return getDepute(seatId)?.groupe !== hoveredGroupe.value;

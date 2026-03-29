@@ -40,4 +40,38 @@ router.get('/partis', async (req, res) => {
     });
 });
 
+router.get('/partis/:abrev', async (req, res) => {
+    const abrev = req.params.abrev.toUpperCase();
+    const info = groupes[abrev];
+
+    if (!info) {
+        return res.status(404).render('parti.njk', {
+            title: 'Groupe introuvable — Consilium',
+            parti: null,
+        });
+    }
+
+    const membres = await Depute.findByGroupe(abrev);
+    const deputes = membres.map(d => ({
+        id: d.id,
+        prenom: d.prenom,
+        nom: d.nom,
+        departementNom: d.departement_nom,
+        slug: toSlug(`${d.prenom} ${d.nom}`),
+        initiales: `${d.prenom[0]}${d.nom[0]}`,
+    }));
+
+    res.render('parti.njk', {
+        title: `${info.nom} — Consilium`,
+        parti: {
+            abrev,
+            nom: info.nom,
+            logo: info.logo || null,
+            couleur: info.couleur || '#aaaaaa',
+            nbDeputes: deputes.length,
+        },
+        deputes,
+    });
+});
+
 export default router;

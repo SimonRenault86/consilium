@@ -30,29 +30,55 @@
                     >{{ g.abrev }}</span>
                 </div>
 
-                <!-- Barre pour/contre/abstention -->
+                <!-- Barre pour/contre/abstention/non-participation -->
                 <div class="relative h-3 flex-1 rounded-full bg-slate-100 overflow-hidden flex">
                     <div
                         class="h-full bg-emerald-500 transition-all duration-500"
-                        :style="{ width: g.total ? (g.pour / g.total * 100) + '%' : '0%' }"
+                        :style="{ width: g.nbDeputes ? (g.pour / g.nbDeputes * 100) + '%' : '0%' }"
                     />
                     <div
                         class="h-full bg-red-500 transition-all duration-500"
-                        :style="{ width: g.total ? (g.contre / g.total * 100) + '%' : '0%' }"
+                        :style="{ width: g.nbDeputes ? (g.contre / g.nbDeputes * 100) + '%' : '0%' }"
                     />
                     <div
-                        class="h-full bg-slate-300 transition-all duration-500"
-                        :style="{ width: g.total ? (g.abstention / g.total * 100) + '%' : '0%' }"
+                        class="h-full bg-amber-400 transition-all duration-500"
+                        :style="{ width: g.nbDeputes ? (g.abstention / g.nbDeputes * 100) + '%' : '0%' }"
+                    />
+                    <div
+                        class="h-full bg-slate-300 flex-1 transition-all duration-500"
+                        :style="{ minWidth: g.nbDeputes ? (g.nonParticipation / g.nbDeputes * 100) + '%' : '0%' }"
                     />
                 </div>
 
                 <!-- Détail chiffres -->
-                <div class="shrink-0 flex gap-2 text-xs w-24 justify-end">
+                <div class="shrink-0 flex gap-2 text-xs w-28 justify-end">
                     <span class="text-emerald-600 font-medium">{{ g.pour }}</span>
                     <span class="text-slate-300">/</span>
                     <span class="text-red-500 font-medium">{{ g.contre }}</span>
                     <span class="text-slate-300">/</span>
-                    <span class="text-slate-400">{{ g.abstention }}</span>
+                    <span class="text-amber-500">{{ g.abstention }}</span>
+                    <span class="text-slate-300">/</span>
+                    <span class="text-slate-400">{{ g.nonParticipation }}</span>
+                </div>
+            </div>
+
+            <!-- Légende -->
+            <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-1">
+                <div class="flex items-center gap-1.5">
+                    <span class="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-500" />
+                    <span class="text-xs text-slate-500">Pour</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="inline-block w-2.5 h-2.5 rounded-sm bg-red-500" />
+                    <span class="text-xs text-slate-500">Contre</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="inline-block w-2.5 h-2.5 rounded-sm bg-amber-400" />
+                    <span class="text-xs text-slate-500">Abstention</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="inline-block w-2.5 h-2.5 rounded-sm bg-slate-300" />
+                    <span class="text-xs text-slate-500">Non-participation</span>
                 </div>
             </div>
         </div>
@@ -177,21 +203,24 @@ const stats = computed(() => {
     });
 });
 
-// Calcule le décompte pour/contre/abstention par groupe pour le vote sélectionné
+// Calcule le décompte pour/contre/abstention/non-participation par groupe pour le vote sélectionné
 const statsVoteParGroupe = computed(() => {
     if (!props.selectedVote?.votantsMap) return [];
     const { votantsMap } = props.selectedVote;
     const parGroupe = {};
     for (const depute of tousLesDeputes.value) {
-        const position = votantsMap[depute.id];
-        if (!position) continue;
         const g = depute.groupe;
-        if (!parGroupe[g]) parGroupe[g] = { pour: 0, contre: 0, abstention: 0, total: 0 };
-        parGroupe[g][position]++;
-        parGroupe[g].total++;
+        if (!parGroupe[g]) parGroupe[g] = { pour: 0, contre: 0, abstention: 0, nbDeputes: 0 };
+        parGroupe[g].nbDeputes++;
+        const position = votantsMap[depute.id];
+        if (position) parGroupe[g][position]++;
     }
     return Object.entries(parGroupe)
-        .map(([abrev, counts]) => ({ abrev, ...counts }))
+        .map(([abrev, counts]) => ({
+            abrev,
+            ...counts,
+            nonParticipation: counts.nbDeputes - counts.pour - counts.contre - counts.abstention,
+        }))
         .sort((a, b) => (groupeOrdreGaucheaDroite[a.abrev] ?? 99) - (groupeOrdreGaucheaDroite[b.abrev] ?? 99));
 });
 

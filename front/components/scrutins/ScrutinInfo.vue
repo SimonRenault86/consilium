@@ -106,14 +106,28 @@
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-sm text-slate-600 flex items-center gap-1.5">
-                                <i class="fa-solid fa-circle text-slate-300 text-xs" />Abstentions
+                                <i class="fa-solid fa-circle text-amber-400 text-xs" />Abstentions
                             </span>
                             <span class="text-sm font-semibold text-slate-800">{{ scrutin.synthese.abstentions }}</span>
                         </div>
                         <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                             <div
-                                class="h-full bg-slate-300 rounded-full"
+                                class="h-full bg-amber-400 rounded-full"
                                 :style="{ width: pct(scrutin.synthese.abstentions) + '%' }"
+                            />
+                        </div>
+                    </div>
+                    <div v-if="absents">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm text-slate-600 flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle text-slate-300 text-xs" />Non-participation
+                            </span>
+                            <span class="text-sm font-semibold text-slate-800">{{ absents }}</span>
+                        </div>
+                        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                                class="h-full bg-slate-300 rounded-full"
+                                :style="{ width: pct(absents) + '%' }"
                             />
                         </div>
                     </div>
@@ -133,8 +147,12 @@
                         :style="{ width: pct(scrutin.synthese.contre) + '%' }"
                     />
                     <div
-                        class="h-3 bg-slate-300"
+                        class="h-3 bg-amber-400"
                         :style="{ width: pct(scrutin.synthese.abstentions) + '%' }"
+                    />
+                    <div
+                        class="h-3 bg-slate-300 flex-1"
+                        :style="{ minWidth: pct(absents) + '%' }"
                     />
                 </div>
             </Panel>
@@ -143,13 +161,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import Panel from '@components/Panel.vue';
 import AssemblyMap from '@components/AssemblyMap.vue';
 import ScrutinCategorie from '@components/scrutins/ScrutinCategorie.vue';
 import LoadingState from '@components/LoadingState.vue';
 import ErrorState from '@components/ErrorState.vue';
-import { initDeputes } from '@/helpers/deputes.js';
+import { initDeputes, deputesMap } from '@/helpers/deputes.js';
 import { initPartis } from '@/helpers/partis.js';
 
 const props = defineProps({
@@ -169,9 +187,19 @@ const formatDate = dateStr => {
     return `${d} ${mois[m - 1]} ${y}`;
 };
 
-const pct = value => scrutin.value?.synthese?.votants
-    ? Math.round((value / scrutin.value.synthese.votants) * 100)
-    : 0;
+// Absents = total députés − (pour + contre + abstentions + non_votants officiels)
+// nb_non_votants AN = présents qui n'ont pas voté (petite valeur), les vrais absents sont calculés
+const absents = computed(() => {
+    const s = scrutin.value?.synthese;
+    if (!s || !deputesMap.value.size) return null;
+    const val = deputesMap.value.size - (s.pour ?? 0) - (s.contre ?? 0) - (s.abstentions ?? 0) - (s.nonVotants ?? 0);
+    return val > 0 ? val : null;
+});
+
+const pct = value => {
+    if (!deputesMap.value.size) return 0;
+    return Math.round((value / deputesMap.value.size) * 100);
+};
 
 onMounted(async () => {
     await Promise.all([initPartis(), initDeputes()]);

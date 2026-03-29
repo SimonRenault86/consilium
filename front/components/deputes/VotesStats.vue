@@ -47,13 +47,13 @@
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-sm text-slate-600 flex items-center gap-1.5">
-                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-300" />Abstentions
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400" />Abstentions
                             </span>
                             <span class="text-sm font-semibold text-slate-800">{{ stats.abstentions }}</span>
                         </div>
                         <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                             <div
-                                class="h-full bg-slate-300 rounded-full"
+                                class="h-full bg-amber-400 rounded-full"
                                 :style="{ width: pct(stats.abstentions) + '%' }"
                             />
                         </div>
@@ -61,13 +61,13 @@
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-sm text-slate-600 flex items-center gap-1.5">
-                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-200" />Non participation
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-300" />Non participation
                             </span>
                             <span class="text-sm font-semibold text-slate-800">{{ stats.nonParticipation }}</span>
                         </div>
                         <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                             <div
-                                class="h-full bg-slate-200 rounded-full"
+                                class="h-full bg-slate-300 rounded-full"
                                 :style="{ width: pctTotal(stats.nonParticipation) + '%' }"
                             />
                         </div>

@@ -1,0 +1,32 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+    <div class="mb-6">
+        <a href="/partis" class="text-sm text-slate-500 hover:text-slate-700">← Groupes politiques</a>
+    </div>
+
+    {% if not parti %}
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+            <p class="text-slate-500">Groupe introuvable.</p>
+        </section>
+    {% else %}
+
+    {# En-tête SSR (pour SEO) #}
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-8 mb-6">
+        <div class="flex items-center gap-4">
+            {% if parti.logo %}
+                <img src="{{ parti.logo }}" alt="{{ parti.nom }}" class="h-12 object-contain">
+            {% else %}
+                <span class="text-sm font-bold px-3 py-1.5 rounded" style="background: {{ parti.couleur }}22; color: {{ parti.couleur }}">{{ parti.abrev }}</span>
+            {% endif %}
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">{{ parti.nom }}</h1>
+                <p class="text-slate-400 text-sm mt-1">{{ parti.nbDeputes }} député{{ 's' if parti.nbDeputes > 1 }} · Groupe {{ parti.abrev }}</p>
+            </div>
+        </div>
+    </section>
+
+    <parti-page data-abrev="{{ parti.abrev }}" class="block"></parti-page>
+
+    {% endif %}
+{% endblock %}

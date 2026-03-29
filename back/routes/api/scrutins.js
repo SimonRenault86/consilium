@@ -25,6 +25,7 @@ const serialize = row => ({
         pour: row.nb_pour,
         contre: row.nb_contre,
         abstentions: row.nb_abstentions,
+        nonVotants: row.nb_non_votants,
     },
 });
 
