@@ -5,8 +5,8 @@ const TOTAL_SEATS = 577;
 const ROWS = 16;
 const INNER_RADIUS = 130;
 const OUTER_RADIUS = 530;
-const ANGLE_START = 0.09;
-const ANGLE_END = Math.PI - 0.09;
+const ANGLE_START = 0;
+const ANGLE_END = Math.PI;
 const CENTER_X = 550;
 const CENTER_Y = 560;
 

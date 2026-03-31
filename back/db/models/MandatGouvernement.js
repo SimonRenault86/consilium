@@ -13,6 +13,18 @@ export default class MandatGouvernement {
         return rows;
     }
 
+    // Retourne tous les mandats ministériels (passés + actuels) avec info acteur
+    static async findAllMinisteres () {
+        const { rows } = await pool.query(
+            `SELECT mg.*, a.nom, a.prenom, a.civ
+            FROM mandats_gouvernement mg
+            JOIN acteurs a ON a.id = mg.acteur_id
+            WHERE mg.type_organe = 'MINISTERE'
+            ORDER BY mg.preseance, mg.date_debut DESC`
+        );
+        return rows;
+    }
+
     // Retourne tous les mandats d'un acteur
     static async findByActeur (acteurId) {
         const { rows } = await pool.query(

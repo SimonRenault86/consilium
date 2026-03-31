@@ -22,9 +22,9 @@
             />
             <svg
                 ref="svgEl"
-                :viewBox="`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`"
+                :viewBox="`0 0 ${VIEWBOX_WIDTH} ${svgHeight}`"
                 class="w-full h-auto"
-                @mouseleave="hoveredSeat = null"
+                @mouseleave="hoveredSeat = null; hoveredMinisterId = null"
             >
                 <a
                     v-for="seat in seats"
@@ -60,12 +60,97 @@
                         @mouseenter="onSeatHover(seat, $event)"
                     />
                 </a>
+
+                <!-- Mini hémicycle gouvernement (dans le creux des députés) -->
+                <template v-if="gouvernementActuel.length">
+                    <g
+                        v-for="ms in ministerSeats"
+                        :key="ms.acteurId"
+                    >
+                        <!-- Anneau hover -->
+                        <circle
+                            :cx="ms.x"
+                            :cy="ms.y"
+                            :r="MINISTER_RADIUS + 3"
+                            :fill="hoveredMinisterId === ms.acteurId ? ms.couleur + '44' : 'transparent'"
+                        />
+                        <!-- Cercle principal -->
+                        <circle
+                            :cx="ms.x"
+                            :cy="ms.y"
+                            :r="MINISTER_RADIUS"
+                            :fill="ms.couleur"
+                        />
+                        <!-- Zone de hover -->
+                        <circle
+                            :cx="ms.x"
+                            :cy="ms.y"
+                            :r="MINISTER_RADIUS + 6"
+                            fill="transparent"
+                            class="cursor-pointer"
+                            @mouseenter="onMinisterHover(ms, $event)"
+                            @mouseleave="hoveredMinisterId = null"
+                        />
+                    </g>
+                    <text
+                        :x="VIEWBOX_WIDTH / 2"
+                        y="580"
+                        text-anchor="middle"
+                        font-size="11"
+                        fill="#94a3b8"
+                        font-family="system-ui, sans-serif"
+                    >Gouvernement</text>
+                </template>
             </svg>
 
-            <!-- Tooltip flottant -->
+            <!-- Tooltip ministre -->
             <Transition name="tooltip">
                 <div
-                    v-if="hoveredDepute"
+                    v-if="hoveredMinisterData"
+                    class="pointer-events-none fixed z-50 w-56 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden"
+                    :style="tooltipStyle"
+                >
+                    <div
+                        class="flex items-center gap-2 px-3 py-2"
+                        :style="{ backgroundColor: hoveredMinisterData.couleur + '22', borderBottom: `2px solid ${hoveredMinisterData.couleur}` }"
+                    >
+                        <span
+                            class="text-xs font-bold"
+                            :style="{ color: hoveredMinisterData.couleur }"
+                        >
+                            {{ hoveredMinisterData.roleLabel }}
+                        </span>
+                    </div>
+                    <div class="p-3 flex items-center gap-3">
+                        <img
+                            v-if="ministerPhotoLoaded[hoveredMinisterData.acteurId]"
+                            :src="`/elus/${hoveredMinisterData.acteurId}.jpg`"
+                            :alt="`${hoveredMinisterData.prenom} ${hoveredMinisterData.nom}`"
+                            class="size-10 shrink-0 rounded-lg object-cover bg-slate-100"
+                        >
+                        <div
+                            v-else
+                            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
+                            :style="{ backgroundColor: hoveredMinisterData.couleur }"
+                        >
+                            {{ hoveredMinisterData.prenom[0] }}{{ hoveredMinisterData.nom[0] }}
+                        </div>
+                        <div class="flex flex-col justify-center gap-0.5 min-w-0">
+                            <p class="text-sm font-semibold text-slate-900 truncate">
+                                {{ hoveredMinisterData.civ }} {{ hoveredMinisterData.prenom }} {{ hoveredMinisterData.nom }}
+                            </p>
+                            <p class="mt-0.5 text-xs text-slate-400 truncate">
+                                {{ hoveredMinisterData.qualite }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </Transition>
+
+            <!-- Tooltip député -->
+            <Transition name="tooltip">
+                <div
+                    v-if="hoveredDepute && !hoveredMinisterId"
                     class="pointer-events-none fixed z-50 w-60 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden"
                     :style="tooltipStyle"
                 >
@@ -153,6 +238,24 @@
                 <span class="text-xs text-slate-500">100 %</span>
             </div>
 
+            <!-- Légende gouvernement -->
+            <div
+                v-if="gouvernementActuel.length"
+                class="mt-3 flex flex-wrap items-center justify-center gap-3"
+            >
+                <div
+                    v-for="(label, role) in LABELS_GOUVERNEMENT"
+                    :key="role"
+                    class="flex items-center gap-1.5"
+                >
+                    <span
+                        class="inline-block h-3 w-3 rounded-full shrink-0"
+                        :style="{ background: COULEURS_GOUVERNEMENT[role] }"
+                    />
+                    <span class="text-xs text-slate-500">{{ label }}</span>
+                </div>
+            </div>
+
             <!-- Légende mode vote -->
             <div
                 v-if="vueActive === 'vote'"
@@ -198,6 +301,7 @@
 import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue';
 import seats, { VIEWBOX_WIDTH, VIEWBOX_HEIGHT, SEAT_RADIUS } from '@/helpers/hemicycle.js';
 import deputesMap, { getDepute, getCouleurSiege, getCouleur2Siege, getCouleurScoreSiege, getPhotoUrl, isDeputesReady } from '@/helpers/deputes.js';
+import { gouvernementActuel, COULEURS_GOUVERNEMENT, LABELS_GOUVERNEMENT, categorieRole } from '@/helpers/ministres.js';
 import LoadingState from '@components/LoadingState.vue';
 import { groupes, getLogoUrl } from '@/helpers/partis.js';
 import HemicycleFilters from '@/components/HemicycleFilters.vue';
@@ -334,6 +438,7 @@ const tooltipPos = reactive({ x: 0, y: 0 });
 // Mémorise quelles photos/logos ont chargé avec succès pour afficher les initiales/sigle en fallback
 const photoLoaded = reactive({});
 const logoLoaded = reactive({});
+const ministerPhotoLoaded = reactive({});
 
 const hoveredDepute = computed(() => hoveredSeat.value ? getDepute(hoveredSeat.value) : null);
 
@@ -370,13 +475,96 @@ const onSeatHover = (seat, event) => {
     hoveredSeat.value = seat.seatId;
     if (!containerEl.value) return;
 
-    // Utilise la position réelle de l'élément survolé en coords viewport (fixed)
     const circleRect = event.target.getBoundingClientRect();
     const domX = (circleRect.left + circleRect.right) / 2;
     const domY = (circleRect.top + circleRect.bottom) / 2;
 
-    tooltipPos.x = domX - 120; // moitié de w-60 (240px / 2)
-    tooltipPos.y = domY - 220; // au-dessus du siège
+    tooltipPos.x = domX - 120;
+    tooltipPos.y = domY - 220;
+};
+
+// — Ministres (mini hémicycle dans le creux des députés) —
+// Reprend la géométrie de hemicycle.js
+const HEMI_CENTER_X = 550;
+const HEMI_CENTER_Y = 556;
+const HEMI_ANGLE_START = 0;
+const HEMI_ANGLE_END = Math.PI;
+const MINISTER_RADIUS = 8;
+
+const svgHeight = computed(() => VIEWBOX_HEIGHT);
+
+const ministerSeats = computed(() => {
+    const ministers = gouvernementActuel.value;
+    if (!ministers.length) return [];
+
+    const N = ministers.length;
+    const angleRange = HEMI_ANGLE_END - HEMI_ANGLE_START; // π
+
+    // 2 rangées, rayons réduits pour laisser plus d'espace avec les députés (INNER_RADIUS=130)
+    const radii = N <= 10 ? [85] : [60, 90];
+    const totalArc = radii.reduce((sum, r) => sum + r * angleRange, 0);
+    const seatsPerRow = radii.map(r => Math.round((r * angleRange / totalArc) * N));
+    seatsPerRow[seatsPerRow.length - 1] += N - seatsPerRow.reduce((a, b) => a + b, 0);
+
+    const result = [];
+    let idx = 0;
+    for (let rowIdx = 0; rowIdx < radii.length; rowIdx++) {
+        const radius = radii[rowIdx];
+        const count = seatsPerRow[rowIdx];
+
+        // Répartition uniforme qui couvre tout le demi-cercle (de 0 à π inclus)
+        const step = angleRange / count;
+        const angles = Array.from({ length: count }, (_, i) => HEMI_ANGLE_START + step / 2 + i * step);
+
+        // Ordre de remplissage : centre d'abord (PM au sommet), puis alternance gauche/droite
+        const mid = Math.floor(count / 2);
+        const posOrder = [mid];
+        for (let d = 1; d <= Math.max(mid, count - mid - 1); d++) {
+            if (mid + d < count) posOrder.push(mid + d);
+            if (mid - d >= 0) posOrder.push(mid - d);
+        }
+
+        const rowSeats = new Array(count);
+        for (let i = 0; i < count && idx < N; i++) {
+            const pos = posOrder[i];
+            const angle = angles[pos];
+            const x = Math.round((HEMI_CENTER_X - radius * Math.cos(angle)) * 100) / 100;
+            const y = Math.round((HEMI_CENTER_Y - radius * Math.sin(angle)) * 100) / 100;
+            const m = ministers[idx++];
+            const role = categorieRole(m.qualite);
+            rowSeats[pos] = {
+                ...m, x, y,
+                couleur: COULEURS_GOUVERNEMENT[role] ?? '#3b82f6',
+                roleLabel: LABELS_GOUVERNEMENT[role] ?? 'Ministre',
+            };
+        }
+        result.push(...rowSeats.filter(Boolean));
+    }
+    return result;
+});
+
+const hoveredMinisterId = ref(null);
+const hoveredMinisterData = computed(() =>
+    hoveredMinisterId.value
+        ? ministerSeats.value.find(m => m.acteurId === hoveredMinisterId.value) ?? null
+        : null
+);
+
+const onMinisterHover = (ms, event) => {
+    hoveredSeat.value = null;
+    hoveredMinisterId.value = ms.acteurId;
+    const rect = event.target.getBoundingClientRect();
+    const domX = (rect.left + rect.right) / 2;
+    const domY = (rect.top + rect.bottom) / 2;
+    tooltipPos.x = domX - 112;
+    tooltipPos.y = domY - 110;
+
+    if (ministerPhotoLoaded[ms.acteurId] === undefined) {
+        const img = new Image();
+        img.onload = () => { ministerPhotoLoaded[ms.acteurId] = true; };
+        img.onerror = () => { ministerPhotoLoaded[ms.acteurId] = false; };
+        img.src = `/elus/${ms.acteurId}.jpg`;
+    }
 };
 </script>
 

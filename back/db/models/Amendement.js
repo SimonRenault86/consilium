@@ -18,14 +18,15 @@ export default class Amendement {
 
         const { rows } = await pool.query(
             `SELECT a.*,
-                d.prenom AS auteur_prenom,
-                d.nom AS auteur_nom,
+                ac.prenom AS auteur_prenom,
+                ac.nom AS auteur_nom,
                 d.groupe_abrev AS auteur_groupe,
                 sc.nom AS sous_categorie_nom,
                 COALESCE(c2.nom, c1.nom) AS categorie_nom,
                 COALESCE(c2.couleur, c1.couleur) AS categorie_couleur
             FROM amendements a
             LEFT JOIN deputes d ON d.id = a.auteur_ref
+            LEFT JOIN acteurs ac ON ac.id = a.auteur_ref
             LEFT JOIN scrutin_categories c1 ON c1.id = a.amendement_categorie_id
             LEFT JOIN scrutin_sous_categories sc ON sc.id = a.amendement_sous_categorie_id
             LEFT JOIN scrutin_categories c2 ON c2.id = sc.categorie_id
@@ -40,14 +41,15 @@ export default class Amendement {
     static async findByUid (uid) {
         const { rows } = await pool.query(
             `SELECT a.*,
-                d.prenom AS auteur_prenom,
-                d.nom AS auteur_nom,
+                ac.prenom AS auteur_prenom,
+                ac.nom AS auteur_nom,
                 d.groupe_abrev AS auteur_groupe,
                 sc.nom AS sous_categorie_nom,
                 COALESCE(c2.nom, c1.nom) AS categorie_nom,
                 COALESCE(c2.couleur, c1.couleur) AS categorie_couleur
             FROM amendements a
             LEFT JOIN deputes d ON d.id = a.auteur_ref
+            LEFT JOIN acteurs ac ON ac.id = a.auteur_ref
             LEFT JOIN scrutin_categories c1 ON c1.id = a.amendement_categorie_id
             LEFT JOIN scrutin_sous_categories sc ON sc.id = a.amendement_sous_categorie_id
             LEFT JOIN scrutin_categories c2 ON c2.id = sc.categorie_id
@@ -61,14 +63,15 @@ export default class Amendement {
         const [amendementResult, signatairesResult] = await Promise.all([
             pool.query(
                 `SELECT a.*,
-                    d.prenom AS auteur_prenom,
-                    d.nom AS auteur_nom,
+                    ac.prenom AS auteur_prenom,
+                    ac.nom AS auteur_nom,
                     d.groupe_abrev AS auteur_groupe,
                     sc.nom AS sous_categorie_nom,
                     COALESCE(c2.nom, c1.nom) AS categorie_nom,
                     COALESCE(c2.couleur, c1.couleur) AS categorie_couleur
                 FROM amendements a
                 LEFT JOIN deputes d ON d.id = a.auteur_ref
+                LEFT JOIN acteurs ac ON ac.id = a.auteur_ref
                 LEFT JOIN scrutin_categories c1 ON c1.id = a.amendement_categorie_id
                 LEFT JOIN scrutin_sous_categories sc ON sc.id = a.amendement_sous_categorie_id
                 LEFT JOIN scrutin_categories c2 ON c2.id = sc.categorie_id

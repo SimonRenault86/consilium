@@ -11,13 +11,14 @@ import MajoriteBuilder from '@components/outils/MajoriteBuilder.vue';
 import PartiPage from '@components/partis/PartiPage.vue';
 import { initDeputes } from '@/helpers/deputes.js';
 import { initPartis } from '@/helpers/partis.js';
+import { initMinstres } from '@/helpers/ministres.js';
 
 const createVueApp = (component, props = {}) => createApp(component, props);
 
 const mapEl = document.getElementById('assembly-map');
 if (mapEl) {
     createVueApp(HomePage).mount(mapEl);
-    initPartis().then(() => initDeputes());
+    initPartis().then(() => Promise.all([initDeputes(), initMinstres()]));
 }
 
 const deputeHeaderEl = document.querySelector('depute-header');
