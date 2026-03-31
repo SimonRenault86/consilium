@@ -6,9 +6,27 @@
                 <SeedUpdateChip :loading="loading" />
             </div>
             <div class="flex items-center justify-between mb-3">
-                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest py-3">
-                    Derniers scrutins
-                </h2>
+                <!-- Toggle scrutins / amendements -->
+                <div class="flex bg-slate-100 rounded-lg p-0.5">
+                    <button
+                        class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 cursor-pointer"
+                        :class="mode === 'scrutins'
+                            ? 'bg-white shadow-sm text-slate-800'
+                            : 'text-slate-500 hover:text-slate-700'"
+                        @click="switchMode('scrutins')"
+                    >
+                        Scrutins
+                    </button>
+                    <button
+                        class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 cursor-pointer"
+                        :class="mode === 'amendements'
+                            ? 'bg-white shadow-sm text-slate-800'
+                            : 'text-slate-500 hover:text-slate-700'"
+                        @click="switchMode('amendements')"
+                    >
+                        Amendements
+                    </button>
+                </div>
                 <div class="flex items-center gap-2">
                     <ButtonBase
                         v-if="selectedVote"
@@ -25,9 +43,27 @@
         <div class="mb-2">
             <SearchBar
                 v-model="search"
-                placeholder="Rechercher un vote…"
+                :placeholder="mode === 'scrutins' ? 'Rechercher un vote…' : 'Rechercher un amendement…'"
                 @update:model-value="onSearchInput"
             />
+        </div>
+
+        <!-- Filtre par statut (amendements uniquement) -->
+        <div
+            v-if="mode === 'amendements'"
+            class="flex flex-wrap gap-1.5 mb-3"
+        >
+            <button
+                v-for="s in SORT_FILTERS"
+                :key="s.value"
+                class="px-2.5 py-1 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
+                :class="sortFilter === s.value
+                    ? s.activeClass
+                    : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'"
+                @click="setSortFilter(s.value)"
+            >
+                {{ s.label }}
+            </button>
         </div>
 
         <!-- Filtre par dates -->
@@ -58,15 +94,15 @@
 
         <!-- États de chargement / erreur / vide -->
         <LoadingState
-            v-if="loading && !votes.length"
+            v-if="loading && !items.length"
             class="flex-1 py-8"
         />
         <ErrorState
-            v-else-if="error && !votes.length"
+            v-else-if="error && !items.length"
             class="flex-1 py-8"
         />
         <EmptyState
-            v-else-if="!loading && !votes.length"
+            v-else-if="!loading && !items.length"
             class="flex-1 py-8"
         />
 
@@ -112,110 +148,40 @@
                 class="h-full overflow-y-auto space-y-2 pr-1 transition-opacity duration-200"
                 :class="loading ? 'opacity-40' : 'opacity-100'"
             >
-                <div
-                    v-for="vote in votes"
-                    :key="vote.uid"
-                    class="rounded-xl border transition-all duration-150 cursor-pointer relative group"
-                    :class="selectedVote?.uid === vote.uid
-                        ? 'border-slate-900 bg-slate-50'
-                        : 'border-slate-200 bg-white hover:border-slate-300'"
-                    @click="toggleVote(vote)"
-                >
-                    <!-- Infobulle titre complet -->
-                    <div class="pointer-events-none absolute bottom-full left-0 right-0 mb-2 z-50 hidden group-hover:block">
-                        <div class="bg-slate-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg leading-snug">
-                            {{ vote.titre }}
-                        </div>
-                    </div>
+                <!-- MODE SCRUTINS -->
+                <template v-if="mode === 'scrutins'">
+                    <ScrutinItem
+                        v-for="vote in items"
+                        :key="vote.uid"
+                        :vote="vote"
+                        :selected="selectedVote?.uid === vote.uid"
+                        @toggle="toggleVote"
+                    />
+                </template>
 
-                    <div class="px-4 py-3 flex items-start gap-3">
-                        <span
-                            class="flex-shrink-0 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold uppercase"
-                            :class="vote.sort === 'adopté'
-                                ? 'bg-emerald-100 text-emerald-700'
-                                : 'bg-red-100 text-red-700'"
-                        >
-                            {{ vote.sort === 'adopté' ? 'Adopté' : 'Rejeté' }}
-                        </span>
-                        <div class="flex flex-col gap-1">
-                            <ScrutinCategorie
-                                :categorie="vote.categorie"
-                                class="mb-1"
-                            />
-                            <p class="text-sm font-medium text-slate-800 leading-snug line-clamp-2">
-                                {{ vote.titre }}
-                            </p>
-                            <p class="text-xs text-slate-400 mt-1">
-                                Scrutin n°{{ vote.numero }} · {{ formatDate(vote.dateScrutin) }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div
-                        v-if="selectedVote?.uid === vote.uid"
-                        class="border-t border-slate-100 px-4 py-3"
-                    >
-                        <p
-                            v-if="vote.demandeur"
-                            class="text-xs text-slate-500 mb-3"
-                        >
-                            Demandé par : {{ vote.demandeur }}
-                        </p>
-
-                        <div class="flex items-center gap-4 text-sm">
-                            <div class="flex items-center gap-1.5">
-                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                                <span class="font-semibold text-slate-800">{{ vote.synthese.pour }}</span>
-                                <span class="text-slate-400">pour</span>
-                            </div>
-                            <div class="flex items-center gap-1.5">
-                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500" />
-                                <span class="font-semibold text-slate-800">{{ vote.synthese.contre }}</span>
-                                <span class="text-slate-400">contre</span>
-                            </div>
-                            <div class="flex items-center gap-1.5">
-                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-300" />
-                                <span class="font-semibold text-slate-800">{{ vote.synthese.abstentions }}</span>
-                                <span class="text-slate-400">abst.</span>
-                            </div>
-                        </div>
-
-                        <div class="mt-3 h-2 rounded-full overflow-hidden bg-slate-100 flex">
-                            <div
-                                class="h-full bg-emerald-500"
-                                :style="{ width: pct(vote.synthese.pour, vote.synthese.votants) + '%' }"
-                            />
-                            <div
-                                class="h-full bg-red-500"
-                                :style="{ width: pct(vote.synthese.contre, vote.synthese.votants) + '%' }"
-                            />
-                            <div
-                                class="h-full bg-slate-300"
-                                :style="{ width: pct(vote.synthese.abstentions, vote.synthese.votants) + '%' }"
-                            />
-                        </div>
-                        <div class="mt-3">
-                            <ButtonLink
-                                :href="`/scrutin/${vote.uid}`"
-                                @click.stop
-                            >
-                                Voir le scrutin <i class="fa-solid fa-arrow-right" />
-                            </ButtonLink>
-                        </div>
-                    </div>
-                </div>
+                <!-- MODE AMENDEMENTS -->
+                <template v-else>
+                    <AmendementItem
+                        v-for="amdt in items"
+                        :key="amdt.uid"
+                        :amdt="amdt"
+                        :selected="selectedVote?.uid === amdt.uid"
+                        @toggle="toggleAmendement"
+                    />
+                </template>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { fetchScrutins } from '@/helpers/scrutins.js';
-import ButtonLink from '@components/ButtonLink.vue';
+import { fetchAmendements } from '@/helpers/amendements.js';
 import ButtonBase from '@components/ButtonBase.vue';
 import SearchBar from '@components/SearchBar.vue';
-import ScrutinCategorie from '@components/scrutins/ScrutinCategorie.vue';
+import ScrutinItem from '@components/scrutins/ScrutinItem.vue';
+import AmendementItem from '@components/amendements/AmendementItem.vue';
 import LoadingState from '@components/LoadingState.vue';
 import ErrorState from '@components/ErrorState.vue';
 import EmptyState from '@components/EmptyState.vue';
@@ -223,44 +189,71 @@ import SeedUpdateChip from '@components/SeedUpdateChip.vue';
 
 const emit = defineEmits(['select']);
 
+const SORT_FILTERS = [
+    { value: '', label: 'Tous', activeClass: 'bg-slate-800 border-slate-800 text-white' },
+    { value: 'Adopté', label: 'Adoptés', activeClass: 'bg-emerald-600 border-emerald-600 text-white' },
+    { value: 'Rejeté', label: 'Rejetés', activeClass: 'bg-red-600 border-red-600 text-white' },
+    { value: 'Retiré', label: 'Retirés', activeClass: 'bg-amber-500 border-amber-500 text-white' },
+    { value: 'Non soutenu', label: 'Non soutenus', activeClass: 'bg-slate-500 border-slate-500 text-white' },
+    { value: 'Irrecevable', label: 'Irrecevables', activeClass: 'bg-orange-600 border-orange-600 text-white' },
+];
+
+const mode = ref('scrutins');
 const votes = ref([]);
+const amendements = ref([]);
+const items = computed(() => mode.value === 'scrutins' ? votes.value : amendements.value);
+
 const selectedVote = ref(null);
 const loading = ref(false);
 const error = ref(false);
 const dateFrom = ref('');
 const dateTo = ref('');
 const search = ref('');
+const sortFilter = ref('');
 let searchTimer = null;
-
-const mois = ['jan.', 'fév.', 'mars', 'avr.', 'mai', 'juin',
-    'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
-
-const formatDate = dateStr => {
-    const [y, m, d] = dateStr.split('-').map(Number);
-    return `${d} ${mois[m - 1]} ${y}`;
-};
-
-const pct = (value, total) => total ? Math.round((value / total) * 100) : 0;
 
 const load = async () => {
     loading.value = true;
     error.value = false;
     try {
+        const params = {
+            from: dateFrom.value || undefined,
+            to: dateTo.value || undefined,
+            q: search.value.trim() || undefined,
+            sort: (mode.value === 'amendements' && sortFilter.value) ? sortFilter.value : undefined,
+            limit: (dateFrom.value || dateTo.value || search.value.trim() || sortFilter.value) ? 50 : 10,
+        };
         const [result] = await Promise.all([
-            fetchScrutins({
-                from: dateFrom.value || undefined,
-                to: dateTo.value || undefined,
-                q: search.value.trim() || undefined,
-                limit: (dateFrom.value || dateTo.value || search.value.trim()) ? 50 : 10,
-            }),
+            mode.value === 'scrutins' ? fetchScrutins(params) : fetchAmendements(params),
             new Promise(resolve => setTimeout(resolve, 1000)),
         ]);
-        votes.value = result;
-    } catch (e) {
+        if (mode.value === 'scrutins') {
+            votes.value = result;
+        } else {
+            amendements.value = result;
+        }
+    } catch {
         error.value = true;
     } finally {
         loading.value = false;
     }
+};
+
+const setSortFilter = value => {
+    sortFilter.value = value;
+    selectedVote.value = null;
+    load();
+};
+
+const switchMode = newMode => {
+    if (mode.value === newMode) return;
+    mode.value = newMode;
+    selectedVote.value = null;
+    search.value = '';
+    dateFrom.value = '';
+    dateTo.value = '';
+    sortFilter.value = '';
+    load();
 };
 
 const applyFilter = () => {
@@ -288,14 +281,36 @@ const toggleVote = async vote => {
         selectedVote.value = null;
         return;
     }
-    // On sélectionne d'abord le vote de la liste pour un affichage immédiat
     selectedVote.value = vote;
-    // Puis on enrichit avec le votantsMap pour colorer la carte
     try {
         const res = await fetch(`/api/scrutins/${vote.uid}`);
         if (res.ok) selectedVote.value = await res.json();
     } catch {
         // en cas d'erreur on garde le vote sans votantsMap
+    }
+};
+
+const toggleAmendement = async amdt => {
+    if (selectedVote.value?.uid === amdt.uid) {
+        selectedVote.value = null;
+        return;
+    }
+    selectedVote.value = amdt;
+    try {
+        const res = await fetch(`/api/amendements/${amdt.uid}`);
+        if (res.ok) {
+            const detail = await res.json();
+            // Mapper auteur → 'auteur' et cosignataires → 'cosignataire' pour l'hémicycle
+            if (detail.signatairesMap) {
+                detail.votantsMap = {};
+                for (const [depId, role] of Object.entries(detail.signatairesMap)) {
+                    detail.votantsMap[depId] = role;
+                }
+            }
+            selectedVote.value = detail;
+        }
+    } catch {
+        // en cas d'erreur on garde l'amendement sans signatairesMap
     }
 };
 

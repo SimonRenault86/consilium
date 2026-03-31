@@ -33,7 +33,8 @@
                 <!-- Barre pour/contre/abstention/non-participation -->
                 <div class="relative h-3 flex-1 rounded-full bg-slate-100 overflow-hidden flex">
                     <div
-                        class="h-full bg-emerald-500 transition-all duration-500"
+                        class="h-full transition-all duration-500"
+                        :class="selectedVote?.signatairesMap ? 'bg-emerald-600' : 'bg-emerald-500'"
                         :style="{ width: g.nbDeputes ? (g.pour / g.nbDeputes * 100) + '%' : '0%' }"
                     />
                     <div
@@ -41,10 +42,12 @@
                         :style="{ width: g.nbDeputes ? (g.contre / g.nbDeputes * 100) + '%' : '0%' }"
                     />
                     <div
-                        class="h-full bg-amber-400 transition-all duration-500"
+                        class="h-full transition-all duration-500"
+                        :class="selectedVote?.signatairesMap ? 'bg-emerald-300' : 'bg-amber-400'"
                         :style="{ width: g.nbDeputes ? (g.abstention / g.nbDeputes * 100) + '%' : '0%' }"
                     />
                     <div
+                        v-if="!selectedVote?.signatairesMap"
                         class="h-full bg-slate-300 flex-1 transition-all duration-500"
                         :style="{ minWidth: g.nbDeputes ? (g.nonParticipation / g.nbDeputes * 100) + '%' : '0%' }"
                     />
@@ -52,34 +55,69 @@
 
                 <!-- Détail chiffres -->
                 <div class="shrink-0 flex gap-2 text-xs w-28 justify-end">
-                    <span class="text-emerald-600 font-medium">{{ g.pour }}</span>
+                    <span
+                        class="font-medium"
+                        :class="selectedVote?.signatairesMap ? 'text-emerald-700' : 'text-emerald-600'"
+                    >{{ g.pour }}</span>
+                    <template v-if="!selectedVote?.signatairesMap">
+                        <span class="text-slate-300">/</span>
+                        <span class="text-red-500 font-medium">{{ g.contre }}</span>
+                    </template>
                     <span class="text-slate-300">/</span>
-                    <span class="text-red-500 font-medium">{{ g.contre }}</span>
-                    <span class="text-slate-300">/</span>
-                    <span class="text-amber-500">{{ g.abstention }}</span>
-                    <span class="text-slate-300">/</span>
-                    <span class="text-slate-400">{{ g.nonParticipation }}</span>
+                    <span :class="selectedVote?.signatairesMap ? 'text-emerald-400' : 'text-amber-500'">{{ g.abstention }}</span>
+                    <template v-if="!selectedVote?.signatairesMap">
+                        <span class="text-slate-300">/</span>
+                        <span class="text-slate-400">{{ g.nonParticipation }}</span>
+                    </template>
                 </div>
             </div>
 
             <!-- Légende -->
             <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-1">
-                <div class="flex items-center gap-1.5">
-                    <span class="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-500" />
-                    <span class="text-xs text-slate-500">Pour</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="inline-block w-2.5 h-2.5 rounded-sm bg-red-500" />
-                    <span class="text-xs text-slate-500">Contre</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="inline-block w-2.5 h-2.5 rounded-sm bg-amber-400" />
-                    <span class="text-xs text-slate-500">Abstention</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="inline-block w-2.5 h-2.5 rounded-sm bg-slate-300" />
-                    <span class="text-xs text-slate-500">Non-participation</span>
-                </div>
+                <template v-if="selectedVote?.signatairesMap">
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-600" />
+                        <span class="text-xs text-slate-500">Auteur</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-300" />
+                        <span class="text-xs text-slate-500">Cosignataires</span>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-500" />
+                        <span class="text-xs text-slate-500">Pour</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-2.5 h-2.5 rounded-sm bg-red-500" />
+                        <span class="text-xs text-slate-500">Contre</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-2.5 h-2.5 rounded-sm bg-amber-400" />
+                        <span class="text-xs text-slate-500">Abstention</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-2.5 h-2.5 rounded-sm bg-slate-300" />
+                        <span class="text-xs text-slate-500">Non-participation</span>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Chargement du vote en cours -->
+        <div
+            v-else-if="vueActive === 'vote'"
+            class="flex flex-col gap-1.5 animate-pulse px-1"
+        >
+            <div
+                v-for="n in 5"
+                :key="n"
+                class="flex items-center gap-3"
+            >
+                <div class="w-14 h-4 rounded bg-slate-200" />
+                <div class="h-3 flex-1 rounded-full bg-slate-200" />
+                <div class="w-20 h-3 rounded bg-slate-200" />
             </div>
         </div>
 
@@ -118,7 +156,7 @@
 
         <!-- Filtres scores : barre par groupe -->
         <div
-            v-else
+            v-else-if="champ"
             class="flex flex-col gap-2"
         >
             <div
@@ -207,13 +245,16 @@ const stats = computed(() => {
 const statsVoteParGroupe = computed(() => {
     if (!props.selectedVote?.votantsMap) return [];
     const { votantsMap } = props.selectedVote;
+    const isAmendement = !!props.selectedVote.signatairesMap;
     const parGroupe = {};
     for (const depute of tousLesDeputes.value) {
         const g = depute.groupe;
         if (!parGroupe[g]) parGroupe[g] = { pour: 0, contre: 0, abstention: 0, nbDeputes: 0 };
         parGroupe[g].nbDeputes++;
         const position = votantsMap[depute.id];
-        if (position) parGroupe[g][position]++;
+        if (position === 'auteur') parGroupe[g].pour++;
+        else if (position === 'cosignataire') parGroupe[g].abstention++;
+        else if (position === 'pour' || position === 'contre' || position === 'abstention') parGroupe[g][position]++;
     }
     return Object.entries(parGroupe)
         .map(([abrev, counts]) => ({
@@ -221,6 +262,7 @@ const statsVoteParGroupe = computed(() => {
             ...counts,
             nonParticipation: counts.nbDeputes - counts.pour - counts.contre - counts.abstention,
         }))
+        .filter(g => !isAmendement || (g.pour + g.abstention) > 0)
         .sort((a, b) => (groupeOrdreGaucheaDroite[a.abrev] ?? 99) - (groupeOrdreGaucheaDroite[b.abrev] ?? 99));
 });
 

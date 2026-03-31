@@ -38,7 +38,7 @@
                         :cy="seat.y"
                         :r="SEAT_RADIUS + 2.5"
                         :fill="(hoveredSeat === seat.seatId || pinnedSeat === seat.seatId) ? getCouleur2Siege(seat.seatId) : 'transparent'"
-                        :opacity="isSeatDimmed(seat.seatId) ? 0.3 : 1"
+                        :opacity="isSeatDimmed(seat.seatId) ? 0 : 1"
                     />
                     <!-- Cercle principal -->
                     <circle
@@ -158,18 +158,30 @@
                 v-if="vueActive === 'vote'"
                 class="mt-3 flex items-center justify-center gap-4"
             >
-                <div class="flex items-center gap-1.5">
-                    <span class="inline-block w-3 h-3 rounded-full bg-emerald-500" />
-                    <span class="text-xs text-slate-500">Pour</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="inline-block w-3 h-3 rounded-full bg-red-500" />
-                    <span class="text-xs text-slate-500">Contre</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="inline-block w-3 h-3 rounded-full bg-amber-400" />
-                    <span class="text-xs text-slate-500">Abstention</span>
-                </div>
+                <template v-if="props.selectedVote?.signatairesMap">
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-3 h-3 rounded-full bg-emerald-600" />
+                        <span class="text-xs text-slate-500">Auteur</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-3 h-3 rounded-full bg-emerald-300" />
+                        <span class="text-xs text-slate-500">Cosignataires</span>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-3 h-3 rounded-full bg-emerald-500" />
+                        <span class="text-xs text-slate-500">Pour</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-3 h-3 rounded-full bg-red-500" />
+                        <span class="text-xs text-slate-500">Contre</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-3 h-3 rounded-full bg-amber-400" />
+                        <span class="text-xs text-slate-500">Abstention</span>
+                    </div>
+                </template>
             </div>
 
             <AssemblyStats
@@ -246,6 +258,8 @@ const COULEURS_VOTE = {
     pour: '#10b981',
     contre: '#ef4444',
     abstention: '#fbbf24',
+    auteur: '#059669',
+    cosignataire: '#6ee7b7',
 };
 
 const getCouleurSiegeActive = seatId => {
