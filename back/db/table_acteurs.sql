@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS acteurs (
+    id              VARCHAR(20)     PRIMARY KEY,
+    civ             VARCHAR(10),
+    nom             VARCHAR(200)    NOT NULL,
+    prenom          VARCHAR(200)    NOT NULL,
+    alpha           VARCHAR(200),
+    trigramme       VARCHAR(10),
+    naissance       DATE,
+    ville_naissance VARCHAR(200),
+    dep_naissance   VARCHAR(100),
+    pays_naissance  VARCHAR(100),
+    date_deces      DATE,
+    profession      VARCHAR(300),
+    uri_hatvp       VARCHAR(300),
+    mail            VARCHAR(200),
+    twitter         VARCHAR(200),
+    facebook        VARCHAR(200),
+    instagram       VARCHAR(200),
+    linkedin        VARCHAR(200),
+    site_internet   VARCHAR(300),
+    created_at      TIMESTAMP       DEFAULT NOW(),
+    updated_at      TIMESTAMP       DEFAULT NOW()
+);

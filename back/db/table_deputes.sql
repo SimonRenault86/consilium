@@ -1,12 +1,6 @@
 CREATE TABLE IF NOT EXISTS deputes (
-    id                              VARCHAR(20)     PRIMARY KEY,
+    id                              VARCHAR(20)     PRIMARY KEY REFERENCES acteurs(id),
     legislature                     INTEGER         NOT NULL,
-    civ                             VARCHAR(10),
-    nom                             VARCHAR(100)    NOT NULL,
-    prenom                          VARCHAR(100)    NOT NULL,
-    ville_naissance                 VARCHAR(100),
-    naissance                       DATE,
-    age                             INTEGER,
     groupe                          VARCHAR(200),
     groupe_abrev                    VARCHAR(20),
     departement_nom                 VARCHAR(100),
@@ -14,10 +8,6 @@ CREATE TABLE IF NOT EXISTS deputes (
     circo                           INTEGER,
     date_prise_fonction             DATE,
     job                             VARCHAR(200),
-    mail                            VARCHAR(200),
-    twitter                         VARCHAR(100),
-    facebook                        VARCHAR(100),
-    website                         VARCHAR(200),
     nombre_mandats                  INTEGER,
     experience_depute               VARCHAR(50),
     score_participation             DECIMAL(6, 4),
@@ -28,3 +18,6 @@ CREATE TABLE IF NOT EXISTS deputes (
     created_at                      TIMESTAMP       DEFAULT NOW(),
     updated_at                      TIMESTAMP       DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_deputes_groupe ON deputes(groupe_abrev);
+CREATE INDEX IF NOT EXISTS idx_deputes_departement ON deputes(departement_code);
