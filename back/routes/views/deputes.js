@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { groupes } from '../../../front/helpers/partis.js';
-import { toSlug, formatDate } from './_shared.js';
+import { toSlug, formatDate, safeJsonLd } from './_shared.js';
 import Depute from '../../db/models/Depute.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -133,8 +133,28 @@ router.get('/depute/:slug', async (req, res) => {
         initiales: `${d.prenom[0]}${d.nom[0]}`
     }));
 
+    const siteUrl = process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
+    const pageUrl = `${siteUrl}/depute/${depute.slug}`;
+    const photoUrl = `${siteUrl}/elus/${depute.id}.jpg`;
+    const description = `${depute.civ} ${depute.prenom} ${depute.nom}, député${depute.civ === 'Mme' ? 'e' : ''} de ${depute.departementNom} (circonscription ${depute.circo})${groupe ? `, groupe ${groupe.nom}` : ''}. Découvrez ses votes et son activité à l'Assemblée Nationale.`;
+
+    const schemaJson = safeJsonLd({
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name: `${depute.prenom} ${depute.nom}`,
+        jobTitle: 'Député',
+        image: photoUrl,
+        url: pageUrl,
+        ...(groupe && { memberOf: { '@type': 'Organization', name: groupe.nom } }),
+        ...(depute.naissanceFormatee && { birthDate: String(deputeRaw.naissance).slice(0, 10) }),
+    });
+
     res.render('depute.njk', {
         title: `${depute.civ} ${depute.prenom} ${depute.nom} — Consilium`,
+        description,
+        canonicalUrl: pageUrl,
+        ogImage: photoUrl,
+        schemaJson,
         slug,
         depute,
         groupe,

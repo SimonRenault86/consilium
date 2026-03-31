@@ -6,6 +6,9 @@ export const toSlug = text =>
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '');
 
+// Sérialise un objet en JSON-LD sûr pour injection dans du HTML
+export const safeJsonLd = obj => JSON.stringify(obj).replace(/</g, '\\u003C');
+
 const mois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
     'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 

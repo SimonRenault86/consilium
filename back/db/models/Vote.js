@@ -69,6 +69,14 @@ export default class Vote {
         return { ...vote, votantsMap };
     }
 
+    // Retourne uniquement uid + date_scrutin pour tous les scrutins (usage sitemap)
+    static async findAllUids () {
+        const { rows } = await pool.query(
+            'SELECT uid, date_scrutin FROM scrutins ORDER BY numero DESC'
+        );
+        return rows;
+    }
+
     static async upsert (vote) {
         await pool.query(
             `INSERT INTO scrutins (uid, numero, legislature, date_scrutin, titre, sort, demandeur,

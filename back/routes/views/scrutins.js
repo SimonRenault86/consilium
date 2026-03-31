@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import Vote from '../../db/models/Vote.js';
 import { groupes, groupeOrdreGaucheaDroite } from '../../../front/helpers/partis.js';
+import { formatDate, safeJsonLd } from './_shared.js';
 
 const router = Router();
 
@@ -14,7 +15,13 @@ router.get('/scrutins', (req, res) => {
             couleur: groupes[abrev]?.couleur || '#aaaaaa',
         }));
 
-    res.render('scrutins.njk', { title: 'Scrutins — Consilium', groupes: groupesList });
+    const siteUrl = process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
+    res.render('scrutins.njk', {
+        title: 'Scrutins — Consilium',
+        description: "Retrouvez tous les scrutins et votes de l'Assemblée Nationale française : résultats, détail des positions par groupe politique.",
+        canonicalUrl: `${siteUrl}/scrutins`,
+        groupes: groupesList
+    });
 });
 
 router.get('/scrutin/:uid', async (req, res) => {
@@ -28,13 +35,40 @@ router.get('/scrutin/:uid', async (req, res) => {
                 vote: null,
             });
         }
+        const siteUrl = process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
+        const pageUrl = `${siteUrl}/scrutin/${vote.uid}`;
+        const dateFormatee = formatDate(vote.date_scrutin);
+        const titrePropre = vote.titre ? vote.titre.replace(/\.+$/, '') : null;
+        const description = `Scrutin n°${vote.numero}${dateFormatee ? ` du ${dateFormatee}` : ''}${titrePropre ? ` — ${titrePropre}` : ''}. Résultat : ${vote.sort}.`;
+
+        const schemaJson = safeJsonLd({
+            '@context': 'https://schema.org',
+            '@type': 'Event',
+            name: `Scrutin n°${vote.numero} — ${vote.titre}`,
+            description: description,
+            startDate: vote.date_scrutin
+                ? (vote.date_scrutin instanceof Date
+                    ? vote.date_scrutin.toISOString().slice(0, 10)
+                    : String(vote.date_scrutin).slice(0, 10))
+                : undefined,
+            location: { '@type': 'Place', name: 'Assemblée Nationale, Paris' },
+            organizer: { '@type': 'Organization', name: 'Assemblée Nationale', url: 'https://www.assemblee-nationale.fr' },
+            url: pageUrl,
+            eventStatus: 'https://schema.org/EventScheduled',
+        });
+
         res.render('scrutin.njk', {
             title: `Scrutin n°${vote.numero} — Consilium`,
+            description,
+            canonicalUrl: pageUrl,
+            schemaJson,
             uid,
             vote: {
                 uid: vote.uid,
                 numero: vote.numero,
                 sort: vote.sort,
+                titre: vote.titre,
+                dateFormatee,
             },
         });
     } catch (err) {

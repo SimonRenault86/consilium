@@ -4,6 +4,26 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{ title }}</title>
+        <meta name="description" content="{{ description or 'Consilium — Suivez les votes et l\'activité des 577 députés de l\'Assemblée Nationale française.' }}">
+        {% if canonicalUrl %}<link rel="canonical" href="{{ canonicalUrl }}">{% endif %}
+
+        {# Open Graph #}
+        <meta property="og:type" content="{{ ogType or 'website' }}">
+        <meta property="og:site_name" content="Consilium">
+        <meta property="og:locale" content="fr_FR">
+        <meta property="og:title" content="{{ title }}">
+        <meta property="og:description" content="{{ description or 'Consilium — Suivez les votes et l\'activité des 577 députés de l\'Assemblée Nationale française.' }}">
+        {% if canonicalUrl %}<meta property="og:url" content="{{ canonicalUrl }}">{% endif %}
+        {% if ogImage %}<meta property="og:image" content="{{ ogImage }}">{% endif %}
+
+        {# Twitter Card #}
+        <meta name="twitter:card" content="{{ 'summary_large_image' if ogImage else 'summary' }}">
+        <meta name="twitter:title" content="{{ title }}">
+        <meta name="twitter:description" content="{{ description or 'Consilium — Suivez les votes et l\'activité des 577 députés de l\'Assemblée Nationale française.' }}">
+        {% if ogImage %}<meta name="twitter:image" content="{{ ogImage }}">{% endif %}
+
+        {% block head %}{% endblock %}
+
         <link rel="stylesheet" href="/dist/main.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer">
     </head>
