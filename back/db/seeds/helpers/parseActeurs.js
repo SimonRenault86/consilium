@@ -95,6 +95,6 @@ export function parseMandatsSenat (raw) {
             dateFin: val(m.dateFin) ?? null,
             premiereElection: val(m.mandature?.premiereElection) === '1' ? true
                 : val(m.mandature?.premiereElection) === '0' ? false
-                : null,
+                    : null,
         }));
 }
