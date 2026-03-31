@@ -1,5 +1,6 @@
 import pool from '../dbManager.js';
 import Parti from '../models/Parti.js';
+import { logSeed } from './helpers/logSeed.js';
 
 const partis = [
     { abrev: 'LFI', nom: 'La France insoumise', couleur: '#cc2443', couleur2: '#f0504e', logo: '/partis/lfi-nfp.png', ordre: 1 },
@@ -21,6 +22,7 @@ const run = async () => {
         console.log(`Import de ${partis.length} partis...`);
         await Parti.upsertMany(partis);
         console.log('Import des partis terminé.');
+        await logSeed('partis');
     } catch (err) {
         console.error('Erreur lors du seed partis :', err);
         process.exit(1);

@@ -6,6 +6,7 @@ import https from 'https';
 import { execSync } from 'child_process';
 import 'dotenv/config';
 import pool from '../dbManager.js';
+import { logSeed } from './helpers/logSeed.js';
 import Vote from '../models/Vote.js';
 import DeputeVote from '../models/DeputeVote.js';
 import { categoriseVotes, OPENAI_BATCH_SIZE } from './helpers/categorise.js';
@@ -242,6 +243,7 @@ const run = async () => {
         // 8. Nettoyer les fichiers temporaires
         rmSync(TMP_DIR, { recursive: true, force: true });
         console.log('Fichiers temporaires supprimés.');
+        await logSeed('scrutins');
     }
 };
 

@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import pool from '../dbManager.js';
+import { logSeed } from './helpers/logSeed.js';
 import { categoriseVotes, OPENAI_BATCH_SIZE } from './helpers/categorise.js';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -62,6 +63,7 @@ const run = async () => {
     }
 
     console.log(`Catégorisation terminée : ${done} scrutins mis à jour, ${errors} erreur(s) de batch.`);
+    await logSeed('categorise-scrutins');
 };
 
 run().finally(() => pool.end());

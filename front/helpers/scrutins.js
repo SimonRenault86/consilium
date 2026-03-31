@@ -11,3 +11,10 @@ export const fetchScrutins = async ({ from, to, q, limit = 10 } = {}) => {
     if (!res.ok) throw new Error('Erreur chargement des scrutins');
     return res.json();
 };
+
+export const fetchLastUpdate = async () => {
+    const res = await fetch('/api/scrutins/last-update');
+    if (!res.ok) throw new Error('Erreur chargement de la dernière mise à jour');
+    const { lastUpdate } = await res.json();
+    return lastUpdate ? new Date(lastUpdate) : null;
+};

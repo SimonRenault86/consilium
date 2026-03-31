@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Vote from '../../db/models/Vote.js';
+import pool from '../../db/dbManager.js';
 
 const router = Router();
 
@@ -27,6 +28,19 @@ const serialize = row => ({
         abstentions: row.nb_abstentions,
         nonVotants: row.nb_non_votants,
     },
+});
+
+// GET /api/scrutins/last-update — dernière exécution du seed scrutins
+router.get('/last-update', async (req, res) => {
+    try {
+        const { rows } = await pool.query(
+            "SELECT executed_at FROM seed_logs WHERE categorie = 'scrutins' ORDER BY executed_at DESC LIMIT 1"
+        );
+        res.json({ lastUpdate: rows[0]?.executed_at || null });
+    } catch (err) {
+        console.error('Erreur GET /api/scrutins/last-update :', err);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
 });
 
 // GET /api/scrutins?from=&to=&limit=&q=
