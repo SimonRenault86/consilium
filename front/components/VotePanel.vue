@@ -7,12 +7,12 @@
             </div>
             <div class="flex items-center justify-between mb-3">
                 <!-- Toggle scrutins / amendements -->
-                <div class="flex bg-slate-100 rounded-lg p-0.5">
+                <div class="flex bg-primary-100 rounded-lg p-0.5">
                     <button
                         class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 cursor-pointer"
                         :class="mode === 'scrutins'
-                            ? 'bg-white shadow-sm text-slate-800'
-                            : 'text-slate-500 hover:text-slate-700'"
+                            ? 'bg-white shadow-sm text-primary-700'
+                            : 'text-primary-500 hover:text-primary-600'"
                         @click="switchMode('scrutins')"
                     >
                         Scrutins
@@ -20,8 +20,8 @@
                     <button
                         class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 cursor-pointer"
                         :class="mode === 'amendements'
-                            ? 'bg-white shadow-sm text-slate-800'
-                            : 'text-slate-500 hover:text-slate-700'"
+                            ? 'bg-white shadow-sm text-primary-700'
+                            : 'text-primary-500 hover:text-primary-600'"
                         @click="switchMode('amendements')"
                     >
                         Amendements
@@ -30,6 +30,7 @@
                 <div class="flex items-center gap-2">
                     <ButtonBase
                         v-if="selectedVote"
+                        size="sm"
                         @click="clearVote"
                     >
                         <i class="fa-solid fa-xmark" /> Réinitialiser
@@ -59,7 +60,7 @@
                 class="px-2.5 py-1 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
                 :class="sortFilter === s.value
                     ? s.activeClass
-                    : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'"
+                    : 'bg-white border-slate-200 text-primary-500 hover:border-slate-400'"
                 @click="setSortFilter(s.value)"
             >
                 {{ s.label }}
@@ -71,19 +72,19 @@
             <input
                 v-model="dateFrom"
                 type="date"
-                class="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400 min-w-0"
+                class="rounded-lg border border-primary-200 bg-white px-2 py-1.5 text-xs text-primary-700 focus:outline-none focus:border-primary-400 min-w-0"
                 @change="applyFilter"
             >
-            <span class="text-xs text-slate-400 px-0.5">→</span>
+            <span class="text-xs text-primary-500 px-0.5">→</span>
             <input
                 v-model="dateTo"
                 type="date"
-                class="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-slate-400 min-w-0"
+                class="rounded-lg border border-primary-200 bg-white px-2 py-1.5 text-xs text-primary-700 focus:outline-none focus:border-primary-400 min-w-0"
                 @change="applyFilter"
             >
             <button
                 v-if="dateFrom || dateTo"
-                class="text-xs text-slate-400 hover:text-slate-700 px-0.5"
+                class="text-xs text-primary-500 hover:text-primary-700 px-0.5"
                 title="Effacer le filtre"
                 @click="clearFilter"
             >
@@ -117,9 +118,9 @@
                     v-if="loading"
                     class="absolute inset-0 z-10 flex items-start justify-center pt-8 pointer-events-none"
                 >
-                    <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm text-xs text-slate-500">
+                    <div class="flex items-center gap-2 bg-white border border-primary-200 rounded-full px-3 py-1.5 shadow-sm text-xs text-primary-600">
                         <svg
-                            class="h-3 w-3 animate-spin text-slate-400"
+                            class="h-3 w-3 animate-spin text-secondary-500"
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
                             viewBox="0 0 24 24"
@@ -190,7 +191,7 @@ import SeedUpdateChip from '@components/SeedUpdateChip.vue';
 const emit = defineEmits(['select']);
 
 const SORT_FILTERS = [
-    { value: '', label: 'Tous', activeClass: 'bg-slate-800 border-slate-800 text-white' },
+    { value: '', label: 'Tous', activeClass: 'bg-primary-700 border-primary-700 text-white' },
     { value: 'Adopté', label: 'Adoptés', activeClass: 'bg-emerald-600 border-emerald-600 text-white' },
     { value: 'Rejeté', label: 'Rejetés', activeClass: 'bg-red-600 border-red-600 text-white' },
     { value: 'Retiré', label: 'Retirés', activeClass: 'bg-amber-500 border-amber-500 text-white' },

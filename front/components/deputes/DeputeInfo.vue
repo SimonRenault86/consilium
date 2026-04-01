@@ -18,58 +18,58 @@
                 <Panel title="Mandat">
                     <dl class="space-y-3">
                         <div>
-                            <dt class="text-xs text-slate-400 mb-0.5">
+                            <dt class="text-xs text-primary-500 mb-0.5">
                                 Circonscription
                             </dt>
-                            <dd class="text-slate-800 font-medium">
+                            <dd class="text-primary-700 font-medium">
                                 {{ depute.departementNom }}{{ depute.departementCode ? ` (${depute.departementCode})` : '' }} — {{ depute.circo }}e
                             </dd>
                         </div>
                         <div v-if="depute.mandatPrincipal?.region">
-                            <dt class="text-xs text-slate-400 mb-0.5">
+                            <dt class="text-xs text-primary-500 mb-0.5">
                                 Région
                             </dt>
-                            <dd class="text-slate-800 font-medium">
+                            <dd class="text-primary-700 font-medium">
                                 {{ depute.mandatPrincipal.region }}
                             </dd>
                         </div>
                         <div v-if="depute.mandatPrincipal?.legislature">
-                            <dt class="text-xs text-slate-400 mb-0.5">
+                            <dt class="text-xs text-primary-500 mb-0.5">
                                 Législature
                             </dt>
-                            <dd class="text-slate-800 font-medium">
+                            <dd class="text-primary-700 font-medium">
                                 {{ depute.mandatPrincipal.legislature }}e
                             </dd>
                         </div>
                         <div v-if="depute.datePriseFonction">
-                            <dt class="text-xs text-slate-400 mb-0.5">
+                            <dt class="text-xs text-primary-500 mb-0.5">
                                 Prise de fonction
                             </dt>
-                            <dd class="text-slate-800 font-medium">
+                            <dd class="text-primary-700 font-medium">
                                 {{ formatDate(depute.datePriseFonction) }}
                             </dd>
                         </div>
                         <div v-if="depute.mandatPrincipal?.causeMandat">
-                            <dt class="text-xs text-slate-400 mb-0.5">
+                            <dt class="text-xs text-primary-500 mb-0.5">
                                 Cause du mandat
                             </dt>
-                            <dd class="text-slate-800 font-medium capitalize">
+                            <dd class="text-primary-700 font-medium capitalize">
                                 {{ depute.mandatPrincipal.causeMandat }}
                             </dd>
                         </div>
                         <div v-if="depute.mandatPrincipal?.placeHemicycle">
-                            <dt class="text-xs text-slate-400 mb-0.5">
+                            <dt class="text-xs text-primary-500 mb-0.5">
                                 Siège à l'hémicycle
                             </dt>
-                            <dd class="text-slate-800 font-medium">
+                            <dd class="text-primary-700 font-medium">
                                 N° {{ depute.mandatPrincipal.placeHemicycle }}
                             </dd>
                         </div>
                         <div v-if="depute.nombreMandats">
-                            <dt class="text-xs text-slate-400 mb-0.5">
+                            <dt class="text-xs text-primary-500 mb-0.5">
                                 Expérience
                             </dt>
-                            <dd class="text-slate-800 font-medium">
+                            <dd class="text-primary-700 font-medium">
                                 {{ depute.nombreMandats }} mandat{{ depute.nombreMandats > 1 ? 's' : '' }}{{ depute.experienceDepute ? ` · ${depute.experienceDepute}` : '' }}
                                 <span
                                     v-if="depute.mandatPrincipal?.premiereElection"
@@ -84,26 +84,26 @@
                 <Panel title="Identité">
                     <dl class="space-y-3">
                         <div v-if="depute.naissance">
-                            <dt class="text-xs text-slate-400 mb-0.5">
+                            <dt class="text-xs text-primary-500 mb-0.5">
                                 Date de naissance
                             </dt>
-                            <dd class="text-slate-800 font-medium">
+                            <dd class="text-primary-700 font-medium">
                                 {{ formatDate(depute.naissance) }}{{ depute.age ? ` (${depute.age} ans)` : '' }}
                             </dd>
                         </div>
                         <div v-if="depute.villeNaissance">
-                            <dt class="text-xs text-slate-400 mb-0.5">
+                            <dt class="text-xs text-primary-500 mb-0.5">
                                 Lieu de naissance
                             </dt>
-                            <dd class="text-slate-800 font-medium">
+                            <dd class="text-primary-700 font-medium">
                                 {{ depute.villeNaissance }}
                             </dd>
                         </div>
                         <div v-if="depute.job">
-                            <dt class="text-xs text-slate-400 mb-0.5">
+                            <dt class="text-xs text-primary-500 mb-0.5">
                                 Profession
                             </dt>
-                            <dd class="text-slate-800 font-medium">
+                            <dd class="text-primary-700 font-medium">
                                 {{ depute.job }}
                             </dd>
                         </div>
@@ -127,11 +127,11 @@
                             class="flex items-start gap-2"
                         >
                             <i class="fa-solid fa-circle mt-1.5 flex-shrink-0 text-blue-400 text-[6px]" />
-                            <span class="text-slate-800 text-sm">
+                            <span class="text-primary-700 text-sm">
                                 {{ commission.nom }}
                                 <span
                                     v-if="commission.role && commission.role !== 'Membre'"
-                                    class="ml-1 text-xs text-slate-400"
+                                    class="ml-1 text-xs text-primary-500"
                                 >({{ commission.role }})</span>
                             </span>
                         </li>
@@ -146,9 +146,9 @@
                         <li
                             v-for="collaborateur in depute.mandatPrincipal.collaborateurs"
                             :key="collaborateur"
-                            class="flex items-center gap-2 text-sm text-slate-800"
+                            class="flex items-center gap-2 text-sm text-primary-700"
                         >
-                            <i class="fa-solid fa-circle flex-shrink-0 text-slate-300 text-[6px]" />
+                            <i class="fa-solid fa-circle flex-shrink-0 text-primary-300 text-[6px]" />
                             {{ collaborateur }}
                         </li>
                     </ul>
@@ -164,10 +164,10 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div v-if="depute.scoreParticipation != null">
                         <div class="flex justify-between items-center mb-1.5">
-                            <span class="text-sm text-slate-600">Participation</span>
-                            <span class="text-sm font-semibold text-slate-800">{{ pct(depute.scoreParticipation) }} %</span>
+                            <span class="text-sm text-primary-600">Participation</span>
+                            <span class="text-sm font-semibold text-primary-700">{{ pct(depute.scoreParticipation) }} %</span>
                         </div>
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-2 bg-primary-100 rounded-full overflow-hidden">
                             <div
                                 class="h-2 rounded-full bg-blue-500"
                                 :style="{ width: pct(depute.scoreParticipation) + '%' }"
@@ -176,10 +176,10 @@
                     </div>
                     <div v-if="depute.scoreLoyaute != null">
                         <div class="flex justify-between items-center mb-1.5">
-                            <span class="text-sm text-slate-600">Loyauté au groupe</span>
-                            <span class="text-sm font-semibold text-slate-800">{{ pct(depute.scoreLoyaute) }} %</span>
+                            <span class="text-sm text-primary-600">Loyauté au groupe</span>
+                            <span class="text-sm font-semibold text-primary-700">{{ pct(depute.scoreLoyaute) }} %</span>
                         </div>
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-2 bg-primary-100 rounded-full overflow-hidden">
                             <div
                                 class="h-2 rounded-full bg-emerald-500"
                                 :style="{ width: pct(depute.scoreLoyaute) + '%' }"
@@ -199,35 +199,35 @@
                     <a
                         v-if="depute.mail"
                         :href="`mailto:${depute.mail}`"
-                        class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5"
+                        class="inline-flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-900 border border-slate-200 rounded-lg px-3 py-1.5"
                     ><i class="fa-solid fa-envelope" /> {{ depute.mail }}</a>
                     <a
                         v-if="depute.twitter"
                         :href="`https://twitter.com/${depute.twitter.replace('@', '')}`"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5"
+                        class="inline-flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-900 border border-slate-200 rounded-lg px-3 py-1.5"
                     ><i class="fa-brands fa-x-twitter" /> {{ depute.twitter }}</a>
                     <a
                         v-if="depute.facebook"
                         :href="`https://facebook.com/${depute.facebook}`"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5"
+                        class="inline-flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-900 border border-slate-200 rounded-lg px-3 py-1.5"
                     ><i class="fa-brands fa-facebook" /> Facebook</a>
                     <a
                         v-if="depute.website"
                         :href="`https://${depute.website}`"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5"
+                        class="inline-flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-900 border border-slate-200 rounded-lg px-3 py-1.5"
                     ><i class="fa-solid fa-globe" /> Site web</a>
                     <a
                         v-if="depute.hatvpUrl"
                         :href="depute.hatvpUrl"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5"
+                        class="inline-flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-900 border border-slate-200 rounded-lg px-3 py-1.5"
                     ><i class="fa-solid fa-file-lines" /> Déclaration HATVP</a>
                 </div>
             </Panel>

@@ -4,9 +4,9 @@
             class="w-full flex items-center justify-between px-4 sm:px-6 py-4 text-left cursor-pointer"
             @click="isOpen = !isOpen"
         >
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">{{ title }}</span>
+            <span class="text-xs font-semibold text-primary-500 uppercase tracking-widest">{{ title }}</span>
             <i
-                class="fa-solid fa-chevron-down text-slate-300 text-xs transition-transform duration-200"
+                class="fa-solid fa-chevron-down text-primary-300 text-xs transition-transform duration-200"
                 :class="{ 'rotate-180': isOpen }"
             />
         </button>

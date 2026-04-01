@@ -9,9 +9,9 @@
                 <div class="flex items-baseline gap-3">
                     <span
                         class="text-5xl font-bold tabular-nums transition-colors duration-300"
-                        :class="atteint ? 'text-emerald-600' : 'text-slate-900'"
+                        :class="atteint ? 'text-emerald-600' : 'text-primary-900'"
                     >{{ totalSelectionne }}</span>
-                    <span class="text-xl text-slate-400">/ 577</span>
+                    <span class="text-xl text-primary-500">/ 577</span>
                 </div>
                 <div
                     v-if="atteint"
@@ -34,14 +34,14 @@
                 </div>
                 <div
                     v-else
-                    class="rounded-full bg-slate-100 px-4 py-1.5 text-sm font-semibold text-slate-500"
+                    class="rounded-full bg-primary-100 px-4 py-1.5 text-sm font-semibold text-primary-500"
                 >
                     {{ SEUIL_MAJORITE - totalSelectionne }} siège{{ SEUIL_MAJORITE - totalSelectionne > 1 ? 's' : '' }} manquant{{ SEUIL_MAJORITE - totalSelectionne > 1 ? 's' : '' }}
                 </div>
             </div>
             <!-- Barre de progression -->
             <div class="relative mt-4 pb-5">
-                <div class="h-3 w-full overflow-hidden rounded-full bg-slate-100">
+                <div class="h-3 w-full overflow-hidden rounded-full bg-primary-100">
                     <div
                         class="h-full rounded-full transition-all duration-300"
                         :class="atteint ? 'bg-emerald-500' : 'bg-red-500'"
@@ -59,12 +59,12 @@
                     />
                     <span
                         class="mt-1 text-xs font-semibold transition-colors duration-300"
-                        :class="atteint ? 'text-emerald-600' : 'text-slate-500'"
+                        :class="atteint ? 'text-emerald-600' : 'text-primary-500'"
                     >{{ SEUIL_MAJORITE }}</span>
                 </div>
                 <!-- Labels extrémités -->
-                <span class="absolute bottom-0 left-0 text-xs text-slate-400">0</span>
-                <span class="absolute bottom-0 right-0 text-xs text-slate-400">577</span>
+                <span class="absolute bottom-0 left-0 text-xs text-primary-500">0</span>
+                <span class="absolute bottom-0 right-0 text-xs text-primary-500">577</span>
             </div>
         </div>
 
@@ -91,7 +91,7 @@
             <!-- Liste des groupes -->
             <div class="flex w-full flex-col gap-2 xl:w-72">
                 <div class="mb-1 flex items-center justify-between">
-                    <h2 class="text-sm font-semibold text-slate-700">
+                    <h2 class="text-sm font-semibold text-primary-700">
                         Groupes politiques
                     </h2>
                     <div class="flex gap-2 text-xs">
@@ -101,7 +101,7 @@
                         >
                             Tout
                         </button>
-                        <span class="text-slate-300">·</span>
+                        <span class="text-primary-300">·</span>
                         <button
                             class="text-blue-600 hover:underline"
                             @click="toutDeselectionner"
@@ -129,7 +129,7 @@
                         class="w-10 shrink-0 text-center text-xs font-bold"
                         :style="{ color: groupe.couleur }"
                     >{{ groupe.abrev }}</span>
-                    <span class="line-clamp-1 flex-1 text-xs font-medium leading-tight text-slate-800">{{ groupe.nom }}</span>
+                    <span class="line-clamp-1 flex-1 text-xs font-medium leading-tight text-primary-700">{{ groupe.nom }}</span>
                     <span
                         class="shrink-0 text-sm font-bold tabular-nums"
                         :style="{ color: groupe.couleur }"

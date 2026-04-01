@@ -1,10 +1,10 @@
 <template>
     <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
         <div class="mb-4">
-            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+            <h2 class="text-xs font-semibold text-primary-500 uppercase tracking-widest">
                 Votes par thématique
             </h2>
-            <p class="text-xs text-slate-400 mt-1">
+            <p class="text-xs text-primary-500 mt-1">
                 Comportement de vote du groupe selon les catégories de scrutins
             </p>
         </div>
@@ -24,10 +24,10 @@
                     :key="s.categorie"
                 >
                     <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-sm text-slate-700 truncate mr-2">{{ s.categorie }}</span>
-                        <span class="text-xs text-slate-400 shrink-0">{{ s.nbScrutins }} scrutin{{ s.nbScrutins > 1 ? 's' : '' }}</span>
+                        <span class="text-sm text-primary-700 truncate mr-2">{{ s.categorie }}</span>
+                        <span class="text-xs text-primary-500 shrink-0">{{ s.nbScrutins }} scrutin{{ s.nbScrutins > 1 ? 's' : '' }}</span>
                     </div>
-                    <div class="relative h-2 rounded-full overflow-hidden bg-slate-100 flex">
+                    <div class="relative h-2 rounded-full overflow-hidden bg-primary-100 flex">
                         <div
                             v-for="segment in segments(s)"
                             :key="segment.label"
@@ -52,7 +52,7 @@
                         class="w-2.5 h-2.5 rounded-full shrink-0"
                         :class="seg.bg"
                     />
-                    <span class="text-xs text-slate-500">{{ seg.label }}</span>
+                    <span class="text-xs text-primary-500">{{ seg.label }}</span>
                 </div>
             </div>
         </template>
@@ -64,8 +64,8 @@
                 class="pointer-events-none fixed z-50 rounded-lg border border-slate-200 bg-white shadow-md px-3 py-2 text-xs"
                 :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }"
             >
-                <span class="font-semibold text-slate-800">{{ tooltip.count }}</span>
-                <span class="text-slate-500"> vote{{ tooltip.count > 1 ? 's' : '' }} {{ tooltip.label.toLowerCase() }}</span>
+                <span class="font-semibold text-primary-700">{{ tooltip.count }}</span>
+                <span class="text-primary-500"> vote{{ tooltip.count > 1 ? 's' : '' }} {{ tooltip.label.toLowerCase() }}</span>
             </div>
         </Transition>
     </section>

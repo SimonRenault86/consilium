@@ -21,12 +21,12 @@
                     <ScrutinCategorie :categorie="scrutin.categorie" />
                 </div>
                 <p
-                    class="text-sm font-medium text-slate-800 leading-snug"
+                    class="text-sm font-medium text-primary-700 leading-snug"
                     :class="compact ? 'line-clamp-2' : ''"
                 >
                     {{ scrutin.titre }}
                 </p>
-                <p class="text-xs text-slate-400 mt-1">
+                <p class="text-xs text-primary-500 mt-1">
                     Scrutin n°{{ scrutin.numero }} · {{ formatDate(scrutin.dateScrutin) }}
                     <span
                         v-if="position"
@@ -38,24 +38,24 @@
         </div>
 
         <template v-if="showStats && scrutin.synthese">
-            <div class="mt-3 flex items-center gap-4 text-xs text-slate-600">
+            <div class="mt-3 flex items-center gap-4 text-xs text-primary-600">
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block w-2 h-2 rounded-full bg-emerald-500" />
                     <span class="font-semibold">{{ scrutin.synthese.pour }}</span>
-                    <span class="text-slate-400">pour</span>
+                    <span class="text-primary-500">pour</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block w-2 h-2 rounded-full bg-red-500" />
                     <span class="font-semibold">{{ scrutin.synthese.contre }}</span>
-                    <span class="text-slate-400">contre</span>
+                    <span class="text-primary-500">contre</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block w-2 h-2 rounded-full bg-slate-300" />
                     <span class="font-semibold">{{ scrutin.synthese.abstentions }}</span>
-                    <span class="text-slate-400">abst.</span>
+                    <span class="text-primary-500">abst.</span>
                 </div>
             </div>
-            <div class="mt-3 h-1.5 rounded-full overflow-hidden bg-slate-100 flex">
+            <div class="mt-3 h-1.5 rounded-full overflow-hidden bg-primary-100 flex">
                 <div
                     class="h-full bg-emerald-500"
                     :style="{ width: pct(scrutin.synthese.pour, scrutin.synthese.votants) + '%' }"
@@ -99,7 +99,7 @@ const pct = (value, total) => total ? Math.round((value / total) * 100) : 0;
 const badgeClass = computed(() => {
     if (props.position === 'pour') return 'bg-emerald-100 text-emerald-700';
     if (props.position === 'contre') return 'bg-red-100 text-red-700';
-    if (props.position === 'abstention') return 'bg-slate-100 text-slate-600';
+    if (props.position === 'abstention') return 'bg-primary-100 text-primary-600';
     return props.scrutin.sort === 'adopté'
         ? 'bg-emerald-100 text-emerald-700'
         : 'bg-red-100 text-red-700';

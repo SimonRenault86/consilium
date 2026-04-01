@@ -18,7 +18,7 @@
                 title="Objet du scrutin"
                 class="mb-6"
             >
-                <p class="text-slate-800 leading-relaxed">
+                <p class="text-primary-700 leading-relaxed">
                     {{ scrutin.titre }}
                 </p>
                 <ScrutinCategorie
@@ -28,18 +28,18 @@
                 />
                 <dl class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div v-if="scrutin.demandeur">
-                        <dt class="text-xs text-slate-400 mb-0.5">
+                        <dt class="text-xs text-primary-500 mb-0.5">
                             Demandé par
                         </dt>
-                        <dd class="text-slate-800 font-medium text-sm">
+                        <dd class="text-primary-700 font-medium text-sm">
                             {{ scrutin.demandeur }}
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-xs text-slate-400 mb-0.5">
+                        <dt class="text-xs text-primary-500 mb-0.5">
                             Date
                         </dt>
-                        <dd class="text-slate-800 font-medium text-sm">
+                        <dd class="text-primary-700 font-medium text-sm">
                             {{ formatDate(scrutin.dateScrutin) }}
                         </dd>
                     </div>
@@ -71,18 +71,18 @@
                     >
                         {{ scrutin.sort }}
                     </span>
-                    <span class="text-sm text-slate-500">{{ scrutin.synthese.votants }} votants</span>
+                    <span class="text-sm text-primary-500">{{ scrutin.synthese.votants }} votants</span>
                 </div>
 
                 <div class="space-y-3">
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm text-slate-600 flex items-center gap-1.5">
+                            <span class="text-sm text-primary-600 flex items-center gap-1.5">
                                 <i class="fa-solid fa-circle text-emerald-500 text-xs" />Pour
                             </span>
-                            <span class="text-sm font-semibold text-slate-800">{{ scrutin.synthese.pour }}</span>
+                            <span class="text-sm font-semibold text-primary-700">{{ scrutin.synthese.pour }}</span>
                         </div>
-                        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-1.5 bg-primary-100 rounded-full overflow-hidden">
                             <div
                                 class="h-full bg-emerald-500 rounded-full"
                                 :style="{ width: pct(scrutin.synthese.pour) + '%' }"
@@ -91,12 +91,12 @@
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm text-slate-600 flex items-center gap-1.5">
+                            <span class="text-sm text-primary-600 flex items-center gap-1.5">
                                 <i class="fa-solid fa-circle text-red-500 text-xs" />Contre
                             </span>
-                            <span class="text-sm font-semibold text-slate-800">{{ scrutin.synthese.contre }}</span>
+                            <span class="text-sm font-semibold text-primary-700">{{ scrutin.synthese.contre }}</span>
                         </div>
-                        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-1.5 bg-primary-100 rounded-full overflow-hidden">
                             <div
                                 class="h-full bg-red-500 rounded-full"
                                 :style="{ width: pct(scrutin.synthese.contre) + '%' }"
@@ -105,12 +105,12 @@
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm text-slate-600 flex items-center gap-1.5">
+                            <span class="text-sm text-primary-600 flex items-center gap-1.5">
                                 <i class="fa-solid fa-circle text-amber-400 text-xs" />Abstentions
                             </span>
-                            <span class="text-sm font-semibold text-slate-800">{{ scrutin.synthese.abstentions }}</span>
+                            <span class="text-sm font-semibold text-primary-700">{{ scrutin.synthese.abstentions }}</span>
                         </div>
-                        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-1.5 bg-primary-100 rounded-full overflow-hidden">
                             <div
                                 class="h-full bg-amber-400 rounded-full"
                                 :style="{ width: pct(scrutin.synthese.abstentions) + '%' }"
@@ -119,12 +119,12 @@
                     </div>
                     <div v-if="absents">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm text-slate-600 flex items-center gap-1.5">
-                                <i class="fa-solid fa-circle text-slate-300 text-xs" />Non-participation
+                            <span class="text-sm text-primary-600 flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle text-primary-300 text-xs" />Non-participation
                             </span>
-                            <span class="text-sm font-semibold text-slate-800">{{ absents }}</span>
+                            <span class="text-sm font-semibold text-primary-700">{{ absents }}</span>
                         </div>
-                        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-1.5 bg-primary-100 rounded-full overflow-hidden">
                             <div
                                 class="h-full bg-slate-300 rounded-full"
                                 :style="{ width: pct(absents) + '%' }"
@@ -134,10 +134,10 @@
                 </div>
 
                 <!-- Barre combinée -->
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-5 mb-2">
+                <p class="text-xs font-semibold text-primary-500 uppercase tracking-widest mt-5 mb-2">
                     Récapitulatif
                 </p>
-                <div class="mt-1 h-3 rounded-full overflow-hidden bg-slate-100 flex">
+                <div class="mt-1 h-3 rounded-full overflow-hidden bg-primary-100 flex">
                     <div
                         class="h-3 bg-emerald-500"
                         :style="{ width: pct(scrutin.synthese.pour) + '%' }"

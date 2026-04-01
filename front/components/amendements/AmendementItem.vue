@@ -38,10 +38,10 @@
                         >· {{ amdt.sousCategorie.nom }}</span>
                     </span>
                 </div>
-                <p class="text-sm font-medium text-slate-800 leading-snug line-clamp-2">
+                <p class="text-sm font-medium text-primary-700 leading-snug line-clamp-2">
                     {{ amdt.dispositif || 'Amendement ' + amdt.numeroLong }}
                 </p>
-                <p class="text-xs text-slate-400 mt-1">
+                <p class="text-xs text-primary-500 mt-1">
                     {{ amdt.numeroLong }}
                     <template v-if="amdt.auteur">
                         · {{ amdt.auteur.nom }}
@@ -59,23 +59,23 @@
         >
             <p
                 v-if="amdt.auteur"
-                class="text-xs text-slate-500 mb-2"
+                class="text-xs text-primary-500 mb-2"
             >
                 Auteur : {{ amdt.auteur.nom }}
                 <span
                     v-if="amdt.auteur.groupe"
-                    class="text-slate-400"
+                    class="text-primary-500"
                 >({{ amdt.auteur.groupe }})</span>
             </p>
             <p
                 v-if="amdt.exposeSommaire"
-                class="text-xs text-slate-600 leading-relaxed line-clamp-4 mb-2"
+                class="text-xs text-primary-600 leading-relaxed line-clamp-4 mb-2"
             >
                 {{ amdt.exposeSommaire }}
             </p>
             <p
                 v-if="amdt.etat || amdt.sousEtat"
-                class="text-xs text-slate-400"
+                class="text-xs text-primary-500"
             >
                 État : {{ amdt.etat }}
                 <template v-if="amdt.sousEtat">
@@ -110,6 +110,6 @@ const sortClass = computed(() => {
     if (s === 'adopté') return 'bg-emerald-100 text-emerald-700';
     if (s === 'rejeté') return 'bg-red-100 text-red-700';
     if (s === 'retiré') return 'bg-amber-100 text-amber-700';
-    return 'bg-slate-100 text-slate-600';
+    return 'bg-primary-100 text-primary-600';
 });
 </script>

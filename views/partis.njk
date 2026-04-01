@@ -2,8 +2,8 @@
 
 {% block content %}
     <div class="mb-5 sm:mb-6">
-        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">Groupes politiques</h1>
-        <p class="text-slate-400 text-sm mt-1">{{ totalDeputes }} député{{ 's' if totalDeputes > 1 }} répartis en {{ groupes.length }} groupe{{ 's' if groupes.length > 1 }}</p>
+        <h1 class="text-2xl sm:text-3xl font-bold text-primary-900">Groupes politiques</h1>
+        <p class="text-primary-500 text-sm mt-1">{{ totalDeputes }} député{{ 's' if totalDeputes > 1 }} répartis en {{ groupes.length }} groupe{{ 's' if groupes.length > 1 }}</p>
     </div>
 
     {% for groupe in groupes %}
@@ -12,12 +12,12 @@
             {% if groupe.logo %}
                 <img src="{{ groupe.logo }}" alt="{{ groupe.nom }}" class="h-7 object-contain">
             {% else %}
-                <span class="text-xs font-bold px-2 py-1 rounded bg-slate-100 text-slate-600">{{ groupe.abrev }}</span>
+                <span class="text-xs font-bold px-2 py-1 rounded bg-primary-100 text-primary-600">{{ groupe.abrev }}</span>
             {% endif %}
             <div class="flex-1 min-w-0">
-                <h2 class="text-base font-bold text-slate-900 truncate">{{ groupe.nom }}</h2>
+                <h2 class="text-base font-bold text-primary-900 truncate">{{ groupe.nom }}</h2>
             </div>
-            <span class="text-sm text-slate-400 shrink-0">{{ groupe.deputes.length }} député{{ 's' if groupe.deputes.length > 1 }}</span>
+            <span class="text-sm text-primary-500 shrink-0">{{ groupe.deputes.length }} député{{ 's' if groupe.deputes.length > 1 }}</span>
         </a>
     </section>
     {% endfor %}

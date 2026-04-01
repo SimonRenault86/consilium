@@ -2,7 +2,7 @@
     <div>
         <div
             v-if="loading"
-            class="flex items-center justify-center py-12 text-slate-400 text-sm"
+            class="flex items-center justify-center py-12 text-primary-500 text-sm"
         >
             Chargement de la carte…
         </div>

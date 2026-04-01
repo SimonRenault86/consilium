@@ -10,7 +10,7 @@
 
             <!-- Scrutins spécifiques au groupe -->
             <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
+                <h2 class="text-xs font-semibold text-primary-500 uppercase tracking-widest mb-4">
                     Scrutins récents
                 </h2>
                 <LoadingState
@@ -40,10 +40,10 @@
                             {{ positionLabel(s.groupeVote) }}
                         </span>
                         <div class="min-w-0">
-                            <p class="text-sm font-medium text-slate-800 leading-snug line-clamp-2 group-hover:text-slate-900">
+                            <p class="text-sm font-medium text-primary-700 leading-snug line-clamp-2 group-hover:text-primary-900">
                                 {{ s.titre }}
                             </p>
-                            <p class="text-xs text-slate-400 mt-0.5">
+                            <p class="text-xs text-primary-500 mt-0.5">
                                 Scrutin n°{{ s.numero }} · {{ formatDate(s.dateScrutin) }}
                             </p>
                         </div>
@@ -66,10 +66,10 @@
             <!-- Nombre de députés + résumé (droite, 1/3) -->
             <div class="flex flex-col gap-4">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center">
-                    <p class="text-5xl font-bold text-slate-900">
+                    <p class="text-5xl font-bold text-primary-900">
                         {{ nbDeputes }}
                     </p>
-                    <p class="text-sm text-slate-400 mt-2">
+                    <p class="text-sm text-primary-500 mt-2">
                         député{{ nbDeputes > 1 ? 's' : '' }}
                     </p>
                 </div>
@@ -79,38 +79,38 @@
                     v-if="totaux"
                     class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5"
                 >
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
+                    <p class="text-xs font-semibold text-primary-500 uppercase tracking-widest mb-4">
                         Vote global
                     </p>
                     <div class="space-y-2">
                         <div class="flex items-center justify-between text-sm">
-                            <span class="flex items-center gap-1.5 text-slate-600">
+                            <span class="flex items-center gap-1.5 text-primary-600">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
                                 Pour
                             </span>
-                            <span class="font-semibold text-slate-800">
+                            <span class="font-semibold text-primary-700">
                                 {{ pct(totaux.pour, totaux.total) }}%
                             </span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="flex items-center gap-1.5 text-slate-600">
+                            <span class="flex items-center gap-1.5 text-primary-600">
                                 <span class="w-2 h-2 rounded-full bg-red-500 shrink-0" />
                                 Contre
                             </span>
-                            <span class="font-semibold text-slate-800">
+                            <span class="font-semibold text-primary-700">
                                 {{ pct(totaux.contre, totaux.total) }}%
                             </span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="flex items-center gap-1.5 text-slate-600">
+                            <span class="flex items-center gap-1.5 text-primary-600">
                                 <span class="w-2 h-2 rounded-full bg-slate-300 shrink-0" />
                                 Abstention
                             </span>
-                            <span class="font-semibold text-slate-800">
+                            <span class="font-semibold text-primary-700">
                                 {{ pct(totaux.abstentions, totaux.total) }}%
                             </span>
                         </div>
-                        <div class="mt-2 h-2 rounded-full overflow-hidden bg-slate-100 flex">
+                        <div class="mt-2 h-2 rounded-full overflow-hidden bg-primary-100 flex">
                             <div
                                 class="h-full bg-emerald-500"
                                 :style="{ width: pct(totaux.pour, totaux.total) + '%' }"
@@ -156,14 +156,14 @@
                             class="w-12 h-12 rounded-full object-cover border border-slate-100"
                             @error="e => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }"
                         >
-                        <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-600 font-bold absolute inset-0 hidden items-center justify-center text-sm">
+                        <div class="w-12 h-12 rounded-full bg-slate-200 text-primary-600 font-bold absolute inset-0 hidden items-center justify-center text-sm">
                             {{ depute.prenom[0] }}{{ depute.nom[0] }}
                         </div>
                     </div>
-                    <span class="text-xs font-medium text-slate-800 leading-tight">{{ depute.prenom }} {{ depute.nom }}</span>
+                    <span class="text-xs font-medium text-primary-700 leading-tight">{{ depute.prenom }} {{ depute.nom }}</span>
                     <span
                         v-if="depute.departementNom"
-                        class="text-xs text-slate-400 leading-tight"
+                        class="text-xs text-primary-500 leading-tight"
                     >{{ depute.departementNom }}</span>
                 </a>
             </div>
@@ -228,7 +228,7 @@ const positionClass = groupeVote => {
     const pos = positionMajoritaire(groupeVote);
     if (pos === 'pour') return 'bg-emerald-100 text-emerald-700';
     if (pos === 'contre') return 'bg-red-100 text-red-700';
-    return 'bg-slate-100 text-slate-600';
+    return 'bg-primary-100 text-primary-600';
 };
 
 const positionLabel = groupeVote => {

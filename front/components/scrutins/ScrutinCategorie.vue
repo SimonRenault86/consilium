@@ -11,7 +11,7 @@
         </span>
         <span
             v-if="sousCategorie"
-            class="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600"
+            class="inline-flex items-center gap-1 rounded-md bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-600"
         >
             {{ sousCategorie.nom }}
         </span>

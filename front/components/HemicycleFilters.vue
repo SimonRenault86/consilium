@@ -7,8 +7,8 @@
             :class="modelValue === vue.id
                 ? 'bg-slate-900 text-white border-slate-900'
                 : (vue.id === 'vote' && voteDisabled)
-                    ? 'bg-white text-slate-300 border-slate-100 cursor-not-allowed'
-                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'"
+                    ? 'bg-white text-primary-300 border-slate-100 cursor-not-allowed'
+                    : 'bg-white text-primary-600 border-slate-200 hover:border-slate-400'"
             :disabled="vue.id === 'vote' && voteDisabled"
             @click="vue.id === 'vote' && voteDisabled ? null : $emit('update:modelValue', vue.id)"
         >

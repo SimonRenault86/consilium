@@ -20,6 +20,28 @@
                 v-if="!hideFilters"
                 @pin="onPin"
             />
+
+            <!-- Taux pour / contre / abstention en mode vote -->
+            <div
+                v-if="vueActive === 'vote' && voteStats"
+                class="mb-2 px-1"
+            >
+                <div class="flex items-center justify-center gap-5">
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                        <span class="text-xl font-bold text-emerald-600">{{ voteStats.pour.pct }} %</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-red-500 shrink-0" />
+                        <span class="text-xl font-bold text-red-500">{{ voteStats.contre.pct }} %</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                        <span class="text-xl font-bold text-amber-500">{{ voteStats.abstentions.pct }} %</span>
+                    </div>
+                </div>
+            </div>
+
             <svg
                 ref="svgEl"
                 :viewBox="`0 0 ${VIEWBOX_WIDTH} ${svgHeight}`"
@@ -126,7 +148,7 @@
                             v-if="ministerPhotoLoaded[hoveredMinisterData.acteurId]"
                             :src="`/elus/${hoveredMinisterData.acteurId}.jpg`"
                             :alt="`${hoveredMinisterData.prenom} ${hoveredMinisterData.nom}`"
-                            class="size-10 shrink-0 rounded-lg object-cover bg-slate-100"
+                            class="size-10 shrink-0 rounded-lg object-cover bg-primary-100"
                         >
                         <div
                             v-else
@@ -136,10 +158,10 @@
                             {{ hoveredMinisterData.prenom[0] }}{{ hoveredMinisterData.nom[0] }}
                         </div>
                         <div class="flex flex-col justify-center gap-0.5 min-w-0">
-                            <p class="text-sm font-semibold text-slate-900 truncate">
+                            <p class="text-sm font-semibold text-primary-900 truncate">
                                 {{ hoveredMinisterData.civ }} {{ hoveredMinisterData.prenom }} {{ hoveredMinisterData.nom }}
                             </p>
-                            <p class="mt-0.5 text-xs text-slate-400 truncate">
+                            <p class="mt-0.5 text-xs text-primary-500 truncate">
                                 {{ hoveredMinisterData.qualite }}
                             </p>
                         </div>
@@ -178,7 +200,7 @@
                             v-if="photoLoaded[hoveredDepute.slug]"
                             :src="getPhotoUrl(hoveredDepute)"
                             :alt="`${hoveredDepute.prenom} ${hoveredDepute.nom}`"
-                            class="size-12 shrink-0 rounded-lg object-cover bg-slate-100"
+                            class="size-12 shrink-0 rounded-lg object-cover bg-primary-100"
                         >
                         <div
                             v-else
@@ -188,10 +210,10 @@
                             {{ hoveredDepute.prenom[0] }}{{ hoveredDepute.nom[0] }}
                         </div>
                         <div class="flex flex-col justify-center gap-0.5 overflow-hidden">
-                            <span class="truncate text-sm font-semibold text-slate-900">
+                            <span class="truncate text-sm font-semibold text-primary-900">
                                 {{ hoveredDepute.prenom }} {{ hoveredDepute.nom }}
                             </span>
-                            <span class="truncate text-xs text-slate-400">{{ groupes[hoveredDepute.groupe]?.nom }}</span>
+                            <span class="truncate text-xs text-primary-500">{{ groupes[hoveredDepute.groupe]?.nom }}</span>
                         </div>
                     </div>
 
@@ -202,7 +224,7 @@
                             :key="score.champ"
                             class="flex flex-col gap-0.5"
                         >
-                            <div class="flex justify-between text-xs text-slate-500">
+                            <div class="flex justify-between text-xs text-primary-500">
                                 <span>{{ score.label }}</span>
                                 <span
                                     class="font-medium"
@@ -211,7 +233,7 @@
                                     {{ hoveredDepute[score.champ] !== null ? Math.round(hoveredDepute[score.champ] * 100) + ' %' : '—' }}
                                 </span>
                             </div>
-                            <div class="relative h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                            <div class="relative h-1.5 rounded-full bg-primary-100 overflow-hidden">
                                 <div
                                     class="absolute inset-y-0 left-0 rounded-full"
                                     :style="{
@@ -230,12 +252,12 @@
                 v-if="vueActive === 'loyaute' || vueActive === 'participation'"
                 class="mt-3 flex items-center justify-center gap-3"
             >
-                <span class="text-xs text-slate-500">0 %</span>
+                <span class="text-xs text-primary-500">0 %</span>
                 <div
                     class="h-2.5 w-40 rounded-full"
                     style="background: linear-gradient(to right, #ef4444, #22c55e)"
                 />
-                <span class="text-xs text-slate-500">100 %</span>
+                <span class="text-xs text-primary-500">100 %</span>
             </div>
 
             <!-- Légende gouvernement -->
@@ -252,7 +274,7 @@
                         class="inline-block h-3 w-3 rounded-full shrink-0"
                         :style="{ background: COULEURS_GOUVERNEMENT[role] }"
                     />
-                    <span class="text-xs text-slate-500">{{ label }}</span>
+                    <span class="text-xs text-primary-500">{{ label }}</span>
                 </div>
             </div>
 
@@ -264,25 +286,25 @@
                 <template v-if="props.selectedVote?.signatairesMap">
                     <div class="flex items-center gap-1.5">
                         <span class="inline-block w-3 h-3 rounded-full bg-emerald-600" />
-                        <span class="text-xs text-slate-500">Auteur</span>
+                        <span class="text-xs text-primary-500">Auteur</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <span class="inline-block w-3 h-3 rounded-full bg-emerald-300" />
-                        <span class="text-xs text-slate-500">Cosignataires</span>
+                        <span class="text-xs text-primary-500">Cosignataires</span>
                     </div>
                 </template>
                 <template v-else>
                     <div class="flex items-center gap-1.5">
                         <span class="inline-block w-3 h-3 rounded-full bg-emerald-500" />
-                        <span class="text-xs text-slate-500">Pour</span>
+                        <span class="text-xs text-primary-500">Pour</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <span class="inline-block w-3 h-3 rounded-full bg-red-500" />
-                        <span class="text-xs text-slate-500">Contre</span>
+                        <span class="text-xs text-primary-500">Contre</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <span class="inline-block w-3 h-3 rounded-full bg-amber-400" />
-                        <span class="text-xs text-slate-500">Abstention</span>
+                        <span class="text-xs text-primary-500">Abstention</span>
                     </div>
                 </template>
             </div>
@@ -356,6 +378,18 @@ const voteParSiege = computed(() => {
         if (seatId) map[seatId] = position;
     }
     return map;
+});
+
+const voteStats = computed(() => {
+    const s = props.selectedVote?.synthese;
+    if (!s) return null;
+    const total = (s.pour ?? 0) + (s.contre ?? 0) + (s.abstentions ?? 0);
+    if (!total) return null;
+    return {
+        pour: { count: s.pour ?? 0, pct: Math.round((s.pour ?? 0) / total * 100) },
+        contre: { count: s.contre ?? 0, pct: Math.round((s.contre ?? 0) / total * 100) },
+        abstentions: { count: s.abstentions ?? 0, pct: Math.round((s.abstentions ?? 0) / total * 100) },
+    };
 });
 
 const COULEURS_VOTE = {

@@ -31,7 +31,7 @@
                 </div>
 
                 <!-- Barre pour/contre/abstention/non-participation -->
-                <div class="relative h-3 flex-1 rounded-full bg-slate-100 overflow-hidden flex">
+                <div class="relative h-3 flex-1 rounded-full bg-primary-100 overflow-hidden flex">
                     <div
                         class="h-full transition-all duration-500"
                         :class="selectedVote?.signatairesMap ? 'bg-emerald-600' : 'bg-emerald-500'"
@@ -60,14 +60,14 @@
                         :class="selectedVote?.signatairesMap ? 'text-emerald-700' : 'text-emerald-600'"
                     >{{ g.pour }}</span>
                     <template v-if="!selectedVote?.signatairesMap">
-                        <span class="text-slate-300">/</span>
+                        <span class="text-primary-300">/</span>
                         <span class="text-red-500 font-medium">{{ g.contre }}</span>
                     </template>
-                    <span class="text-slate-300">/</span>
+                    <span class="text-primary-300">/</span>
                     <span :class="selectedVote?.signatairesMap ? 'text-emerald-400' : 'text-amber-500'">{{ g.abstention }}</span>
                     <template v-if="!selectedVote?.signatairesMap">
-                        <span class="text-slate-300">/</span>
-                        <span class="text-slate-400">{{ g.nonParticipation }}</span>
+                        <span class="text-primary-300">/</span>
+                        <span class="text-primary-500">{{ g.nonParticipation }}</span>
                     </template>
                 </div>
             </div>
@@ -77,29 +77,29 @@
                 <template v-if="selectedVote?.signatairesMap">
                     <div class="flex items-center gap-1.5">
                         <span class="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-600" />
-                        <span class="text-xs text-slate-500">Auteur</span>
+                        <span class="text-xs text-primary-500">Auteur</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <span class="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-300" />
-                        <span class="text-xs text-slate-500">Cosignataires</span>
+                        <span class="text-xs text-primary-500">Cosignataires</span>
                     </div>
                 </template>
                 <template v-else>
                     <div class="flex items-center gap-1.5">
                         <span class="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-500" />
-                        <span class="text-xs text-slate-500">Pour</span>
+                        <span class="text-xs text-primary-500">Pour</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <span class="inline-block w-2.5 h-2.5 rounded-sm bg-red-500" />
-                        <span class="text-xs text-slate-500">Contre</span>
+                        <span class="text-xs text-primary-500">Contre</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <span class="inline-block w-2.5 h-2.5 rounded-sm bg-amber-400" />
-                        <span class="text-xs text-slate-500">Abstention</span>
+                        <span class="text-xs text-primary-500">Abstention</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <span class="inline-block w-2.5 h-2.5 rounded-sm bg-slate-300" />
-                        <span class="text-xs text-slate-500">Non-participation</span>
+                        <span class="text-xs text-primary-500">Non-participation</span>
                     </div>
                 </template>
             </div>
@@ -148,8 +148,8 @@
                     :style="{ color: groupes[g.abrev]?.couleur }"
                 >{{ g.abrev }}</span>
                 <div class="flex flex-col leading-tight">
-                    <span class="text-xs font-semibold text-slate-800">{{ g.nombreDeputes }}</span>
-                    <span class="text-xs text-slate-400">députés</span>
+                    <span class="text-xs font-semibold text-primary-700">{{ g.nombreDeputes }}</span>
+                    <span class="text-xs text-primary-500">députés</span>
                 </div>
             </a>
         </div>
@@ -185,7 +185,7 @@
                 </div>
 
                 <!-- Barre -->
-                <div class="relative h-3 flex-1 rounded-full bg-slate-100 overflow-hidden">
+                <div class="relative h-3 flex-1 rounded-full bg-primary-100 overflow-hidden">
                     <div
                         class="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
                         :style="{

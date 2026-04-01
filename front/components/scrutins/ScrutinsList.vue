@@ -5,7 +5,7 @@
             <SearchBar
                 v-model="search"
                 placeholder="Rechercher un scrutin…"
-                input-class="w-full rounded-xl border border-slate-200 bg-white pl-9 pr-8 py-2.5 text-sm text-slate-700 focus:outline-none focus:border-slate-400"
+                input-class="w-full rounded-xl border border-slate-200 bg-white pl-9 pr-8 py-2.5 text-sm text-primary-700 focus:outline-none focus:border-slate-400"
                 @update:model-value="onSearchInput"
             />
         </div>
@@ -37,6 +37,7 @@
             />
             <ButtonBase
                 v-if="hasActiveFilters"
+                type="secondary"
                 @click="resetFilters"
             >
                 <i class="fa-solid fa-xmark" /> Tout réinitialiser

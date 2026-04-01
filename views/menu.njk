@@ -1,25 +1,25 @@
-<header class="sticky top-0 z-50 bg-white border-b border-slate-200">
+<header class="sticky top-0 z-50 bg-white border-b-2 border-secondary-500 shadow-sm">
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-2 text-xl font-bold text-primary no-underline">
-            <span><i class="fa-solid fa-building-columns"></i></span>
-            <span>Consilium</span>
+        <a href="/" class="flex items-center gap-2 text-xl font-bold text-primary-700 no-underline">
+            <span class="text-secondary-600"><i class="fa-solid fa-building-columns"></i></span>
+            <span class="text-primary-700 font-extrabold">Consilium</span>
         </a>
 
         <!-- Liens desktop -->
         <div class="hidden md:flex items-center gap-6">
-            <a href="/" class="text-sm text-slate-600 hover:text-slate-900">Hémicycle</a>
-            <a href="/scrutins" class="text-sm text-slate-600 hover:text-slate-900">Scrutins</a>
-            <a href="/partis" class="text-sm text-slate-600 hover:text-slate-900">Groupes</a>
+            <a href="/" class="text-sm font-medium text-primary-600 hover:text-secondary-500 transition-colors duration-150 cursor-pointer">Hémicycle</a>
+            <a href="/scrutins" class="text-sm font-medium text-primary-600 hover:text-secondary-500 transition-colors duration-150 cursor-pointer">Scrutins</a>
+            <a href="/partis" class="text-sm font-medium text-primary-600 hover:text-secondary-500 transition-colors duration-150 cursor-pointer">Groupes</a>
             <div class="group relative">
-                <button class="flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900">
+                <button class="flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:text-secondary-500 transition-colors duration-150 cursor-pointer">
                     Outils
                     <svg class="h-3.5 w-3.5 transition-transform duration-150 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
                 <div class="absolute right-0 top-full hidden pt-1 group-hover:block">
-                    <div class="w-52 rounded-xl border border-slate-200 bg-white py-1.5 shadow-lg">
-                        <a href="/outils/majorite-builder" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Majorité Builder</a>
+                    <div class="w-52 rounded-md border border-slate-200 bg-white py-1 px-1 shadow-lg">
+                        <a href="/outils/majorite-builder" class="block px-4 py-2 text-sm text-primary-700 hover:bg-primary-100 hover:text-primary-700 transition-colors duration-150 cursor-pointer rounded-sm">Majorité Builder</a>
                     </div>
                 </div>
             </div>
@@ -35,21 +35,21 @@
                 this.setAttribute('aria-expanded', !open);
             "
         >
-            <span class="block w-5 h-0.5 bg-slate-700 transition-all duration-200"></span>
-            <span class="block w-5 h-0.5 bg-slate-700 transition-all duration-200"></span>
-            <span class="block w-5 h-0.5 bg-slate-700 transition-all duration-200"></span>
+            <span class="block w-5 h-0.5 bg-primary-700 transition-all duration-200"></span>
+            <span class="block w-5 h-0.5 bg-primary-700 transition-all duration-200"></span>
+            <span class="block w-5 h-0.5 bg-primary-700 transition-all duration-200"></span>
         </button>
     </nav>
 
     <!-- Menu mobile -->
     <div id="mobile-menu" class="hidden md:hidden border-t border-slate-100">
         <div class="flex flex-col px-4 py-3 gap-0.5">
-            <a href="/" class="px-3 py-2.5 text-sm text-slate-700 rounded-lg hover:bg-slate-50">Hémicycle</a>
-            <a href="/scrutins" class="px-3 py-2.5 text-sm text-slate-700 rounded-lg hover:bg-slate-50">Scrutins</a>
-            <a href="/partis" class="px-3 py-2.5 text-sm text-slate-700 rounded-lg hover:bg-slate-50">Groupes</a>
+            <a href="/" class="px-3 py-2.5 text-sm text-primary-700 rounded-lg hover:bg-primary-100 hover:text-primary-700 transition-colors duration-150">Hémicycle</a>
+            <a href="/scrutins" class="px-3 py-2.5 text-sm text-primary-700 rounded-lg hover:bg-primary-100 hover:text-primary-700 transition-colors duration-150">Scrutins</a>
+            <a href="/partis" class="px-3 py-2.5 text-sm text-primary-700 rounded-lg hover:bg-primary-100 hover:text-primary-700 transition-colors duration-150">Groupes</a>
             <div class="mt-2 border-t border-slate-100 pt-2">
-                <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Outils</p>
-                <a href="/outils/majorite-builder" class="px-3 py-2.5 text-sm text-slate-700 rounded-lg hover:bg-slate-50 block">Majorité Builder</a>
+                <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-primary-500">Outils</p>
+                <a href="/outils/majorite-builder" class="px-3 py-2.5 text-sm text-primary-700 rounded-lg hover:bg-primary-100 hover:text-primary-700 transition-colors duration-150 block">Majorité Builder</a>
             </div>
         </div>
     </div>

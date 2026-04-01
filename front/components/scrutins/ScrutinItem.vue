@@ -30,10 +30,10 @@
                     />
                 </div>
 
-                <p class="text-sm font-medium text-slate-800 leading-snug line-clamp-2">
+                <p class="text-sm font-medium text-primary-700 leading-snug line-clamp-2">
                     {{ vote.titre }}
                 </p>
-                <p class="text-xs text-slate-400 mt-1">
+                <p class="text-xs text-primary-500 mt-1">
                     Scrutin n°{{ vote.numero }} · {{ formatDate(vote.dateScrutin) }}
                 </p>
             </div>
@@ -45,7 +45,7 @@
         >
             <p
                 v-if="vote.demandeur"
-                class="text-xs text-slate-500 mb-3"
+                class="text-xs text-primary-500 mb-3"
             >
                 Demandé par : {{ vote.demandeur }}
             </p>
@@ -53,22 +53,22 @@
             <div class="flex items-center gap-4 text-sm">
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                    <span class="font-semibold text-slate-800">{{ vote.synthese.pour }}</span>
-                    <span class="text-slate-400">pour</span>
+                    <span class="font-semibold text-primary-700">{{ vote.synthese.pour }}</span>
+                    <span class="text-primary-500">pour</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500" />
-                    <span class="font-semibold text-slate-800">{{ vote.synthese.contre }}</span>
-                    <span class="text-slate-400">contre</span>
+                    <span class="font-semibold text-primary-700">{{ vote.synthese.contre }}</span>
+                    <span class="text-primary-500">contre</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-300" />
-                    <span class="font-semibold text-slate-800">{{ vote.synthese.abstentions }}</span>
-                    <span class="text-slate-400">abst.</span>
+                    <span class="font-semibold text-primary-700">{{ vote.synthese.abstentions }}</span>
+                    <span class="text-primary-500">abst.</span>
                 </div>
             </div>
 
-            <div class="mt-3 h-2 rounded-full overflow-hidden bg-slate-100 flex">
+            <div class="mt-3 h-2 rounded-full overflow-hidden bg-primary-100 flex">
                 <div
                     class="h-full bg-emerald-500"
                     :style="{ width: pct(vote.synthese.pour, vote.synthese.votants) + '%' }"

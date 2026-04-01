@@ -10,8 +10,8 @@
                 sizeClass.button,
                 buttonClass,
                 modelValue.length
-                    ? 'border-slate-400 text-slate-800'
-                    : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                    ? 'border-slate-400 text-primary-700'
+                    : 'border-slate-200 text-primary-600 hover:border-slate-300'
             ]"
             @click="open = !open"
         >
@@ -24,7 +24,7 @@
                 >{{ modelValue.length }}</span>
                 <span
                     v-if="modelValue.length"
-                    class="text-slate-400 hover:text-slate-700 transition-colors leading-none"
+                    class="text-primary-500 hover:text-primary-700 transition-colors leading-none"
                     role="button"
                     aria-label="Effacer"
                     @click.stop="$emit('update:modelValue', [])"
@@ -32,7 +32,7 @@
                     <i class="fa-solid fa-xmark" />
                 </span>
                 <svg
-                    class="text-slate-400 transition-transform duration-150"
+                    class="text-primary-500 transition-transform duration-150"
                     :class="[sizeClass.icon, open ? 'rotate-180' : '']"
                     fill="none"
                     stroke="currentColor"
@@ -72,12 +72,12 @@
                             class="inline-block w-2.5 h-2.5 rounded-full shrink-0"
                             :style="{ background: opt.color }"
                         />
-                        <span class="text-sm text-slate-700 truncate">{{ opt.label }}</span>
+                        <span class="text-sm text-primary-700 truncate">{{ opt.label }}</span>
                     </label>
 
                     <div
                         v-if="!options.length"
-                        class="px-3 py-4 text-xs text-slate-400 text-center"
+                        class="px-3 py-4 text-xs text-primary-500 text-center"
                     >
                         Aucune option disponible
                     </div>
@@ -89,7 +89,7 @@
                 >
                     <button
                         type="button"
-                        class="text-xs text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                        class="text-xs text-primary-500 hover:text-primary-700 transition-colors cursor-pointer"
                         @click="$emit('update:modelValue', [])"
                     >
                         Tout effacer

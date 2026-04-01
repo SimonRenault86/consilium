@@ -2,7 +2,7 @@
     <div class="relative w-full max-w-sm mx-auto mb-4">
         <div class="relative">
             <svg
-                class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
+                class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary-500"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
@@ -18,7 +18,7 @@
                 :value="displayQuery"
                 type="text"
                 placeholder="Rechercher un député..."
-                class="w-full rounded-full border border-slate-200 bg-white py-2 pl-9 pr-9 text-sm text-slate-800 shadow-sm outline-none focus:border-slate-400 placeholder:text-slate-400"
+                class="w-full rounded-full border border-slate-200 bg-white py-2 pl-9 pr-9 text-sm text-primary-700 shadow-sm outline-none focus:border-slate-400 placeholder:text-primary-500"
                 @input="onInput"
                 @focus="onFocus"
                 @keydown.escape="effacer"
@@ -28,7 +28,7 @@
             >
             <button
                 v-if="displayQuery"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-primary-500 hover:text-primary-600"
                 @mousedown.prevent="effacer"
             >
                 <svg
@@ -52,7 +52,7 @@
                 v-for="(depute, i) in suggestions"
                 :key="depute.seatId"
                 class="flex items-center gap-3 px-3 py-2 cursor-pointer text-sm transition-colors"
-                :class="i === indexActif ? 'bg-slate-100' : 'hover:bg-slate-50'"
+                :class="i === indexActif ? 'bg-primary-100' : 'hover:bg-slate-50'"
                 @mousedown.prevent="selectionner(depute)"
                 @mouseenter="indexActif = i"
             >
@@ -60,7 +60,7 @@
                     v-if="getPhotoUrl(depute) && !photoErreur[depute.slug]"
                     :src="getPhotoUrl(depute)"
                     :alt="`${depute.prenom} ${depute.nom}`"
-                    class="size-7 shrink-0 rounded-md object-cover bg-slate-100"
+                    class="size-7 shrink-0 rounded-md object-cover bg-primary-100"
                     @error="photoErreur[depute.slug] = true"
                 >
                 <div
@@ -70,8 +70,8 @@
                 >
                     {{ depute.prenom[0] }}{{ depute.nom[0] }}
                 </div>
-                <span class="font-medium text-slate-900">{{ depute.prenom }} {{ depute.nom }}</span>
-                <span class="ml-auto text-xs text-slate-400 shrink-0">{{ groupes[depute.groupe]?.nom }}</span>
+                <span class="font-medium text-primary-900">{{ depute.prenom }} {{ depute.nom }}</span>
+                <span class="ml-auto text-xs text-primary-500 shrink-0">{{ groupes[depute.groupe]?.nom }}</span>
             </li>
         </ul>
     </div>

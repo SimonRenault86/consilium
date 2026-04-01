@@ -2,7 +2,7 @@
     <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-8 mb-6">
         <div
             v-if="loading"
-            class="h-16 animate-pulse bg-slate-100 rounded-xl"
+            class="h-16 animate-pulse bg-primary-100 rounded-xl"
         />
         <div
             v-else-if="depute"
@@ -18,7 +18,7 @@
                 >
                 <div
                     v-if="showInitiales"
-                    class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-slate-200 text-slate-600 text-2xl font-bold absolute inset-0 flex items-center justify-center"
+                    class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-slate-200 text-primary-600 text-2xl font-bold absolute inset-0 flex items-center justify-center"
                 >
                     {{ depute.prenom[0] }}{{ depute.nom[0] }}
                 </div>
@@ -26,7 +26,7 @@
 
             <!-- Infos -->
             <div class="flex-1 min-w-0">
-                <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">
+                <h1 class="text-2xl sm:text-3xl font-bold text-primary-900">
                     {{ depute.civ }} {{ depute.prenom }} {{ depute.nom }}
                 </h1>
 
@@ -48,11 +48,11 @@
                             ? { backgroundColor: depute.groupeCouleur + '22', color: depute.groupeCouleur }
                             : {}"
                     >{{ depute.groupeAbrev }}</span>
-                    <span class="text-slate-600 text-sm">{{ depute.groupe }}</span>
+                    <span class="text-primary-600 text-sm">{{ depute.groupe }}</span>
                 </div>
 
                 <!-- Méta secondaire -->
-                <div class="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 mt-2 text-xs text-slate-500">
+                <div class="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 mt-2 text-xs text-primary-500">
                     <span v-if="depute.departementNom">
                         <i class="fa-solid fa-location-dot mr-1" />{{ depute.departementNom }}{{ depute.departementCode ? ` (${depute.departementCode})` : '' }}
                     </span>

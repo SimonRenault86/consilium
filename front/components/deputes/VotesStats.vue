@@ -12,18 +12,18 @@
                 message="Données indisponibles"
             />
             <template v-else-if="stats">
-                <p class="text-3xl font-bold text-slate-900 mb-4">
+                <p class="text-3xl font-bold text-primary-900 mb-4">
                     {{ stats.total }}
                 </p>
                 <div class="space-y-3">
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm text-slate-600 flex items-center gap-1.5">
+                            <span class="text-sm text-primary-600 flex items-center gap-1.5">
                                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500" />Pour
                             </span>
-                            <span class="text-sm font-semibold text-slate-800">{{ stats.pour }}</span>
+                            <span class="text-sm font-semibold text-primary-700">{{ stats.pour }}</span>
                         </div>
-                        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-1.5 bg-primary-100 rounded-full overflow-hidden">
                             <div
                                 class="h-full bg-emerald-500 rounded-full"
                                 :style="{ width: pct(stats.pour) + '%' }"
@@ -32,12 +32,12 @@
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm text-slate-600 flex items-center gap-1.5">
+                            <span class="text-sm text-primary-600 flex items-center gap-1.5">
                                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500" />Contre
                             </span>
-                            <span class="text-sm font-semibold text-slate-800">{{ stats.contre }}</span>
+                            <span class="text-sm font-semibold text-primary-700">{{ stats.contre }}</span>
                         </div>
-                        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-1.5 bg-primary-100 rounded-full overflow-hidden">
                             <div
                                 class="h-full bg-red-500 rounded-full"
                                 :style="{ width: pct(stats.contre) + '%' }"
@@ -46,12 +46,12 @@
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm text-slate-600 flex items-center gap-1.5">
+                            <span class="text-sm text-primary-600 flex items-center gap-1.5">
                                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400" />Abstentions
                             </span>
-                            <span class="text-sm font-semibold text-slate-800">{{ stats.abstentions }}</span>
+                            <span class="text-sm font-semibold text-primary-700">{{ stats.abstentions }}</span>
                         </div>
-                        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-1.5 bg-primary-100 rounded-full overflow-hidden">
                             <div
                                 class="h-full bg-amber-400 rounded-full"
                                 :style="{ width: pct(stats.abstentions) + '%' }"
@@ -60,12 +60,12 @@
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm text-slate-600 flex items-center gap-1.5">
+                            <span class="text-sm text-primary-600 flex items-center gap-1.5">
                                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-300" />Non participation
                             </span>
-                            <span class="text-sm font-semibold text-slate-800">{{ stats.nonParticipation }}</span>
+                            <span class="text-sm font-semibold text-primary-700">{{ stats.nonParticipation }}</span>
                         </div>
-                        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-1.5 bg-primary-100 rounded-full overflow-hidden">
                             <div
                                 class="h-full bg-slate-300 rounded-full"
                                 :style="{ width: pctTotal(stats.nonParticipation) + '%' }"
@@ -78,7 +78,7 @@
                     class="mt-4 pt-4 border-t border-slate-100 space-y-3"
                 >
                     <div>
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide block mb-1.5">Thèmes principaux</span>
+                        <span class="text-xs font-semibold text-primary-500 uppercase tracking-wide block mb-1.5">Thèmes principaux</span>
                         <div class="flex flex-wrap gap-1.5">
                             <span
                                 v-for="cat in stats.categoriesPrincipales"
@@ -89,7 +89,7 @@
                         </div>
                     </div>
                     <div v-if="stats.sousCategoriesPrincipales && stats.sousCategoriesPrincipales.length">
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide block mb-1.5">Sujets spécifiques</span>
+                        <span class="text-xs font-semibold text-primary-500 uppercase tracking-wide block mb-1.5">Sujets spécifiques</span>
                         <div class="flex flex-wrap gap-1.5">
                             <span
                                 v-for="cat in stats.sousCategoriesPrincipales"

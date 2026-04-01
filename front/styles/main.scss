@@ -1,5 +1,5 @@
 // Variables
-$primary: #4d7196;
+$primary: #242424;
 $secondary: #c9a227;
 $background: #f8fafc;
 $text-muted: #64748b;
@@ -13,11 +13,11 @@ body {
     padding: 0;
 }
 
-a {
+a:not([class]) {
     color: $primary;
     text-decoration: none;
 
-    &:not([class]):hover {
+    &:hover {
         text-decoration: underline;
     }
 }
