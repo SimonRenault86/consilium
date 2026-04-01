@@ -52,7 +52,12 @@
             </section>
         </div>
 
-        <!-- 3.2 + 3.3 : Carte + Nombre de députés -->
+        <!-- 3.2 : Dernières QaG -->
+        <div class="mb-6">
+            <DernierQag :abrev="abrev" />
+        </div>
+
+        <!-- 3.3 + 3.4 : Carte + Nombre de députés -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <!-- Carte hémicycle (gauche, 2/3) -->
             <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -178,6 +183,7 @@ import Panel from '@components/Panel.vue';
 import LoadingState from '@components/LoadingState.vue';
 import EmptyState from '@components/EmptyState.vue';
 import ScrutinsPreferesGroupe from '@components/partis/ScrutinsPreferesGroupe.vue';
+import DernierQag from '@components/partis/DernierQag.vue';
 import { deputesMap, isDeputesReady } from '@/helpers/deputes.js';
 
 const props = defineProps({

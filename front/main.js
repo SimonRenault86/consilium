@@ -9,6 +9,9 @@ import ScrutinInfo from '@components/scrutins/ScrutinInfo.vue';
 import ScrutinsList from '@components/scrutins/ScrutinsList.vue';
 import MajoriteBuilder from '@components/outils/MajoriteBuilder.vue';
 import PartiPage from '@components/partis/PartiPage.vue';
+import QagsList from '@components/qags/QagsList.vue';
+import QagSession from '@components/qags/QagSession.vue';
+import DernierQag from '@components/partis/DernierQag.vue';
 import { initDeputes } from '@/helpers/deputes.js';
 import { initPartis } from '@/helpers/partis.js';
 import { initMinstres } from '@/helpers/ministres.js';
@@ -55,4 +58,21 @@ const partiPageEl = document.querySelector('parti-page');
 if (partiPageEl) {
     initPartis().then(() => initDeputes());
     createVueApp(PartiPage, { abrev: partiPageEl.dataset.abrev }).mount(partiPageEl);
+}
+
+const qagsListEl = document.querySelector('qags-list');
+if (qagsListEl) {
+    createVueApp(QagsList).mount(qagsListEl);
+}
+
+const qagSessionEl = document.querySelector('qag-session');
+if (qagSessionEl) {
+    initPartis().then(() => initDeputes());
+    createVueApp(QagSession, { date: qagSessionEl.dataset.date }).mount(qagSessionEl);
+}
+
+const deputeQagsEl = document.querySelector('depute-qags');
+if (deputeQagsEl) {
+    initPartis().then(() => initDeputes());
+    createVueApp(DernierQag, { deputeId: deputeQagsEl.dataset.deputeId }).mount(deputeQagsEl);
 }

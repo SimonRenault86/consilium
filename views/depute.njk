@@ -22,6 +22,10 @@
 
     <scrutins-stats data-depute-id="{{ depute.id }}" class="mb-6 block"></scrutins-stats>
 
+    {% if depute.groupeAbrev %}
+    <depute-qags data-depute-id="{{ depute.id }}" class="mb-6 block"></depute-qags>
+    {% endif %}
+
     {# Députés de la même circonscription #}
     {% if deputesSimilaires.length %}
     <section class="mt-8">

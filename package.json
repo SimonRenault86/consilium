@@ -18,6 +18,7 @@
         "seed:amendements": "node back/db/seeds/amendements.js",
         "seed:categorise-amendements": "node back/db/seeds/categorise-amendements.js",
         "seed:categorise-scrutins": "node back/db/seeds/categorise-votes.js",
+        "seed:qags": "node back/db/seeds/qags.js",
         "photos:deputes": "node scripts/photos.js",
         "photos:ministres": "node scripts/photos.js --source=ministres",
         "lint": "eslint .",
