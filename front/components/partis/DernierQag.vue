@@ -1,9 +1,5 @@
 <template>
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-        <h2 class="text-xs font-semibold text-primary-500 uppercase tracking-widest mb-4">
-            Dernières questions au gouvernement
-        </h2>
-
+    <Panel title="Dernières questions au gouvernement">
         <LoadingState
             v-if="loading"
             class="py-8"
@@ -15,7 +11,7 @@
         />
         <div
             v-else
-            class="space-y-1 -mx-5"
+            class="-mx-4 sm:-mx-6 -my-4 sm:-my-6"
         >
             <div
                 v-for="qag in qags"
@@ -25,7 +21,7 @@
                 <QagItem :qag="qag" />
             </div>
 
-            <div class="px-5 pt-3">
+            <div class="px-4 sm:px-6 py-3">
                 <a
                     href="/qags"
                     class="block text-center text-xs text-secondary-600 hover:text-secondary-700 font-medium"
@@ -34,11 +30,12 @@
                 </a>
             </div>
         </div>
-    </section>
+    </Panel>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import Panel from '@components/Panel.vue';
 import LoadingState from '@components/LoadingState.vue';
 import EmptyState from '@components/EmptyState.vue';
 import QagItem from '@components/qags/QagItem.vue';

@@ -5,28 +5,130 @@
             class="w-full text-left cursor-pointer"
             @click="isOpen = !isOpen"
         >
-            <div class="flex items-start gap-3">
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <span
-                            v-if="qag.rubrique"
-                            class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-primary-600 capitalize"
-                        >
-                            {{ qag.rubrique }}
+            <div class="flex flex-col gap-3">
+                <div class="flex items-start gap-3">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <ScrutinCategorie
+                                v-if="qag.categorie"
+                                :categorie="qag.categorie"
+                                :sous-categorie="qag.sousCategorie"
+                            />
+                        </div>
+                        <p class="mt-1 text-sm font-bold text-primary-800 leading-snug">
+                            {{ qag.analyse || 'Question sans titre' }}
+                        </p>
+                        <p class="mt-0.5 text-xs text-primary-500">
+                            <span v-if="auteurNom">{{ auteurNom }} ·</span>
+                            <span>{{ qag.ministre.abrege }}</span>
+                        </p>
+                    </div>
+                    <i
+                        class="fa-solid fa-chevron-down shrink-0 mt-1 text-primary-300 text-xs transition-transform duration-200"
+                        :class="{ 'rotate-180': isOpen }"
+                    />
+                </div>
+
+                <!-- ── Acteurs concernés ── -->
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- Auteur de la question -->
+                    <div
+                        v-if="qag.auteur.ref"
+                        class="flex items-center justify-between rounded-xl border border-primary-200 bg-primary-50 px-3 py-2 hover:bg-primary-100 transition-colors cursor-pointer h-full"
+                        @click="goto(`/depute/${auteurSlug}`)"
+                    >
+                        <div class="flex gap-2.5">
+                            <div class="relative shrink-0 w-10 h-10">
+                                <img
+                                    :src="`/elus/${qag.auteur.ref}.jpg`"
+                                    :alt="auteurNom"
+                                    class="w-10 h-10 rounded-full object-cover"
+                                    @error="e => { e.target.style.display='none'; e.target.nextElementSibling.style.display='flex'; }"
+                                >
+                                <div class="w-10 h-10 rounded-full bg-primary-200 text-primary-700 text-xs font-bold absolute inset-0 hidden items-center justify-center">
+                                    {{ initials(qag.auteur.prenom, qag.auteur.nom) }}
+                                </div>
+                                <!-- Logo groupe en badge -->
+                                <a
+                                    v-if="auteurGroupe?.logo"
+                                    :href="`/partis/${qag.groupe.abrev}`"
+                                    class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-white border border-slate-200 flex items-center justify-center overflow-hidden"
+                                    @click.stop
+                                >
+                                    <img
+                                        :src="auteurGroupe.logo"
+                                        :alt="qag.groupe.abrev"
+                                        class="w-3 h-3 object-contain"
+                                    >
+                                </a>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-primary-800 leading-tight">
+                                    {{ auteurNom }}
+                                </p>
+                                <p class="text-xs text-primary-500 leading-tight mt-0.5 min-w-0">
+                                    <a
+                                        :href="`/partis/${qag.groupe.abrev}`"
+                                        :title="qag.groupe.developpe || qag.groupe.abrev"
+                                        class="hover:underline line-clamp-1"
+                                        @click.stop
+                                    >{{ qag.groupe.developpe || qag.groupe.abrev }}</a>
+                                </p>
+                                <p
+                                    v-if="auteurDepute?.departementNom"
+                                    class="text-xs text-primary-400 leading-tight mt-0.5"
+                                >
+                                    <i class="fa-solid fa-location-dot mr-0.5" />{{ auteurDepute.departementNom }}
+                                </p>
+                                <p
+                                    v-if="auteurDepute?.job"
+                                    :title="auteurDepute.job"
+                                    class="text-xs text-primary-400 leading-tight mt-0.5 italic line-clamp-1"
+                                >
+                                    {{ auteurDepute.job }}
+                                </p>
+                            </div>
+                        </div>
+                        <span class="ml-1 shrink-0 rounded-full bg-primary-100 border border-primary-200 px-2 py-0.5 text-xs text-primary-600 font-medium">
+                            Question
                         </span>
                     </div>
-                    <p class="mt-1 text-sm font-bold text-primary-800 leading-snug">
-                        {{ qag.analyse || 'Question sans titre' }}
-                    </p>
-                    <p class="mt-0.5 text-xs text-primary-500">
-                        <span v-if="auteurNom">{{ auteurNom }} ·</span>
-                        <span>{{ qag.ministre.abrege }}</span>
-                    </p>
+
+                    <!-- Ministre répondant -->
+                    <div class="flex items-center justify-between rounded-xl border border-secondary-200 bg-secondary-50 px-3 py-2 h-full">
+                        <div class="flex gap-2.5">
+                            <div class="relative shrink-0 w-9 h-9">
+                                <img
+                                    v-if="qag.ministre.acteurId"
+                                    :src="`/elus/${qag.ministre.acteurId}.jpg`"
+                                    :alt="ministreNom"
+                                    class="w-9 h-9 rounded-full object-cover"
+                                    @error="e => { e.target.style.display='none'; e.target.nextElementSibling.style.display='flex'; }"
+                                >
+                                <div
+                                    class="w-9 h-9 rounded-full bg-secondary-100 text-secondary-700 text-xs font-bold absolute inset-0 items-center justify-center"
+                                    :class="qag.ministre.acteurId ? 'hidden' : 'flex'"
+                                >
+                                    <i class="fa-solid fa-user-tie text-xs" />
+                                </div>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-secondary-800 leading-tight">
+                                    {{ ministreNom || qag.ministre.abrege }}
+                                </p>
+                                <p
+                                    :title="qag.ministre.developpe"
+                                    class="text-xs text-secondary-500 leading-tight mt-0.5 line-clamp-1"
+                                >
+                                    {{ qag.ministre.developpe }}
+                                </p>
+                            </div>
+                        </div>
+                        <span class="ml-1 shrink-0 rounded-full bg-secondary-100 border border-secondary-200 px-2 py-0.5 text-xs text-secondary-700 font-medium">
+                            Réponse
+                        </span>
+                    </div>
                 </div>
-                <i
-                    class="fa-solid fa-chevron-down shrink-0 mt-1 text-primary-300 text-xs transition-transform duration-200"
-                    :class="{ 'rotate-180': isOpen }"
-                />
             </div>
         </button>
 
@@ -37,107 +139,6 @@
         >
             <div class="overflow-hidden">
                 <div class="mt-3 space-y-4">
-                    <!-- ── Acteurs concernés ── -->
-                    <div class="grid grid-cols-2 gap-2">
-                        <!-- Auteur de la question -->
-                        <div
-                            v-if="qag.auteur.ref"
-                            class="flex items-center justify-between rounded-xl border border-primary-200 bg-primary-50 px-3 py-2 hover:bg-primary-100 transition-colors cursor-pointer h-full"
-                            @click="goto(`/depute/${auteurSlug}`)"
-                        >
-                            <div class="flex gap-2.5">
-                                <div class="relative shrink-0 w-10 h-10">
-                                    <img
-                                        :src="`/elus/${qag.auteur.ref}.jpg`"
-                                        :alt="auteurNom"
-                                        class="w-10 h-10 rounded-full object-cover"
-                                        @error="e => { e.target.style.display='none'; e.target.nextElementSibling.style.display='flex'; }"
-                                    >
-                                    <div class="w-10 h-10 rounded-full bg-primary-200 text-primary-700 text-xs font-bold absolute inset-0 hidden items-center justify-center">
-                                        {{ initials(qag.auteur.prenom, qag.auteur.nom) }}
-                                    </div>
-                                    <!-- Logo groupe en badge -->
-                                    <a
-                                        v-if="auteurGroupe?.logo"
-                                        :href="`/partis/${qag.groupe.abrev}`"
-                                        class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-white border border-slate-200 flex items-center justify-center overflow-hidden"
-                                        @click.stop
-                                    >
-                                        <img
-                                            :src="auteurGroupe.logo"
-                                            :alt="qag.groupe.abrev"
-                                            class="w-3 h-3 object-contain"
-                                        >
-                                    </a>
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="text-xs font-bold text-primary-800 leading-tight">
-                                        {{ auteurNom }}
-                                    </p>
-                                    <p class="text-xs text-primary-500 leading-tight mt-0.5 min-w-0">
-                                        <a
-                                            :href="`/partis/${qag.groupe.abrev}`"
-                                            :title="qag.groupe.developpe || qag.groupe.abrev"
-                                            class="hover:underline line-clamp-1"
-                                            @click.stop
-                                        >{{ qag.groupe.developpe || qag.groupe.abrev }}</a>
-                                    </p>
-                                    <p
-                                        v-if="auteurDepute?.departementNom"
-                                        class="text-xs text-primary-400 leading-tight mt-0.5"
-                                    >
-                                        <i class="fa-solid fa-location-dot mr-0.5" />{{ auteurDepute.departementNom }}
-                                    </p>
-                                    <p
-                                        v-if="auteurDepute?.job"
-                                        :title="auteurDepute.job"
-                                        class="text-xs text-primary-400 leading-tight mt-0.5 italic line-clamp-1"
-                                    >
-                                        {{ auteurDepute.job }}
-                                    </p>
-                                </div>
-                            </div>
-                            <span class="ml-1 shrink-0 rounded-full bg-primary-100 border border-primary-200 px-2 py-0.5 text-xs text-primary-600 font-medium">
-                                Question
-                            </span>
-                        </div>
-
-                        <!-- Ministre répondant -->
-                        <div class="flex items-center justify-between rounded-xl border border-secondary-200 bg-secondary-50 px-3 py-2 h-full">
-                            <div class="flex gap-2.5">
-                                <div class="relative shrink-0 w-9 h-9">
-                                    <img
-                                        v-if="qag.ministre.acteurId"
-                                        :src="`/elus/${qag.ministre.acteurId}.jpg`"
-                                        :alt="ministreNom"
-                                        class="w-9 h-9 rounded-full object-cover"
-                                        @error="e => { e.target.style.display='none'; e.target.nextElementSibling.style.display='flex'; }"
-                                    >
-                                    <div
-                                        class="w-9 h-9 rounded-full bg-secondary-100 text-secondary-700 text-xs font-bold absolute inset-0 items-center justify-center"
-                                        :class="qag.ministre.acteurId ? 'hidden' : 'flex'"
-                                    >
-                                        <i class="fa-solid fa-user-tie text-xs" />
-                                    </div>
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="text-xs font-bold text-secondary-800 leading-tight">
-                                        {{ ministreNom || qag.ministre.abrege }}
-                                    </p>
-                                    <p
-                                        :title="qag.ministre.developpe"
-                                        class="text-xs text-secondary-500 leading-tight mt-0.5 line-clamp-1"
-                                    >
-                                        {{ qag.ministre.developpe }}
-                                    </p>
-                                </div>
-                            </div>
-                            <span class="ml-1 shrink-0 rounded-full bg-secondary-100 border border-secondary-200 px-2 py-0.5 text-xs text-secondary-700 font-medium">
-                                Réponse
-                            </span>
-                        </div>
-                    </div>
-
                     <!-- ── Transcript ── -->
                     <p
                         v-if="!segments.length"
@@ -306,6 +307,7 @@
 import { ref, computed } from 'vue';
 import { deputesMap } from '@/helpers/deputes.js';
 import { groupes } from '@/helpers/partis.js';
+import ScrutinCategorie from '@components/scrutins/ScrutinCategorie.vue';
 
 const props = defineProps({
     qag: { type: Object, required: true },

@@ -18,6 +18,9 @@ CREATE TABLE IF NOT EXISTS qags (
     created_at          TIMESTAMP       DEFAULT NOW()
 );
 
+ALTER TABLE qags ADD COLUMN IF NOT EXISTS qag_categorie_id INTEGER REFERENCES scrutin_categories(id);
+ALTER TABLE qags ADD COLUMN IF NOT EXISTS qag_sous_categorie_id INTEGER REFERENCES scrutin_sous_categories(id);
+
 CREATE INDEX IF NOT EXISTS idx_qags_date_seance ON qags (date_seance);
 CREATE INDEX IF NOT EXISTS idx_qags_acteur_ref  ON qags (acteur_ref);
 CREATE INDEX IF NOT EXISTS idx_qags_groupe_abrev ON qags (groupe_abrev);

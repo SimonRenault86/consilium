@@ -14,26 +14,40 @@
             message="Aucune question pour cette session"
         />
 
-        <div
-            v-else
-            class="space-y-3"
-        >
-            <QagGroupe
-                v-for="(entry, index) in groupesData"
-                :key="entry.groupe.abrev"
-                :groupe="entry.groupe"
-                :questions="entry.questions"
-                :default-open="index === 0"
-            />
+        <div v-else>
+            <!-- Filtre par catégorie -->
+            <div
+                v-if="categorieOptions.length"
+                class="mb-4"
+            >
+                <SelectBase
+                    v-model="selectedCategories"
+                    :options="categorieOptions"
+                    placeholder="Filtrer par catégorie"
+                    size="md"
+                    button-class="min-w-[220px]"
+                />
+            </div>
+
+            <div class="space-y-3">
+                <QagGroupe
+                    v-for="(entry, index) in groupesData"
+                    :key="entry.groupe.abrev"
+                    :groupe="entry.groupe"
+                    :questions="entry.questions"
+                    :default-open="index === 0"
+                />
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { fetchQags } from '@/helpers/qags.js';
+import { fetchQags, fetchQagCategories } from '@/helpers/qags.js';
 import { groupeOrdreGaucheaDroite } from '@/helpers/partis.js';
 import QagGroupe from '@components/qags/QagGroupe.vue';
+import SelectBase from '@components/SelectBase.vue';
 import LoadingState from '@components/LoadingState.vue';
 import ErrorState from '@components/ErrorState.vue';
 import EmptyState from '@components/EmptyState.vue';
@@ -45,11 +59,22 @@ const props = defineProps({
 const qags = ref([]);
 const loading = ref(false);
 const error = ref(false);
+const selectedCategories = ref([]);
+const categorieOptions = ref([]);
 
 onMounted(async () => {
     loading.value = true;
     try {
-        qags.value = await fetchQags(props.date);
+        const [qagsData, categories] = await Promise.all([
+            fetchQags(props.date),
+            fetchQagCategories().catch(() => []),
+        ]);
+        qags.value = qagsData;
+        categorieOptions.value = categories.map(c => ({
+            value: c.nom,
+            label: c.nom,
+            color: c.couleur || null,
+        }));
     } catch {
         error.value = true;
     } finally {
@@ -57,10 +82,18 @@ onMounted(async () => {
     }
 });
 
+// Filtrer les QaGs selon la catégorie sélectionnée
+const filteredQags = computed(() => {
+    if (!selectedCategories.value.length) return qags.value;
+    return qags.value.filter(q =>
+        q.categorie && selectedCategories.value.includes(q.categorie.nom)
+    );
+});
+
 // Regrouper les questions par groupe politique, triées gauche → droite
 const groupesData = computed(() => {
     const map = new Map();
-    for (const qag of qags.value) {
+    for (const qag of filteredQags.value) {
         const abrev = qag.groupe?.abrev || 'NI';
         if (!map.has(abrev)) {
             map.set(abrev, {

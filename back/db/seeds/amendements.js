@@ -1,11 +1,10 @@
-import { readFileSync, readdirSync, rmSync, mkdirSync, createWriteStream } from 'fs';
+import { readFileSync, rmSync, mkdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import http from 'http';
-import https from 'https';
 import { execSync } from 'child_process';
 import 'dotenv/config';
 import pool from '../dbManager.js';
+import { downloadFile, findJsonFiles } from './helpers/fs.js';
 import { logSeed } from './helpers/logSeed.js';
 import Amendement from '../models/Amendement.js';
 import DeputeAmendement from '../models/DeputeAmendement.js';
@@ -16,47 +15,6 @@ const ZIP_URL = `https://data.assemblee-nationale.fr/static/openData/repository/
 const TMP_DIR = path.join(__dirname, '../../../tmp/amendements');
 const ZIP_PATH = path.join(TMP_DIR, 'Amendements.json.zip');
 const EXTRACT_DIR = path.join(TMP_DIR, 'extracted');
-
-const downloadFile = (url, dest) => new Promise((resolve, reject) => {
-    const protocol = url.startsWith('https') ? https : http;
-    const file = createWriteStream(dest);
-
-    const req = protocol.get(url, response => {
-        if (response.statusCode === 301 || response.statusCode === 302) {
-            file.close();
-            rmSync(dest, { force: true });
-            downloadFile(response.headers.location, dest).then(resolve).catch(reject);
-            return;
-        }
-        if (response.statusCode !== 200) {
-            file.close();
-            rmSync(dest, { force: true });
-            reject(new Error(`Téléchargement échoué : status ${response.statusCode}`));
-            return;
-        }
-        response.pipe(file);
-        file.on('finish', () => file.close(resolve));
-        file.on('error', reject);
-    });
-
-    req.on('error', err => {
-        rmSync(dest, { force: true });
-        reject(err);
-    });
-});
-
-const findJsonFiles = dir => {
-    const results = [];
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-        const fullPath = path.join(dir, entry.name);
-        if (entry.isDirectory()) {
-            results.push(...findJsonFiles(fullPath));
-        } else if (entry.name.endsWith('.json')) {
-            results.push(fullPath);
-        }
-    }
-    return results;
-};
 
 const isNil = val =>
     val === null || val === undefined || (typeof val === 'object' && val['@xsi:nil'] === 'true');

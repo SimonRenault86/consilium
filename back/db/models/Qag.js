@@ -21,7 +21,10 @@ const SELECT_QAG = `
         a.civ     AS auteur_civ,
         mg.acteur_id AS min_acteur_id,
         am.prenom AS min_prenom,
-        am.nom    AS min_nom
+        am.nom    AS min_nom,
+        sc.nom    AS sous_categorie_nom,
+        COALESCE(c2.nom, c1.nom)       AS categorie_nom,
+        COALESCE(c2.couleur, c1.couleur) AS categorie_couleur
     FROM qags q
     LEFT JOIN acteurs a ON a.id = q.acteur_ref
     LEFT JOIN LATERAL (
@@ -31,6 +34,9 @@ const SELECT_QAG = `
         LIMIT 1
     ) mg ON true
     LEFT JOIN acteurs am ON am.id = mg.acteur_id
+    LEFT JOIN scrutin_categories c1 ON c1.id = q.qag_categorie_id
+    LEFT JOIN scrutin_sous_categories sc ON sc.id = q.qag_sous_categorie_id
+    LEFT JOIN scrutin_categories c2 ON c2.id = sc.categorie_id
 `;
 
 export default class Qag {

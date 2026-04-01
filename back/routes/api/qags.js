@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Qag from '../../db/models/Qag.js';
+import Categorie from '../../db/models/Categorie.js';
 import pool from '../../db/dbManager.js';
 
 const router = Router();
@@ -36,6 +37,24 @@ const serializeQag = row => ({
     },
     texteReponse: row.texte_reponse,
     codeCloture: row.code_cloture,
+    categorie: row.categorie_nom ? {
+        nom: row.categorie_nom,
+        couleur: row.categorie_couleur,
+    } : null,
+    sousCategorie: row.sous_categorie_nom ? {
+        nom: row.sous_categorie_nom,
+    } : null,
+});
+
+// GET /api/qags/categories — toutes les catégories de QaGs
+router.get('/categories', async (req, res) => {
+    try {
+        const rows = await Categorie.findAll();
+        res.json(rows);
+    } catch (err) {
+        console.error('Erreur GET /api/qags/categories :', err);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
 });
 
 // GET /api/qags/last-update

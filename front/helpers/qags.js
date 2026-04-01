@@ -1,3 +1,9 @@
+export const fetchQagCategories = async () => {
+    const res = await fetch('/api/qags/categories');
+    if (!res.ok) throw new Error('Erreur chargement des catégories QaG');
+    return res.json();
+};
+
 export const fetchSessions = async () => {
     const res = await fetch('/api/qags/sessions');
     if (!res.ok) throw new Error('Erreur chargement des sessions QaG');
