@@ -43,7 +43,7 @@
         <div class="mb-2">
             <SearchBar
                 v-model="search"
-                :placeholder="mode === 'scrutins' ? 'Rechercher un vote…' : 'Rechercher un amendement…'"
+                :placeholder="mode === 'scrutins' ? 'Rechercher un scrutin...' : 'Rechercher un amendement…'"
                 @update:model-value="onSearchInput"
             />
         </div>
@@ -87,7 +87,7 @@
                 title="Effacer le filtre"
                 @click="clearFilter"
             >
-                ✕
+                <i class="fa-solid fa-xmark"></i>
             </button>
             <div v-else />
         </div>

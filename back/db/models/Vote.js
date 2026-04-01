@@ -1,13 +1,21 @@
 import pool from '../dbManager.js';
 
 export default class Vote {
-    static async findAll ({ from, to, limit = 10, q } = {}) {
+    static async findAll ({ from, to, limit = 10, q, groupes, categories } = {}) {
         const conditions = [];
         const params = [];
 
         if (from) { params.push(from); conditions.push(`v.date_scrutin >= $${params.length}`); }
         if (to) { params.push(to); conditions.push(`v.date_scrutin <= $${params.length}`); }
         if (q) { params.push(`%${q.toLowerCase()}%`); conditions.push(`LOWER(v.titre) LIKE $${params.length}`); }
+        if (categories && categories.length) {
+            params.push(categories);
+            conditions.push(`COALESCE(c2.nom, c1.nom) = ANY($${params.length}::text[])`);
+        }
+        if (groupes && groupes.length) {
+            params.push(groupes);
+            conditions.push(`EXISTS (SELECT 1 FROM deputes_votes dv2 JOIN deputes d2 ON d2.id = dv2.id_depute WHERE dv2.id_vote = v.uid AND d2.groupe_abrev = ANY($${params.length}::text[]))`);
+        }
 
         const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
         params.push(Math.min(limit, 200));

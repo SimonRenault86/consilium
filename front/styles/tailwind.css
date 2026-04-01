@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @theme {
+    --font-sans: 'Roboto', system-ui, -apple-system, sans-serif;
+
     /* Primary — bleu marine */
     --color-primary-100: #e8edf3;
     --color-primary-200: #c5d0de;

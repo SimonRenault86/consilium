@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Vote from '../../db/models/Vote.js';
+import Categorie from '../../db/models/Categorie.js';
 import pool from '../../db/dbManager.js';
 
 const router = Router();
@@ -43,14 +44,28 @@ router.get('/last-update', async (req, res) => {
     }
 });
 
-// GET /api/scrutins?from=&to=&limit=&q=
+// GET /api/scrutins/categories — toutes les catégories de scrutins
+router.get('/categories', async (req, res) => {
+    try {
+        const rows = await Categorie.findAll();
+        res.json(rows);
+    } catch (err) {
+        console.error('Erreur GET /api/scrutins/categories :', err);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
+// GET /api/scrutins?from=&to=&limit=&q=&groupes=NFP,RN&categories=Budget
 router.get('/', async (req, res) => {
-    const { from, to, limit = '10', q } = req.query;
+    const { from, to, limit = '10', q, groupes, categories } = req.query;
 
     const dateRe = /^\d{4}-\d{2}-\d{2}$/;
     if ((from && !dateRe.test(from)) || (to && !dateRe.test(to))) {
         return res.status(400).json({ error: 'Format de date invalide' });
     }
+
+    const groupesList = groupes ? String(groupes).split(',').map(s => s.trim()).filter(Boolean) : null;
+    const categoriesList = categories ? String(categories).split(',').map(s => s.trim()).filter(Boolean) : null;
 
     try {
         const rows = await Vote.findAll({
@@ -58,6 +73,8 @@ router.get('/', async (req, res) => {
             to: to || null,
             limit: parseInt(limit, 10) || 10,
             q: q ? String(q).trim() : null,
+            groupes: groupesList?.length ? groupesList : null,
+            categories: categoriesList?.length ? categoriesList : null,
         });
         res.json(rows.map(serialize));
     } catch (err) {
