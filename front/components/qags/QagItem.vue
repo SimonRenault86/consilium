@@ -78,14 +78,9 @@
                                     v-if="auteurDepute?.departementNom"
                                     class="text-xs text-primary-400 leading-tight mt-0.5"
                                 >
-                                    <i class="fa-solid fa-location-dot mr-0.5" />{{ auteurDepute.departementNom }}
-                                </p>
-                                <p
-                                    v-if="auteurDepute?.job"
-                                    :title="auteurDepute.job"
-                                    class="text-xs text-primary-400 leading-tight mt-0.5 italic line-clamp-1"
-                                >
-                                    {{ auteurDepute.job }}
+                                    <i class="fa-solid fa-location-dot mr-0.5" />{{ auteurDepute.departementNom }} <template v-if="auteurDepute?.job">
+                                        | {{ auteurDepute.job }}
+                                    </template>
                                 </p>
                             </div>
                         </div>
