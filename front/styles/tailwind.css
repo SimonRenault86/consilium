@@ -13,13 +13,13 @@
     --color-primary-700: #242424;
     --color-primary-800: #111111;
 
-    /* Secondary — teal */
-    --color-secondary-100: #ccfbf1;
-    --color-secondary-200: #99f6e4;
-    --color-secondary-300: #5eead4;
-    --color-secondary-400: #2dd4bf;
-    --color-secondary-500: #14b8a6;
-    --color-secondary-600: #0d9488;
-    --color-secondary-700: #0f766e;
-    --color-secondary-800: #115e59;
+    /* Secondary — bordeaux hémicycle */
+    --color-secondary-100: #f7e8ec;
+    --color-secondary-200: #ecc0cb;
+    --color-secondary-300: #da8a9e;
+    --color-secondary-400: #c45470;
+    --color-secondary-500: #a8234a;
+    --color-secondary-600: #8c1a3b;
+    --color-secondary-700: #6e112c;
+    --color-secondary-800: #4a0a1e;
 }
