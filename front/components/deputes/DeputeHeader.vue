@@ -26,9 +26,15 @@
 
             <!-- Infos -->
             <div class="flex-1 min-w-0">
-                <h1 class="text-2xl sm:text-3xl font-bold text-primary-900">
-                    {{ depute.civ }} {{ depute.prenom }} {{ depute.nom }}
-                </h1>
+                <div class="flex items-center justify-center sm:justify-start gap-3 flex-wrap">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-primary-900">
+                        {{ depute.civ }} {{ depute.prenom }} {{ depute.nom }}
+                    </h1>
+                    <CoherenceBadge
+                        :statut="coherenceBadge.statut"
+                        :title="coherenceBadge.title"
+                    />
+                </div>
 
                 <!-- Groupe -->
                 <div
@@ -69,7 +75,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import CoherenceBadge from '@components/deputes/CoherenceBadge.vue';
 
 const props = defineProps({
     deputeId: { type: String, required: true },
@@ -78,11 +85,22 @@ const props = defineProps({
 const depute = ref(null);
 const loading = ref(true);
 const showInitiales = ref(false);
+const coherenceData = ref(null);
+
+// Le statut est déterminé par OpenAI lors du seed, on l'utilise directement
+const coherenceBadge = computed(() => ({
+    statut: coherenceData.value?.statut || 'non_analyse',
+    title:  coherenceData.value?.recap || 'Aucune analyse de cohérence disponible pour ce député',
+}));
 
 onMounted(async () => {
     try {
-        const res = await fetch(`/api/deputes/${props.deputeId}`);
-        if (res.ok) depute.value = await res.json();
+        const [deputeRes, coherenceRes] = await Promise.all([
+            fetch(`/api/deputes/${props.deputeId}`),
+            fetch(`/api/deputes/${props.deputeId}/coherence`),
+        ]);
+        if (deputeRes.ok) depute.value = await deputeRes.json();
+        if (coherenceRes.ok) coherenceData.value = await coherenceRes.json();
     } finally {
         loading.value = false;
     }

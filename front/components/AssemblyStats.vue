@@ -31,27 +31,10 @@
                 </div>
 
                 <!-- Barre pour/contre/abstention/non-participation -->
-                <div class="relative h-3 flex-1 rounded-full bg-primary-100 overflow-hidden flex">
-                    <div
-                        class="h-full transition-all duration-500"
-                        :class="selectedVote?.signatairesMap ? 'bg-emerald-600' : 'bg-emerald-500'"
-                        :style="{ width: g.nbDeputes ? (g.pour / g.nbDeputes * 100) + '%' : '0%' }"
-                    />
-                    <div
-                        class="h-full bg-red-500 transition-all duration-500"
-                        :style="{ width: g.nbDeputes ? (g.contre / g.nbDeputes * 100) + '%' : '0%' }"
-                    />
-                    <div
-                        class="h-full transition-all duration-500"
-                        :class="selectedVote?.signatairesMap ? 'bg-emerald-300' : 'bg-amber-400'"
-                        :style="{ width: g.nbDeputes ? (g.abstention / g.nbDeputes * 100) + '%' : '0%' }"
-                    />
-                    <div
-                        v-if="!selectedVote?.signatairesMap"
-                        class="h-full bg-slate-300 flex-1 transition-all duration-500"
-                        :style="{ minWidth: g.nbDeputes ? (g.nonParticipation / g.nbDeputes * 100) + '%' : '0%' }"
-                    />
-                </div>
+                <SegmentedBar
+                    :segments="g.segments"
+                    class="flex-1"
+                />
 
                 <!-- Détail chiffres -->
                 <div class="shrink-0 flex gap-2 text-xs w-28 justify-end">
@@ -154,6 +137,55 @@
             </a>
         </div>
 
+        <!-- Cohérence par groupe -->
+        <div
+            v-else-if="vueActive === 'coherence'"
+            class="flex flex-col gap-2"
+        >
+            <div
+                v-for="g in coherenceParGroupe"
+                :key="g.abrev"
+                class="flex items-center gap-3 cursor-pointer"
+                :class="hoveredGroupe && hoveredGroupe !== g.abrev ? 'opacity-30' : 'opacity-100'"
+                style="transition: opacity 0.15s"
+                @mouseenter="emit('update:hoveredGroupe', g.abrev)"
+                @mouseleave="emit('update:hoveredGroupe', null)"
+            >
+                <!-- Logo / Abréviation -->
+                <div class="w-14 shrink-0 flex items-center gap-1.5 overflow-hidden">
+                    <img
+                        v-if="getLogoUrl(g.abrev) && !logoErreur[g.abrev]"
+                        :src="getLogoUrl(g.abrev)"
+                        :alt="g.abrev"
+                        class="h-4 max-w-[40px] shrink-0 object-contain"
+                        @error="logoErreur[g.abrev] = true"
+                    >
+                    <span
+                        v-else
+                        class="text-xs font-bold truncate"
+                        :style="{ color: groupes[g.abrev]?.couleur }"
+                    >{{ g.abrev }}</span>
+                </div>
+
+                <!-- Barre segmentée cohérence/mitigé/incohérent/non analysé -->
+                <SegmentedBar
+                    :segments="g.segments"
+                    class="flex-1"
+                />
+
+                <!-- Cohérent / Mitigé / Incohérent / N/A -->
+                <div class="shrink-0 flex gap-1.5 text-xs justify-end tabular-nums">
+                    <span class="font-medium text-emerald-600">{{ g.counts.coherent }}</span>
+                    <span class="text-primary-300">/</span>
+                    <span class="text-amber-500">{{ g.counts.mitige }}</span>
+                    <span class="text-primary-300">/</span>
+                    <span class="font-medium text-red-500">{{ g.counts.incoherent }}</span>
+                    <span class="text-primary-300">/</span>
+                    <span class="text-slate-400">{{ g.counts.non_analyse }}</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Filtres scores : barre par groupe -->
         <div
             v-else-if="champ"
@@ -209,6 +241,7 @@
 import { computed, reactive } from 'vue';
 import { statsParGroupe, normaliserScore, scoreToCouleur, tousLesDeputes } from '@/helpers/deputes.js';
 import { groupes, getLogoUrl, groupeOrdreGaucheaDroite } from '@/helpers/partis.js';
+import SegmentedBar from '@/components/SegmentedBar.vue';
 
 const props = defineProps({
     vueActive: {
@@ -221,8 +254,12 @@ const props = defineProps({
     },
     selectedVote: {
         type: Object,
-        default: null
-    }
+        default: null,
+    },
+    coherenceBadges: {
+        type: Object,
+        default: () => ({}),
+    },
 });
 
 const emit = defineEmits(['update:hoveredGroupe']);
@@ -261,10 +298,49 @@ const statsVoteParGroupe = computed(() => {
             abrev,
             ...counts,
             nonParticipation: counts.nbDeputes - counts.pour - counts.contre - counts.abstention,
+            segments: isAmendement ? [
+                { key: 'auteur', pct: counts.nbDeputes ? counts.pour / counts.nbDeputes * 100 : 0, color: '#059669' },
+                { key: 'cosignataire', pct: counts.nbDeputes ? counts.abstention / counts.nbDeputes * 100 : 0, color: '#6ee7b7' },
+            ] : [
+                { key: 'pour', pct: counts.nbDeputes ? counts.pour / counts.nbDeputes * 100 : 0, color: '#10b981' },
+                { key: 'contre', pct: counts.nbDeputes ? counts.contre / counts.nbDeputes * 100 : 0, color: '#ef4444' },
+                { key: 'abstention', pct: counts.nbDeputes ? counts.abstention / counts.nbDeputes * 100 : 0, color: '#fbbf24' },
+                { key: 'nonParticipation', pct: counts.nbDeputes ? (counts.nbDeputes - counts.pour - counts.contre - counts.abstention) / counts.nbDeputes * 100 : 0, color: '#cbd5e1' },
+            ],
         }))
         .filter(g => !isAmendement || (g.pour + g.abstention) > 0)
         .sort((a, b) => (groupeOrdreGaucheaDroite[a.abrev] ?? 99) - (groupeOrdreGaucheaDroite[b.abrev] ?? 99));
 });
 
 const logoErreur = reactive({});
+
+// Cohérence par groupe — trié par % cohérent décroissant
+const coherenceParGroupe = computed(() => {
+    return [...statsParGroupe.value]
+        .map(g => {
+            const deputes = tousLesDeputes.value.filter(d => d.groupe === g.abrev);
+            const counts = { coherent: 0, mitige: 0, incoherent: 0, non_analyse: 0 };
+            for (const d of deputes) {
+                const statut = props.coherenceBadges[d.id]?.statut ?? 'non_analyse';
+                counts[statut] = (counts[statut] || 0) + 1;
+            }
+            const total = deputes.length;
+            const analysed = total - counts.non_analyse;
+            return {
+                abrev: g.abrev,
+                counts,
+                total,
+                analysed,
+                segments: [
+                    { key: 'coherent', pct: counts.coherent / total * 100, color: '#10b981' },
+                    { key: 'mitige', pct: counts.mitige / total * 100, color: '#f59e0b' },
+                    { key: 'incoherent', pct: counts.incoherent / total * 100, color: '#ef4444' },
+                    { key: 'non_analyse', pct: counts.non_analyse / total * 100, color: '#e2e8f0' },
+                ],
+                coherentPct: analysed ? counts.coherent / total * 100 : -1,
+            };
+        })
+        .filter(g => g.total > 0)
+        .sort((a, b) => b.coherentPct - a.coherentPct);
+});
 </script>

@@ -21,6 +21,7 @@
                         <p class="mt-0.5 text-xs text-primary-500">
                             <span v-if="auteurNom">{{ auteurNom }} ·</span>
                             <span>{{ qag.ministre.abrege }}</span>
+                            <span v-if="qag.dateSeance"> · {{ formatDate(qag.dateSeance) }}</span>
                         </p>
                     </div>
                     <i
@@ -302,6 +303,7 @@
 import { ref, computed } from 'vue';
 import { deputesMap } from '@/helpers/deputes.js';
 import { groupes } from '@/helpers/partis.js';
+import { dayjsParis } from '@/helpers/dayjsUtils.js';
 import ScrutinCategorie from '@components/scrutins/ScrutinCategorie.vue';
 
 const props = defineProps({
@@ -331,6 +333,8 @@ const initials = (prenom, nom) =>
     [(prenom || '')[0], (nom || '')[0]].join('').toUpperCase() || '?';
 
 const goto = url => { window.location.href = url; };
+
+const formatDate = dateStr => dayjsParis(dateStr).format('D MMM YYYY');
 
 // ── Acteurs principaux ───────────────────────────────────────────────────────
 

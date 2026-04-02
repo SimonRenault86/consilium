@@ -214,6 +214,15 @@
                                 {{ hoveredDepute.prenom }} {{ hoveredDepute.nom }}
                             </span>
                             <span class="truncate text-xs text-primary-500">{{ groupes[hoveredDepute.groupe]?.nom }}</span>
+                            <div class="flex">
+                                <!-- Badge cohérence -->
+                                <CoherenceBadge
+                                    class="mt-1"
+                                    :statut="coherenceBadges[hoveredDepute.id]?.statut || 'non_analyse'"
+                                    :title="coherenceBadges[hoveredDepute.id]?.recap || null"
+                                    small
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -246,6 +255,24 @@
                     </div>
                 </div>
             </Transition>
+
+            <!-- Légende cohérence : pills statut uniquement -->
+            <div
+                v-if="vueActive === 'coherence'"
+                class="mt-3 flex items-center justify-center gap-4 flex-wrap"
+            >
+                <div
+                    v-for="[statut, couleur] in [['coherent','#10b981'],['mitige','#f59e0b'],['incoherent','#ef4444'],['non_analyse','#e2e8f0']]"
+                    :key="statut"
+                    class="flex items-center gap-1.5"
+                >
+                    <span
+                        class="inline-block h-3 w-3 rounded-full shrink-0"
+                        :style="{ background: couleur }"
+                    />
+                    <span class="text-xs text-primary-500">{{ { coherent: 'Cohérent', mitige: 'Mitigé', incoherent: 'Incohérent', non_analyse: 'Non analysé' }[statut] }}</span>
+                </div>
+            </div>
 
             <!-- Légende dégradé pour les vues score -->
             <div
@@ -314,6 +341,7 @@
                 v-model:hovered-groupe="hoveredGroupe"
                 :vue-active="vueActive"
                 :selected-vote="props.selectedVote"
+                :coherence-badges="coherenceBadges"
             />
         </div>
     </div>
@@ -329,6 +357,7 @@ import { groupes, getLogoUrl } from '@/helpers/partis.js';
 import HemicycleFilters from '@/components/HemicycleFilters.vue';
 import AssemblyStats from '@/components/AssemblyStats.vue';
 import DeputeSearchBar from '@/components/DeputeSearchBar.vue';
+import CoherenceBadge from '@/components/deputes/CoherenceBadge.vue';
 
 const props = defineProps({
     selectedVote: {
@@ -400,13 +429,26 @@ const COULEURS_VOTE = {
     cosignataire: '#6ee7b7',
 };
 
+const COULEURS_COHERENCE = {
+    coherent:    '#10b981',
+    mitige:      '#f59e0b',
+    incoherent:  '#ef4444',
+    non_analyse: '#e2e8f0',
+};
+
 const getCouleurSiegeActive = seatId => {
     if (vueActive.value === 'vote') {
         return COULEURS_VOTE[voteParSiege.value[seatId]] || '#e2e8f0';
     }
+    if (vueActive.value === 'coherence') {
+        const depute = getDepute(seatId);
+        if (!depute) return '#e2e8f0';
+        const badge = coherenceBadges[depute.id];
+        return COULEURS_COHERENCE[badge?.statut] ?? COULEURS_COHERENCE.non_analyse;
+    }
     if (vueActive.value === 'standard') return getCouleurSiege(seatId);
     return getCouleurScoreSiege(seatId, CHAMP_SCORE[vueActive.value]);
-};
+};;
 
 const isSeatDimmed = seatId => {
     if (vueActive.value === 'vote' && props.selectedVote) {
@@ -439,7 +481,13 @@ const onDocumentClick = e => {
     if (!containerEl.value?.contains(e.target)) pinnedSeat.value = null;
 };
 
-onMounted(() => document.addEventListener('click', onDocumentClick));
+onMounted(() => {
+    document.addEventListener('click', onDocumentClick);
+    fetch('/api/deputes/coherence-badges')
+        .then(r => r.ok ? r.json() : {})
+        .then(data => Object.assign(coherenceBadges, data))
+        .catch(() => {});
+});
 onUnmounted(() => document.removeEventListener('click', onDocumentClick));
 
 // Mêmes seuils que dans deputes.js
@@ -468,6 +516,9 @@ const scores = [
     { champ: 'scoreParticipation', label: 'Participation', normaliser: score => normaliserScore(score, 'scoreParticipation') },
 ];
 const tooltipPos = reactive({ x: 0, y: 0 });
+
+const coherenceBadges = reactive({});
+
 
 // Mémorise quelles photos/logos ont chargé avec succès pour afficher les initiales/sigle en fallback
 const photoLoaded = reactive({});

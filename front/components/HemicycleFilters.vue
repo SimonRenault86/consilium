@@ -18,6 +18,18 @@
                 :style="{ background: 'linear-gradient(to right, #ef4444, #22c55e)' }"
             />
             <span
+                v-else-if="vue.multiCouleur"
+                class="flex gap-px shrink-0"
+            >
+                <span
+                    v-for="(c, i) in vue.multiCouleur"
+                    :key="c"
+                    class="inline-block h-3 w-2.5"
+                    :class="i === 0 ? 'rounded-l-full' : i === vue.multiCouleur.length - 1 ? 'rounded-r-full' : ''"
+                    :style="{ background: c }"
+                />
+            </span>
+            <span
                 v-else
                 class="inline-block h-3 w-3 rounded-full shrink-0"
                 :style="{ background: vue.couleur }"
@@ -46,5 +58,6 @@ const vues = [
     { id: 'loyaute', label: 'Loyauté', gradient: true },
     { id: 'participation', label: 'Participation', gradient: true },
     { id: 'vote', label: 'Vote', couleur: '#10b981', gradient: false },
+    { id: 'coherence', label: 'Cohérence', gradient: false, multiCouleur: ['#10b981', '#f59e0b', '#ef4444'] },
 ];
 </script>

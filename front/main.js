@@ -5,6 +5,7 @@ import HomePage from '@components/HomePage.vue';
 import DeputeInfo from '@components/deputes/DeputeInfo.vue';
 import DeputeHeader from '@components/deputes/DeputeHeader.vue';
 import VotesStats from '@components/deputes/VotesStats.vue';
+import DeputeCoherence from '@components/deputes/DeputeCoherence.vue';
 import ScrutinInfo from '@components/scrutins/ScrutinInfo.vue';
 import ScrutinsList from '@components/scrutins/ScrutinsList.vue';
 import MajoriteBuilder from '@components/outils/MajoriteBuilder.vue';
@@ -37,6 +38,11 @@ if (deputeInfoEl) {
 const votesStatsEl = document.querySelector('scrutins-stats');
 if (votesStatsEl) {
     createVueApp(VotesStats, { deputeId: votesStatsEl.dataset.deputeId }).mount(votesStatsEl);
+}
+
+const deputeCoherenceEl = document.querySelector('depute-coherence');
+if (deputeCoherenceEl) {
+    createVueApp(DeputeCoherence, { deputeId: deputeCoherenceEl.dataset.deputeId }).mount(deputeCoherenceEl);
 }
 
 const scrutinInfoEl = document.querySelector('scrutin-info');

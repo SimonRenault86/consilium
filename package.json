@@ -20,6 +20,7 @@
         "seed:categorise-scrutins": "node back/db/seeds/categorise-votes.js",
         "seed:qags": "node back/db/seeds/qags.js",
         "seed:categorise-qags": "node back/db/seeds/categorise-qags.js",
+        "seed:coherence": "node back/db/seeds/coherence.js",
         "photos:deputes": "node scripts/photos.js",
         "photos:ministres": "node scripts/photos.js --source=ministres",
         "lint": "eslint .",

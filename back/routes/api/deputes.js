@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import Depute from '../../db/models/Depute.js';
 import DeputeVote from '../../db/models/DeputeVote.js';
+import DeputeCoherence from '../../db/models/DeputeCoherence.js';
 import { groupes } from '../../../front/helpers/partis.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -67,6 +68,16 @@ const extractBrutInfo = id => {
 
 const router = Router();
 
+router.get('/coherence-badges', async (req, res) => {
+    try {
+        const badges = await DeputeCoherence.findAllBadges();
+        res.json(badges);
+    } catch (err) {
+        console.error('Erreur GET /api/deputes/coherence-badges :', err);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
 router.get('/', async (req, res) => {
     try {
         const deputes = await Depute.findAll();
@@ -128,6 +139,48 @@ router.get('/:id/scrutins-stats', async (req, res) => {
         res.json(stats);
     } catch (err) {
         console.error('Erreur GET /api/deputes/:id/scrutins-stats :', err);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
+router.get('/:id/coherence/all', async (req, res) => {
+    try {
+        const rows = await DeputeCoherence.findAllByDepute(req.params.id);
+        if (!rows.length) return res.status(404).json({ error: 'Aucune analyse de cohérence disponible' });
+
+        res.json(rows.map(row => ({
+            mois:       row.mois ? row.mois.toISOString().slice(0, 7) : null,
+            statut:     row.statut,
+            recap:      row.recap,
+            resume:     row.resume,
+            coherence:  row.coherence,
+            computedAt: row.computed_at,
+        })));
+    } catch (err) {
+        console.error('Erreur GET /api/deputes/:id/coherence/all :', err);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
+router.get('/:id/coherence', async (req, res) => {
+    try {
+        const mois = req.query.mois || null;
+        const row = await DeputeCoherence.findByDepute(req.params.id, mois);
+        if (!row) return res.status(404).json({ error: 'Aucune analyse de cohérence disponible' });
+
+        const moisDispos = await DeputeCoherence.findMoisByDepute(req.params.id);
+
+        res.json({
+            mois:       row.mois ? row.mois.toISOString().slice(0, 7) : null,
+            statut:     row.statut,
+            recap:      row.recap,
+            resume:     row.resume,
+            coherence:  row.coherence,
+            computedAt: row.computed_at,
+            moisDispos,
+        });
+    } catch (err) {
+        console.error('Erreur GET /api/deputes/:id/coherence :', err);
         res.status(500).json({ error: 'Erreur serveur' });
     }
 });
