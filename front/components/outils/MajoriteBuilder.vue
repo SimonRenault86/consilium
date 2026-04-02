@@ -3,34 +3,44 @@
         <!-- Compteur majorité -->
         <div
             class="rounded-2xl border p-5 transition-colors duration-300"
-            :class="atteint ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white'"
+            :class="{
+                'border-emerald-300 bg-emerald-50': certaine,
+                'border-amber-300 bg-amber-50': !certaine && (atteint || possible),
+                'border-slate-200 bg-white': !certaine && !atteint && !possible,
+            }"
         >
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-baseline gap-3">
                     <span
                         class="text-5xl font-bold tabular-nums transition-colors duration-300"
-                        :class="atteint ? 'text-emerald-600' : 'text-primary-900'"
+                        :class="{
+                            'text-emerald-600': certaine,
+                            'text-amber-600': !certaine && (atteint || possible),
+                            'text-primary-900': !certaine && !atteint && !possible,
+                        }"
                     >{{ totalSelectionne }}</span>
                     <span class="text-xl text-primary-500">/ 577</span>
                 </div>
                 <div
-                    v-if="atteint"
+                    v-if="certaine"
                     class="flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-1.5 text-sm font-semibold text-white"
                 >
-                    <svg
-                        class="h-4 w-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M5 13l4 4L19 7"
-                        />
-                    </svg>
-                    Majorité absolue atteinte
+                    <i class="fa-solid fa-check" />
+                    Majorité assurée
+                </div>
+                <div
+                    v-else-if="atteint"
+                    class="flex items-center gap-2 rounded-full bg-amber-400 px-4 py-1.5 text-sm font-semibold text-white"
+                >
+                    <i class="fa-solid fa-triangle-exclamation" />
+                    Majorité fragile
+                </div>
+                <div
+                    v-else-if="possible"
+                    class="flex items-center gap-2 rounded-full bg-amber-400 px-4 py-1.5 text-sm font-semibold text-white"
+                >
+                    <i class="fa-solid fa-circle-question" />
+                    Résultat incertain
                 </div>
                 <div
                     v-else
@@ -41,12 +51,49 @@
             </div>
             <!-- Barre de progression -->
             <div class="relative mt-4 pb-5">
-                <div class="h-3 w-full overflow-hidden rounded-full bg-primary-100">
+                <div class="flex h-3 w-full overflow-hidden rounded-full bg-primary-100">
+                    <!-- Votes garantis par la loyauté des groupes -->
                     <div
-                        class="h-full rounded-full transition-all duration-300"
-                        :class="atteint ? 'bg-emerald-500' : 'bg-red-500'"
-                        :style="{ width: `${(totalSelectionne / 577) * 100}%` }"
+                        class="h-full transition-all duration-300"
+                        :class="{
+                            'bg-emerald-500': certaine,
+                            'bg-amber-400': !certaine && (atteint || possible),
+                            'bg-red-500': !certaine && !atteint && !possible,
+                        }"
+                        :style="{ width: `${(votesFiables / 577) * 100}%` }"
                     />
+                    <!-- Marge d'erreur : votes incertains liés à la loyauté -->
+                    <div
+                        v-if="margeErreur > 0"
+                        class="h-full transition-all duration-300"
+                        :class="{
+                            'bg-emerald-300': certaine,
+                            'bg-amber-200': !certaine && (atteint || possible),
+                            'bg-red-300': !certaine && !atteint && !possible,
+                        }"
+                        :style="{ width: `${(margeErreur / 577) * 100}%` }"
+                    />
+                </div>
+                <!-- Overlay pour le tooltip des votes fiables (hors du overflow-hidden) -->
+                <div
+                    class="group absolute top-0 h-3 cursor-default transition-all duration-300"
+                    :style="{ left: '0%', width: `${(votesFiables / 577) * 100}%` }"
+                >
+                    <div class="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-800 px-2.5 py-1.5 text-xs text-white opacity-0 shadow transition-opacity duration-150 group-hover:opacity-100">
+                        {{ votesFiables }} siège{{ votesFiables > 1 ? 's' : '' }} certain{{ votesFiables > 1 ? 's' : '' }}
+                        <span class="opacity-70">(votes pondérés par la loyauté des groupes)</span>
+                    </div>
+                </div>
+                <!-- Overlay pour le tooltip de la marge d'erreur (hors du overflow-hidden) -->
+                <div
+                    v-if="margeErreur > 0"
+                    class="group absolute top-0 h-3 cursor-default transition-all duration-300"
+                    :style="{ left: `${(votesFiables / 577) * 100}%`, width: `${(margeErreur / 577) * 100}%` }"
+                >
+                    <div class="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-800 px-2.5 py-1.5 text-xs text-white opacity-0 shadow transition-opacity duration-150 group-hover:opacity-100">
+                        {{ margeErreur }} siège{{ margeErreur > 1 ? 's' : '' }} incertain{{ margeErreur > 1 ? 's' : '' }}
+                        <span class="opacity-70">(défections des groupes sélectionnés + dissidents potentiels des groupes opposés)</span>
+                    </div>
                 </div>
                 <!-- Marqueur majorité : barre + label en position absolue -->
                 <div
@@ -55,11 +102,19 @@
                 >
                     <div
                         class="h-3 w-0.5 transition-colors duration-300"
-                        :class="atteint ? 'bg-emerald-700' : 'bg-slate-400'"
+                        :class="{
+                            'bg-emerald-700': certaine,
+                            'bg-amber-500': !certaine && (atteint || possible),
+                            'bg-slate-400': !certaine && !atteint && !possible,
+                        }"
                     />
                     <span
                         class="mt-1 text-xs font-semibold transition-colors duration-300"
-                        :class="atteint ? 'text-emerald-600' : 'text-primary-500'"
+                        :class="{
+                            'text-emerald-600': certaine,
+                            'text-amber-600': !certaine && (atteint || possible),
+                            'text-primary-500': !certaine && !atteint && !possible,
+                        }"
                     >{{ SEUIL_MAJORITE }}</span>
                 </div>
                 <!-- Labels extrémités -->
@@ -159,6 +214,33 @@ const totalSelectionne = computed(() =>
 );
 
 const atteint = computed(() => totalSelectionne.value >= SEUIL_MAJORITE);
+
+// Majorité garantie même avec les défections
+const certaine = computed(() => votesFiables.value >= SEUIL_MAJORITE);
+
+// Seuil atteignable grâce aux votes incertains des groupes opposés
+const possible = computed(() =>
+    !atteint.value && (totalSelectionne.value + incertitudeNonSelectionnes.value) >= SEUIL_MAJORITE
+);
+
+// Votes pondérés par la loyauté moyenne de chaque groupe sélectionné
+const votesFiables = computed(() =>
+    groupesStats.value
+        .filter(g => selectedGroupes.value.has(g.abrev))
+        .reduce((acc, g) => acc + Math.round(g.nombreDeputes * (g.scoreLoyaute ?? 1)), 0)
+);
+
+// Dissidents potentiels des groupes non sélectionnés (pourraient voter oui malgré leur groupe)
+const incertitudeNonSelectionnes = computed(() =>
+    groupesStats.value
+        .filter(g => !selectedGroupes.value.has(g.abrev))
+        .reduce((acc, g) => acc + Math.round(g.nombreDeputes * (1 - (g.scoreLoyaute ?? 1))), 0)
+);
+
+// Incertitude totale : défections des groupes sélectionnés + dissidents des groupes non sélectionnés
+const margeErreur = computed(() =>
+    (totalSelectionne.value - votesFiables.value) + incertitudeNonSelectionnes.value
+);
 
 const getCouleurSeat = seatId => {
     const depute = getDepute(seatId);
