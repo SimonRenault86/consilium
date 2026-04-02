@@ -11,9 +11,9 @@ export const initMinstres = async () => {
 
 // Couleurs par niveau de rôle
 export const COULEURS_GOUVERNEMENT = {
-    pm:            '#f59e0b', // Premier ministre
-    ministre_etat: '#a855f7', // Ministre d'État
-    ministre:      '#3b82f6', // Ministre
+    pm:            '#d97706', // Premier ministre
+    ministre_etat: '#9333ea', // Ministre d'État
+    ministre:      '#1d4ed8', // Ministre
 };
 
 export const LABELS_GOUVERNEMENT = {

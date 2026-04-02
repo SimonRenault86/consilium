@@ -31,7 +31,7 @@
                 </div>
 
                 <!-- ── Acteurs concernés ── -->
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <!-- Auteur de la question -->
                     <div
                         v-if="qag.auteur.ref"
