@@ -25,15 +25,22 @@ const SELECT_DEPUTE = `
         a.site_internet                 AS website,
         dt.nombre_mandats,
         dt.experience_depute,
-        dt.score_participation,
-        dt.score_participation_specialite,
-        dt.score_loyaute,
-        dt.score_majorite,
         dt.date_maj,
         dt.created_at,
-        dt.updated_at
+        dt.updated_at,
+        sh.score_participation,
+        sh.score_participation_specialite,
+        sh.score_loyaute,
+        sh.score_majorite
     FROM deputes dt
     JOIN acteurs a ON a.id = dt.id
+    LEFT JOIN LATERAL (
+        SELECT score_participation, score_participation_specialite, score_loyaute, score_majorite
+        FROM deputes_scores_history
+        WHERE id_depute = dt.id
+        ORDER BY date_maj DESC
+        LIMIT 1
+    ) sh ON true
 `;
 
 export default class Depute {
@@ -82,12 +89,10 @@ export default class Depute {
                 departement_nom, departement_code, circo,
                 date_prise_fonction, job,
                 nombre_mandats, experience_depute,
-                score_participation, score_participation_specialite,
-                score_loyaute, score_majorite,
                 date_maj, updated_at
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9,
-                $10, $11, $12, $13, $14, $15, $16, NOW()
+                $10, $11, $12, NOW()
             )
             ON CONFLICT (id) DO UPDATE SET
                 legislature                     = EXCLUDED.legislature,
@@ -100,10 +105,6 @@ export default class Depute {
                 job                             = EXCLUDED.job,
                 nombre_mandats                  = EXCLUDED.nombre_mandats,
                 experience_depute               = EXCLUDED.experience_depute,
-                score_participation             = EXCLUDED.score_participation,
-                score_participation_specialite  = EXCLUDED.score_participation_specialite,
-                score_loyaute                   = EXCLUDED.score_loyaute,
-                score_majorite                  = EXCLUDED.score_majorite,
                 date_maj                        = EXCLUDED.date_maj,
                 updated_at                      = NOW()
             RETURNING *`,
@@ -112,8 +113,6 @@ export default class Depute {
                 depute.departementNom, depute.departementCode, depute.circo,
                 depute.datePriseFonction, depute.job,
                 depute.nombreMandats, depute.experienceDepute,
-                depute.scoreParticipation, depute.scoreParticipationSpecialite,
-                depute.scoreLoyaute, depute.scoreMajorite,
                 depute.dateMaj,
             ]
         );

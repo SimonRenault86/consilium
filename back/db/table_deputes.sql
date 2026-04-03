@@ -10,10 +10,6 @@ CREATE TABLE IF NOT EXISTS deputes (
     job                             VARCHAR(200),
     nombre_mandats                  INTEGER,
     experience_depute               VARCHAR(50),
-    score_participation             DECIMAL(6, 4),
-    score_participation_specialite  DECIMAL(6, 4),
-    score_loyaute                   DECIMAL(6, 4),
-    score_majorite                  DECIMAL(6, 4),
     date_maj                        DATE,
     created_at                      TIMESTAMP       DEFAULT NOW(),
     updated_at                      TIMESTAMP       DEFAULT NOW()
@@ -21,3 +17,9 @@ CREATE TABLE IF NOT EXISTS deputes (
 
 CREATE INDEX IF NOT EXISTS idx_deputes_groupe ON deputes(groupe_abrev);
 CREATE INDEX IF NOT EXISTS idx_deputes_departement ON deputes(departement_code);
+
+-- Migration : suppression des colonnes de scores (déplacées dans deputes_scores_history)
+ALTER TABLE deputes DROP COLUMN IF EXISTS score_participation;
+ALTER TABLE deputes DROP COLUMN IF EXISTS score_participation_specialite;
+ALTER TABLE deputes DROP COLUMN IF EXISTS score_loyaute;
+ALTER TABLE deputes DROP COLUMN IF EXISTS score_majorite;

@@ -4,6 +4,7 @@ import path from 'path';
 import pool from '../dbManager.js';
 import Acteur from '../models/Acteur.js';
 import Depute from '../models/Depute.js';
+import DeputeScoreHistory from '../models/DeputeScoreHistory.js';
 import { logSeed } from './helpers/logSeed.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -52,13 +53,22 @@ const run = async () => {
             job: d.job || null,
             nombreMandats: d.nombreMandats ?? null,
             experienceDepute: d.experienceDepute || null,
-            scoreParticipation: d.scoreParticipation ?? null,
-            scoreParticipationSpecialite: d.scoreParticipationSpecialite ?? null,
-            scoreLoyaute: d.scoreLoyaute ?? null,
-            scoreMajorite: d.scoreMajorite ?? null,
             dateMaj: d.dateMaj || null,
         }));
         await Depute.upsertMany(deputesData);
+
+        // 3. Insert score history snapshot (one entry per date_maj, skipped if already exists)
+        const historyData = deputesBrut
+            .filter(d => d.dateMaj)
+            .map(d => ({
+                idDepute: d.id,
+                dateMaj: d.dateMaj,
+                scoreParticipation: d.scoreParticipation ?? null,
+                scoreParticipationSpecialite: d.scoreParticipationSpecialite ?? null,
+                scoreLoyaute: d.scoreLoyaute ?? null,
+                scoreMajorite: d.scoreMajorite ?? null,
+            }));
+        if (historyData.length) await DeputeScoreHistory.upsertMany(historyData);
 
         console.log('Import des députés terminé.');
         await logSeed('deputes');

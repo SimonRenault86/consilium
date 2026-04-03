@@ -5,6 +5,7 @@ import path from 'path';
 import Depute from '../../db/models/Depute.js';
 import DeputeVote from '../../db/models/DeputeVote.js';
 import DeputeCoherence from '../../db/models/DeputeCoherence.js';
+import DeputeScoreHistory from '../../db/models/DeputeScoreHistory.js';
 import { groupes } from '../../../front/helpers/partis.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -120,8 +121,10 @@ router.get('/:id', async (req, res) => {
             website: row.website,
             nombreMandats: row.nombre_mandats,
             experienceDepute: row.experience_depute,
-            scoreParticipation: row.score_participation,
-            scoreLoyaute: row.score_loyaute,
+            scoreParticipation: row.score_participation != null ? parseFloat(row.score_participation) : null,
+            scoreParticipationSpecialite: row.score_participation_specialite != null ? parseFloat(row.score_participation_specialite) : null,
+            scoreLoyaute: row.score_loyaute != null ? parseFloat(row.score_loyaute) : null,
+            scoreMajorite: row.score_majorite != null ? parseFloat(row.score_majorite) : null,
             hatvpUrl,
             mandatPrincipal,
             commissions,
@@ -166,7 +169,7 @@ router.get('/:id/coherence', async (req, res) => {
     try {
         const mois = req.query.mois || null;
         const row = await DeputeCoherence.findByDepute(req.params.id, mois);
-        if (!row) return res.status(404).json({ error: 'Aucune analyse de cohérence disponible' });
+        if (!row) return res.status(200).json(null);
 
         const moisDispos = await DeputeCoherence.findMoisByDepute(req.params.id);
 
@@ -181,6 +184,24 @@ router.get('/:id/coherence', async (req, res) => {
         });
     } catch (err) {
         console.error('Erreur GET /api/deputes/:id/coherence :', err);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
+router.get('/:id/scores-history', async (req, res) => {
+    try {
+        const rows = await DeputeScoreHistory.findByDepute(req.params.id);
+        if (!rows.length) return res.status(404).json({ error: 'Aucun historique de scores disponible' });
+
+        res.json(rows.map(row => ({
+            dateMaj:                    row.date_maj ? row.date_maj.toISOString().slice(0, 10) : null,
+            scoreParticipation:         row.score_participation != null ? parseFloat(row.score_participation) : null,
+            scoreParticipationSpecialite: row.score_participation_specialite != null ? parseFloat(row.score_participation_specialite) : null,
+            scoreLoyaute:               row.score_loyaute != null ? parseFloat(row.score_loyaute) : null,
+            scoreMajorite:              row.score_majorite != null ? parseFloat(row.score_majorite) : null,
+        })));
+    } catch (err) {
+        console.error('Erreur GET /api/deputes/:id/scores-history :', err);
         res.status(500).json({ error: 'Erreur serveur' });
     }
 });
