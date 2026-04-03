@@ -1,10 +1,13 @@
 <template>
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden self-start">
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 self-start">
         <button
             class="w-full flex items-center justify-between px-4 sm:px-6 py-4 text-left cursor-pointer"
             @click="isOpen = !isOpen"
         >
-            <span class="text-xs font-semibold text-primary-500 uppercase tracking-widest">{{ title }}</span>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-primary-500 uppercase tracking-widest">{{ title }}</span>
+                <TooltipInfo v-if="tooltip">{{ tooltip }}</TooltipInfo>
+            </div>
             <i
                 class="fa-solid fa-chevron-down text-primary-300 text-xs transition-transform duration-200"
                 :class="{ 'rotate-180': isOpen }"
@@ -25,10 +28,12 @@
 
 <script setup>
 import { ref } from 'vue';
+import TooltipInfo from '@components/TooltipInfo.vue';
 
 const props = defineProps({
     title: { type: String, required: true },
     defaultOpen: { type: Boolean, default: true },
+    tooltip: { type: String, default: null },
 });
 
 const isOpen = ref(props.defaultOpen);

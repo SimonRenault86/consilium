@@ -3,7 +3,10 @@
         v-if="!loading && (coherence || allAnalyses.length)"
         class="mb-6"
     >
-        <Panel title="Cohérence discours / votes">
+        <Panel
+            title="Cohérence discours / votes"
+            tooltip="L'analyse croise trois dimensions : les questions au gouvernement (QAGs) posées par le député ce mois, ses votes parlementaires sur les mêmes thèmes depuis le début du mandat, et sa discipline de vote par rapport à la position majoritaire de son groupe. Une IA synthétise ensuite ces données en tenant compte du positionnement politique du député (majorité, opposition, indépendant)."
+        >
             <!-- Toggle vue résumée / détaillée -->
             <div class="flex items-center gap-2 mb-5">
                 <button

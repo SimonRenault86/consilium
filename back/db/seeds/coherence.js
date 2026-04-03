@@ -52,13 +52,20 @@ const analyseCoherence = async (nomComplet, moisHumain, groupe, groupeAbrev, cro
         ? `Groupe parlementaire : ${groupe} (${positionnement.label})\nPositionnement : ${positionnement.camp}`
         : `Groupe parlementaire : ${groupe || 'inconnu'}`;
 
-    const lignes = croisements.map(c => [
-        `• Catégorie "${c.categorie}" :`,
-        `  - QAGs posées au gouvernement : ${c.nb_qags}`,
-        c.nb_votes === 0
-            ? '  - Votes : AUCUN vote enregistré sur ce thème depuis le début du mandat'
-            : `  - Votes : ${c.nb_pour} POUR, ${c.nb_contre} CONTRE, ${c.nb_abstention} ABSTENTION (total ${c.nb_votes} scrutins)`,
-    ].join('\n')).join('\n');
+    const lignes = croisements.map(c => {
+        const lines = [
+            `• Catégorie "${c.categorie}" :`,
+            `  - QAGs posées au gouvernement : ${c.nb_qags}`,
+        ];
+        if (c.nb_votes === 0) {
+            lines.push('  - Votes : AUCUN vote enregistré sur ce thème depuis le début du mandat');
+        } else {
+            const tauxAlignement = Math.round((c.nb_aligne_groupe / c.nb_votes) * 100);
+            lines.push(`  - Votes personnels : ${c.nb_pour} POUR, ${c.nb_contre} CONTRE, ${c.nb_abstention} ABSTENTION (total ${c.nb_votes} scrutins)`);
+            lines.push(`  - Discipline de groupe : ${c.nb_aligne_groupe} vote(s) aligné(s) avec la position majoritaire de son groupe, ${c.nb_diverge_groupe} divergence(s) (${tauxAlignement}% d'alignement)`);
+        }
+        return lines.join('\n');
+    }).join('\n');
 
     const prompt = `Tu es un analyste politique spécialisé dans le suivi de l'activité parlementaire française.
 
@@ -67,25 +74,37 @@ ${contexteGroupe}
 Période des questions au gouvernement (QAGs) : ${moisHumain}
 Votes : historique complet du mandat
 
-CONTEXTE IMPORTANT : Les QAGs (questions au gouvernement) sont presque toujours posées par l'opposition pour critiquer la politique gouvernementale. Pour un député de majorité, poser des QAGs sur un sujet signifie qu'il défend activement cette politique. Pour un député d'opposition, poser des QAGs signifie qu'il critique cette politique.
+CONTEXTE IMPORTANT : L'analyse repose sur trois dimensions complémentaires.
+
+1. POSITIONNEMENT CAMP
+Les QAGs (questions au gouvernement) sont presque toujours posées par l'opposition pour critiquer la politique gouvernementale. Pour un député de majorité, poser des QAGs sur un sujet signifie qu'il défend activement cette politique. Pour un député d'opposition, poser des QAGs signifie qu'il critique cette politique.
 La cohérence ne se mesure donc PAS par une règle universelle "vote POUR = cohérent" : elle dépend du camp politique.
-- Pour un député de MAJORITÉ : vote POUR sur un thème qu'il défend en QAG → cohérent. Vote massivement CONTRE → incohérent ou dissidence.
-- Pour un député d'OPPOSITION : vote CONTRE sur un thème qu'il critique en QAG → comportement attendu et cohérent. Vote POUR → potentiellement incohérent ou surprise politique notable.
-- Pour tous : la vraie incohérence est quand un député vote à rebours de ses prises de position publiques ou de la ligne attendue de son groupe.
-- CAS PARTICULIER : si "AUCUN vote enregistré" sur un thème malgré des QAGs → le député interpelle le gouvernement sur ce sujet mais ne se déplace pas pour voter les textes correspondants. C'est une forme d'incohérence ou d'abstentionnisme sélectif à signaler explicitement dans l'insight.
+- Pour un député de MAJORITÉ : vote POUR sur un thème qu'il défend en QAG → cohérent. Vote massivement CONTRE → dissidence notable.
+- Pour un député d'OPPOSITION : vote CONTRE sur un thème qu'il critique en QAG → comportement attendu et cohérent. Vote POUR → potentiellement incohérent.
+- CAS PARTICULIER : si "AUCUN vote enregistré" sur un thème malgré des QAGs → abstentionnisme sélectif à signaler explicitement.
+
+2. DISCIPLINE DE GROUPE
+Pour chaque thème, tu disposes du taux d'alignement du député avec la position majoritaire de son groupe parlementaire.
+- Alignement > 80% : il vote en bloc avec son groupe → discipline standard, pas de signalement particulier.
+- Alignement 50-80% : dissidences ponctuelles → posture mitigée à mentionner selon les thèmes.
+- Alignement < 50% : forte dissidence intra-groupe → incohérence notable même si le discours en QAG semble cohérent.
+La discipline de groupe est un signal fort de cohérence réelle vs discours : un député peut critiquer en QAG mais voter avec son groupe par discipline partisane.
+
+3. COHÉRENCE DISCOURS / VOTE
+La vraie incohérence est quand un député vote à rebours de ses prises de position publiques en QAG ET de la ligne attendue de son camp ou de son groupe.
 
 Pour chaque thème ci-dessous, tu disposes du nombre de questions posées par ce député en ${moisHumain}, et du bilan TOTAL de ses votes parlementaires sur ce même thème depuis le début de son mandat.
 
 ${lignes}
 
 Ta mission :
-1. "statut" : évaluation globale de la cohérence, en tenant compte du positionnement politique du député. Doit être EXACTEMENT l'une de ces trois valeurs : "coherent", "mitige", "incoherent".
-   - "coherent" : le député vote conformément à ses prises de position en QAG ET à la ligne attendue de son camp.
-   - "incoherent" : contradiction nette entre ses QAGs et ses votes, compte tenu de son positionnement politique.
-   - "mitige" : posture ambivalente, cohérences et contradictions se mélangent selon les thèmes.
-2. "recap" : UNE seule phrase percutante et factuelle (max 20 mots) résumant la principale tension ou cohérence, en mentionnant le camp si pertinent.
-3. "resume" : synthèse globale en 2 phrases maximum sur la posture générale du député, en tenant compte de son groupe.
-4. "insights" : pour chaque catégorie, une phrase courte (max 25 mots) factuelle décrivant la cohérence ou l'incohérence entre les QAGs de ce mois et le bilan historique des votes, interprétée selon son camp.
+1. "statut" : évaluation globale de la cohérence, en combinant les trois dimensions (camp, discipline de groupe, cohérence discours/vote). Doit être EXACTEMENT l'une de ces trois valeurs : "coherent", "mitige", "incoherent".
+   - "coherent" : discours QAG aligné avec son camp ET discipline de groupe élevée ET cohérence vote/QAG.
+   - "incoherent" : contradiction nette entre QAGs et votes ET/OU forte dissidence intra-groupe (< 50% d'alignement).
+   - "mitige" : posture ambivalente — certains thèmes cohérents, d'autres non, ou discipline partielle.
+2. "recap" : UNE seule phrase percutante et factuelle (max 20 mots) résumant la principale tension ou cohérence, en mentionnant camp et/ou discipline si pertinent.
+3. "resume" : synthèse globale en 2 phrases maximum intégrant les trois dimensions : posture publique (QAGs), comportement de vote par rapport à son camp, et discipline au sein de son groupe.
+4. "insights" : pour chaque catégorie, une phrase courte (max 30 mots) factuelle décrivant la cohérence ou l'incohérence en tenant compte du discours (QAGs), du vote personnel ET du taux d'alignement avec le groupe.
 
 Réponds UNIQUEMENT avec ce JSON :
 {
@@ -153,14 +172,16 @@ const run = async () => {
             const croisements = qagsCats.map(q => {
                 const v = votesMap[q.categorie_id];
                 return {
-                    categorie:     q.categorie,
-                    categorie_id:  parseInt(q.categorie_id, 10),
-                    couleur:       q.couleur,
-                    nb_qags:       parseInt(q.nb_qags, 10),
-                    nb_votes:      v ? parseInt(v.nb_votes, 10) : 0,
-                    nb_pour:       v ? parseInt(v.nb_pour, 10) : 0,
-                    nb_contre:     v ? parseInt(v.nb_contre, 10) : 0,
-                    nb_abstention: v ? parseInt(v.nb_abstention, 10) : 0,
+                    categorie:         q.categorie,
+                    categorie_id:      parseInt(q.categorie_id, 10),
+                    couleur:           q.couleur,
+                    nb_qags:           parseInt(q.nb_qags, 10),
+                    nb_votes:          v ? parseInt(v.nb_votes, 10) : 0,
+                    nb_pour:           v ? parseInt(v.nb_pour, 10) : 0,
+                    nb_contre:         v ? parseInt(v.nb_contre, 10) : 0,
+                    nb_abstention:     v ? parseInt(v.nb_abstention, 10) : 0,
+                    nb_aligne_groupe:  v ? parseInt(v.nb_aligne_groupe, 10) : 0,
+                    nb_diverge_groupe: v ? parseInt(v.nb_diverge_groupe, 10) : 0,
                 };
             });
 

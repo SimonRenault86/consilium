@@ -125,17 +125,47 @@ export default class DeputeCoherence {
     }
 
     // Votes d'un député groupés par catégorie — tout l'historique
+    // Inclut la discipline de vote par rapport à la position majoritaire de son groupe
     static async findVotesCatsByDepute (idDepute) {
         const { rows } = await pool.query(
-            `SELECT sc.id AS categorie_id, sc.nom AS categorie, sc.couleur,
-                    COUNT(*) AS nb_votes,
-                    COUNT(*) FILTER (WHERE dv.position = 'pour')       AS nb_pour,
-                    COUNT(*) FILTER (WHERE dv.position = 'contre')     AS nb_contre,
-                    COUNT(*) FILTER (WHERE dv.position = 'abstention') AS nb_abstention
-             FROM deputes_votes dv
-             JOIN scrutins s ON s.uid = dv.id_vote
-             JOIN scrutin_categories sc ON sc.id = s.scrutin_categorie_id
-             WHERE dv.id_depute = $1
+            `WITH groupe_vote_counts AS (
+                -- Pour chaque scrutin, nombre de votes par position dans le groupe du député
+                SELECT dv2.id_vote, dv2.position, COUNT(*) AS nb_position
+                FROM deputes_votes dv2
+                JOIN deputes d2 ON d2.id = dv2.id_depute
+                WHERE d2.groupe_abrev = (SELECT groupe_abrev FROM deputes WHERE id = $1)
+                GROUP BY dv2.id_vote, dv2.position
+             ),
+             groupe_position_majoritaire AS (
+                -- Position majoritaire du groupe pour chaque scrutin
+                SELECT DISTINCT ON (id_vote) id_vote, position AS position_groupe
+                FROM groupe_vote_counts
+                ORDER BY id_vote, nb_position DESC
+             ),
+             depute_votes_avec_groupe AS (
+                -- Votes du député croisés avec la position majoritaire de son groupe
+                SELECT
+                    dv.id_vote,
+                    dv.position AS position_depute,
+                    s.scrutin_categorie_id,
+                    gpm.position_groupe,
+                    (dv.position = gpm.position_groupe) AS est_aligne
+                FROM deputes_votes dv
+                JOIN scrutins s ON s.uid = dv.id_vote
+                LEFT JOIN groupe_position_majoritaire gpm ON gpm.id_vote = dv.id_vote
+                WHERE dv.id_depute = $1
+                  AND s.scrutin_categorie_id IS NOT NULL
+             )
+             SELECT
+                sc.id AS categorie_id, sc.nom AS categorie, sc.couleur,
+                COUNT(*)                                                   AS nb_votes,
+                COUNT(*) FILTER (WHERE position_depute = 'pour')           AS nb_pour,
+                COUNT(*) FILTER (WHERE position_depute = 'contre')         AS nb_contre,
+                COUNT(*) FILTER (WHERE position_depute = 'abstention')     AS nb_abstention,
+                COUNT(*) FILTER (WHERE est_aligne = true)                  AS nb_aligne_groupe,
+                COUNT(*) FILTER (WHERE est_aligne = false)                 AS nb_diverge_groupe
+             FROM depute_votes_avec_groupe dva
+             JOIN scrutin_categories sc ON sc.id = dva.scrutin_categorie_id
              GROUP BY sc.id, sc.nom, sc.couleur
              ORDER BY nb_votes DESC`,
             [idDepute]
