@@ -6,6 +6,7 @@ import partisRouter from './api/partis.js';
 import amendementsRouter from './api/amendements.js';
 import ministresRouter from './api/ministres.js';
 import qagsRouter from './api/qags.js';
+import rapportHebdoRouter from './api/rapport-hebdo.js';
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use('/partis', partisRouter);
 router.use('/amendements', amendementsRouter);
 router.use('/ministres', ministresRouter);
 router.use('/qags', qagsRouter);
+router.use('/rapport-hebdo', rapportHebdoRouter);
 
 export default router;

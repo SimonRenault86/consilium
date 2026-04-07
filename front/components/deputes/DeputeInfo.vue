@@ -162,14 +162,14 @@
             >
                 <Panel
                     title="Activité parlementaire"
-                    tooltip="Scores calculés par data.assemblee-nationale.fr à partir des votes, présences et positions du député par rapport à son groupe."
+                    tooltip="Participation calculée à partir des scrutins enregistrés en base. Loyauté et implication dans la spécialité proviennent de data.assemblee-nationale.fr."
                 >
                     <dl class="space-y-4">
                         <div v-if="depute.scoreParticipation != null">
                             <div class="flex justify-between items-center mb-1.5">
                                 <span class="flex items-center gap-1.5 text-sm text-primary-600">
                                     Participation
-                                    <TooltipInfo size="sm">Taux de présence du député à l'ensemble des votes en séance publique.</TooltipInfo>
+                                    <TooltipInfo size="sm">Taux de participation calculé chaque mois à partir des scrutins enregistrés en base (votes pour, contre ou abstention sur l'ensemble des scrutins du mois).</TooltipInfo>
                                 </span>
                                 <span class="flex items-center gap-2">
                                     <span class="text-sm font-semibold text-primary-700">{{ pct(depute.scoreParticipation) }} %</span>

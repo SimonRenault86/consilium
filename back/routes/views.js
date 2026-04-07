@@ -6,6 +6,7 @@ import scrutinsRouter from './views/scrutins.js';
 import outilsRouter from './views/outils.js';
 import sitemapRouter from './views/sitemap.js';
 import qagsRouter from './views/qags.js';
+import rapportHebdoRouter from './views/rapport-hebdo.js';
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use('/', scrutinsRouter);
 router.use('/', outilsRouter);
 router.use('/', sitemapRouter);
 router.use('/', qagsRouter);
+router.use('/', rapportHebdoRouter);
 
 export default router;

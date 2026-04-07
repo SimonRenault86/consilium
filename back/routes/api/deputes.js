@@ -199,6 +199,7 @@ router.get('/:id/scores-history', async (req, res) => {
             scoreParticipationSpecialite: row.score_participation_specialite != null ? parseFloat(row.score_participation_specialite) : null,
             scoreLoyaute:               row.score_loyaute != null ? parseFloat(row.score_loyaute) : null,
             scoreMajorite:              row.score_majorite != null ? parseFloat(row.score_majorite) : null,
+            nationalAvg:                row.avg_participation != null ? parseFloat(row.avg_participation) : null,
         })));
     } catch (err) {
         console.error('Erreur GET /api/deputes/:id/scores-history :', err);

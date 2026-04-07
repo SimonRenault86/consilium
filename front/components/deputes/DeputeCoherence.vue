@@ -52,9 +52,9 @@
                         v-if="coherence.computedAt"
                         class="text-xs text-primary-400 shrink-0 flex items-center gap-2"
                     >
-                        <span class="flex items-center gap-1">
-                            <i class="fa-solid fa-robot" />
-                            Analyse IA
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-secondary-100 px-3 py-1 text-xs font-bold text-secondary-600 uppercase tracking-wide">
+                            <i class="fa-solid fa-wand-magic-sparkles text-[10px]" />
+                            Résumé IA
                         </span>
                         <span class="opacity-40">|</span>
                         Calculé {{ formatDate(coherence.computedAt) }}
@@ -110,9 +110,9 @@
                                 v-if="analyse.computedAt"
                                 class="text-xs text-primary-400 mt-4 flex items-center gap-2"
                             >
-                                <span class="flex items-center gap-1">
-                                    <i class="fa-solid fa-robot" />
-                                    Analyse IA
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-secondary-100 px-3 py-1 text-xs font-bold text-secondary-600 uppercase tracking-wide">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-[10px]" />
+                                    Résumé IA
                                 </span>
                                 <span class="opacity-40">|</span>
                                 Calculé {{ formatDate(analyse.computedAt) }}

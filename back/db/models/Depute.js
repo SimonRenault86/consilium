@@ -28,19 +28,28 @@ const SELECT_DEPUTE = `
         dt.date_maj,
         dt.created_at,
         dt.updated_at,
-        sh.score_participation,
-        sh.score_participation_specialite,
-        sh.score_loyaute,
-        sh.score_majorite
+        COALESCE(sh_men.score_participation_mensuelle, sh_an.score_participation) AS score_participation,
+        sh_an.score_participation_specialite,
+        sh_an.score_loyaute,
+        sh_an.score_majorite
     FROM deputes dt
     JOIN acteurs a ON a.id = dt.id
     LEFT JOIN LATERAL (
         SELECT score_participation, score_participation_specialite, score_loyaute, score_majorite
         FROM deputes_scores_history
         WHERE id_depute = dt.id
+          AND (score_participation IS NOT NULL OR score_loyaute IS NOT NULL
+               OR score_participation_specialite IS NOT NULL OR score_majorite IS NOT NULL)
         ORDER BY date_maj DESC
         LIMIT 1
-    ) sh ON true
+    ) sh_an ON true
+    LEFT JOIN LATERAL (
+        SELECT score_participation_mensuelle
+        FROM deputes_scores_history
+        WHERE id_depute = dt.id AND score_participation_mensuelle IS NOT NULL
+        ORDER BY date_maj DESC
+        LIMIT 1
+    ) sh_men ON true
 `;
 
 export default class Depute {

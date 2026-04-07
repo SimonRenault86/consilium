@@ -2,6 +2,7 @@ import '@styles/tailwind.css';
 import '@styles/main.scss';
 import { createApp } from 'vue';
 import HomePage from '@components/HomePage.vue';
+import RapportHebdo from '@components/RapportHebdo.vue';
 import DeputeInfo from '@components/deputes/DeputeInfo.vue';
 import DeputeHeader from '@components/deputes/DeputeHeader.vue';
 import VotesStats from '@components/deputes/VotesStats.vue';
@@ -81,4 +82,17 @@ const deputeQagsEl = document.querySelector('depute-qags');
 if (deputeQagsEl) {
     initPartis().then(() => initDeputes());
     createVueApp(DernierQag, { deputeId: deputeQagsEl.dataset.deputeId }).mount(deputeQagsEl);
+}
+
+const rapportHebdoEl = document.querySelector('rapport-hebdo');
+if (rapportHebdoEl) {
+    const semaines = JSON.parse(rapportHebdoEl.dataset.semaines || '[]');
+    const rapport = rapportHebdoEl.dataset.rapport && rapportHebdoEl.dataset.rapport !== 'null'
+        ? JSON.parse(rapportHebdoEl.dataset.rapport)
+        : null;
+    createVueApp(RapportHebdo, {
+        semaineActuelle: rapportHebdoEl.dataset.semaineActuelle || null,
+        semaines,
+        rapport,
+    }).mount(rapportHebdoEl);
 }

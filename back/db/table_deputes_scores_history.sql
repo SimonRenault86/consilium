@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS deputes_scores_history (
     score_participation_specialite  DECIMAL(6, 4),
     score_loyaute                   DECIMAL(6, 4),
     score_majorite                  DECIMAL(6, 4),
+    score_participation_mensuelle   DECIMAL(6, 4),
     recorded_at                     TIMESTAMP       DEFAULT NOW(),
     UNIQUE (id_depute, date_maj)
 );
