@@ -286,7 +286,6 @@
                     title="Évolution activité parlementaire"
                     tooltip="Historique des scores enregistrés."
                     fullscreen
-                    iframe
                 >
                     <DeputeScoresChart :depute-id="deputeId" />
                 </Panel>
