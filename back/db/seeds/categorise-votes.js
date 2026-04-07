@@ -11,15 +11,6 @@ const run = async () => {
         process.exit(1);
     }
 
-    // Reset uniquement les catégories — les scrutins ne sont pas touchés
-    console.log('Reset des catégories...');
-    await pool.query('UPDATE scrutins SET scrutin_categorie_id = NULL, scrutin_sous_categorie_id = NULL');
-    await pool.query('DELETE FROM scrutin_sous_categories');
-    await pool.query('DELETE FROM scrutin_categories');
-    await pool.query('ALTER SEQUENCE scrutin_categories_id_seq RESTART WITH 1');
-    await pool.query('ALTER SEQUENCE scrutin_sous_categories_id_seq RESTART WITH 1');
-    console.log('Reset terminé.');
-
     const { rows: votes } = await pool.query(
         'SELECT uid, titre FROM scrutins WHERE scrutin_categorie_id IS NULL ORDER BY numero'
     );
