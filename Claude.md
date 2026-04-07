@@ -4,3 +4,4 @@ Sur la homepage se trouve une carte de l'assemblée nationale permettant de cons
 Règles :
 - Créer un maximum de composants réutilisable.
 - Toujours se référer au tailwind.css pour réutiliser les couleurs du site.
+- Pas d'utilisation de != il faut que ça soit systématiquement !==
