@@ -1,71 +1,9 @@
 import { Router } from 'express';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
 import Depute from '../../db/models/Depute.js';
 import DeputeVote from '../../db/models/DeputeVote.js';
 import DeputeCoherence from '../../db/models/DeputeCoherence.js';
 import DeputeScoreHistory from '../../db/models/DeputeScoreHistory.js';
 import { groupes } from '../../../front/helpers/partis.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const commissionsPermRef = {
-    PO59046: 'Commission des affaires culturelles et de l\'éducation',
-    PO59048: 'Commission des affaires économiques',
-    PO59050: 'Commission des affaires étrangères',
-    PO59051: 'Commission des affaires sociales',
-    PO59052: 'Commission de la défense nationale et des forces armées',
-    PO59053: 'Commission du développement durable et de l\'aménagement du territoire',
-    PO59054: 'Commission des finances, de l\'économie générale et du contrôle budgétaire',
-    PO59056: 'Commission des lois constitutionnelles, de la législation et de l\'administration générale de la République',
-};
-
-const extractBrutInfo = id => {
-    try {
-        const eluBrut = JSON.parse(
-            readFileSync(path.join(__dirname, '../../../front/helpers/brut/elu', `${id}.json`), 'utf8')
-        );
-        const raw = eluBrut?.acteur?.mandats?.mandat;
-        const hatvpUrl = eluBrut?.acteur?.uri_hatvp || null;
-        if (!raw) return { hatvpUrl, mandatPrincipal: null, commissions: [] };
-
-        const mandats = Array.isArray(raw) ? raw : [raw];
-        const mandatAssemblee = mandats.find(m => m.typeOrgane === 'ASSEMBLEE') || null;
-        const mandatsComper = mandats.filter(m => m.typeOrgane === 'COMPER');
-
-        let mandatPrincipal = null;
-        if (mandatAssemblee) {
-            const election = mandatAssemblee.election || {};
-            const mandature = mandatAssemblee.mandature || {};
-            const lieu = election.lieu || {};
-            const collaborateursRaw = mandatAssemblee.collaborateurs?.collaborateur;
-            const collaborateurs = collaborateursRaw
-                ? (Array.isArray(collaborateursRaw) ? collaborateursRaw : [collaborateursRaw])
-                : [];
-            mandatPrincipal = {
-                legislature: mandatAssemblee.legislature,
-                region: lieu.region || null,
-                causeMandat: election.causeMandat || null,
-                placeHemicycle: mandature.placeHemicycle ? parseInt(mandature.placeHemicycle, 10) : null,
-                premiereElection: mandature.premiereElection === '1',
-                collaborateurs: collaborateurs.map(c => `${c.qualite} ${c.prenom} ${c.nom}`),
-            };
-        }
-
-        const commissions = mandatsComper
-            .map(m => {
-                const nom = commissionsPermRef[m.organes?.organeRef] || null;
-                if (!nom) return null;
-                return { nom, role: m.infosQualite?.libQualite || 'Membre' };
-            })
-            .filter(Boolean);
-
-        return { hatvpUrl, mandatPrincipal, commissions };
-    } catch {
-        return { hatvpUrl: null, mandatPrincipal: null, commissions: [] };
-    }
-};
 
 const router = Router();
 
@@ -94,8 +32,19 @@ router.get('/:id', async (req, res) => {
         const row = await Depute.findById(req.params.id);
         if (!row) return res.status(404).json({ error: 'Député introuvable' });
 
-        const { hatvpUrl, mandatPrincipal, commissions } = extractBrutInfo(row.id);
+        const commissions = await Depute.findCommissionsByDepute(row.id);
         const groupe = groupes[row.groupe_abrev] || null;
+
+        const mandatPrincipal = (row.region || row.cause_mandat || row.place_hemicycle || row.collaborateurs)
+            ? {
+                legislature: row.legislature,
+                region: row.region,
+                causeMandat: row.cause_mandat,
+                placeHemicycle: row.place_hemicycle,
+                premiereElection: row.premiere_election ?? false,
+                collaborateurs: row.collaborateurs ?? [],
+            }
+            : null;
 
         res.json({
             id: row.id,
@@ -121,11 +70,11 @@ router.get('/:id', async (req, res) => {
             website: row.website,
             nombreMandats: row.nombre_mandats,
             experienceDepute: row.experience_depute,
-            scoreParticipation: row.score_participation != null ? parseFloat(row.score_participation) : null,
-            scoreParticipationSpecialite: row.score_participation_specialite != null ? parseFloat(row.score_participation_specialite) : null,
-            scoreLoyaute: row.score_loyaute != null ? parseFloat(row.score_loyaute) : null,
-            scoreMajorite: row.score_majorite != null ? parseFloat(row.score_majorite) : null,
-            hatvpUrl,
+            scoreParticipation: row.score_participation !== null ? parseFloat(row.score_participation) : null,
+            scoreParticipationSpecialite: row.score_participation_specialite !== null ? parseFloat(row.score_participation_specialite) : null,
+            scoreLoyaute: row.score_loyaute !== null ? parseFloat(row.score_loyaute) : null,
+            scoreMajorite: row.score_majorite !== null ? parseFloat(row.score_majorite) : null,
+            hatvpUrl: row.hatvp_url,
             mandatPrincipal,
             commissions,
         });

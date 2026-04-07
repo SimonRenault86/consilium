@@ -23,3 +23,10 @@ ALTER TABLE deputes DROP COLUMN IF EXISTS score_participation;
 ALTER TABLE deputes DROP COLUMN IF EXISTS score_participation_specialite;
 ALTER TABLE deputes DROP COLUMN IF EXISTS score_loyaute;
 ALTER TABLE deputes DROP COLUMN IF EXISTS score_majorite;
+
+-- Migration : ajout des données de mandat (anciennement lues depuis les fichiers bruts)
+ALTER TABLE deputes ADD COLUMN IF NOT EXISTS place_hemicycle   INTEGER;
+ALTER TABLE deputes ADD COLUMN IF NOT EXISTS region            VARCHAR(200);
+ALTER TABLE deputes ADD COLUMN IF NOT EXISTS cause_mandat      VARCHAR(300);
+ALTER TABLE deputes ADD COLUMN IF NOT EXISTS premiere_election BOOLEAN DEFAULT FALSE;
+ALTER TABLE deputes ALTER COLUMN cause_mandat TYPE VARCHAR(300);

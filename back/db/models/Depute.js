@@ -23,8 +23,14 @@ const SELECT_DEPUTE = `
         a.twitter,
         a.facebook,
         a.site_internet                 AS website,
+        a.uri_hatvp                     AS hatvp_url,
         dt.nombre_mandats,
         dt.experience_depute,
+        dt.place_hemicycle,
+        dt.region,
+        dt.cause_mandat,
+        dt.premiere_election,
+        dt.collaborateurs,
         dt.date_maj,
         dt.created_at,
         dt.updated_at,
@@ -91,6 +97,25 @@ export default class Depute {
         return rows;
     }
 
+    static async findCommissionsByDepute (id) {
+        const { rows } = await pool.query(
+            'SELECT nom, role FROM deputes_commissions WHERE id_depute = $1',
+            [id]
+        );
+        return rows;
+    }
+
+    static async upsertCommissions (idDepute, commissions, client) {
+        const db = client || pool;
+        await db.query('DELETE FROM deputes_commissions WHERE id_depute = $1', [idDepute]);
+        for (const c of commissions) {
+            await db.query(
+                'INSERT INTO deputes_commissions (id_depute, nom, role) VALUES ($1, $2, $3)',
+                [idDepute, c.nom, c.role || 'Membre']
+            );
+        }
+    }
+
     static async upsert (depute) {
         const { rows } = await pool.query(
             `INSERT INTO deputes (
@@ -98,10 +123,11 @@ export default class Depute {
                 departement_nom, departement_code, circo,
                 date_prise_fonction, job,
                 nombre_mandats, experience_depute,
+                place_hemicycle, region, cause_mandat, premiere_election, collaborateurs,
                 date_maj, updated_at
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9,
-                $10, $11, $12, NOW()
+                $10, $11, $12, $13, $14, $15, $16, $17, NOW()
             )
             ON CONFLICT (id) DO UPDATE SET
                 legislature                     = EXCLUDED.legislature,
@@ -114,6 +140,11 @@ export default class Depute {
                 job                             = EXCLUDED.job,
                 nombre_mandats                  = EXCLUDED.nombre_mandats,
                 experience_depute               = EXCLUDED.experience_depute,
+                place_hemicycle                 = EXCLUDED.place_hemicycle,
+                region                          = EXCLUDED.region,
+                cause_mandat                    = EXCLUDED.cause_mandat,
+                premiere_election               = EXCLUDED.premiere_election,
+                collaborateurs                  = EXCLUDED.collaborateurs,
                 date_maj                        = EXCLUDED.date_maj,
                 updated_at                      = NOW()
             RETURNING *`,
@@ -122,6 +153,9 @@ export default class Depute {
                 depute.departementNom, depute.departementCode, depute.circo,
                 depute.datePriseFonction, depute.job,
                 depute.nombreMandats, depute.experienceDepute,
+                depute.placeHemicycle ?? null, depute.region ?? null,
+                depute.causeMandat ?? null, depute.premiereElection ?? false,
+                depute.collaborateurs ?? null,
                 depute.dateMaj,
             ]
         );
