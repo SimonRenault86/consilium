@@ -1,5 +1,5 @@
 <template>
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+    <section class="bg-white rounded-sm shadow-sm border border-slate-200 p-5">
         <div class="mb-4">
             <h2 class="text-xs font-semibold text-primary-500 uppercase tracking-widest">
                 Votes par thématique

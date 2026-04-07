@@ -2,7 +2,7 @@
     <component
         :is="href ? 'a' : 'div'"
         :href="href || undefined"
-        class="block rounded-2xl border border-slate-200 bg-white px-5 py-4 hover:border-slate-300 hover:shadow-sm transition-all"
+        class="block rounded-sm border border-slate-200 bg-white px-5 py-4 hover:border-slate-300 hover:shadow-sm transition-all"
     >
         <div class="flex items-start gap-3">
             <!-- Badge position député OU sort global -->

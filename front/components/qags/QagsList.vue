@@ -22,7 +22,7 @@
                 v-for="session in sessions"
                 :key="session.dateSeance"
                 :href="`/qag/${session.dateSeance}`"
-                class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 hover:border-slate-300 hover:shadow-sm transition-all"
+                class="flex items-center justify-between rounded-sm border border-slate-200 bg-white px-5 py-4 hover:border-slate-300 hover:shadow-sm transition-all"
             >
                 <div class="flex items-center gap-3">
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary-100 text-secondary-600">

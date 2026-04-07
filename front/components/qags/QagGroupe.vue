@@ -1,6 +1,6 @@
 <template>
     <div
-        class="rounded-2xl border border-slate-200 bg-white overflow-hidden"
+        class="rounded-sm border border-slate-200 bg-white overflow-hidden"
     >
         <!-- En-tête groupe -->
         <button

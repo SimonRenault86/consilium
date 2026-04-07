@@ -1,5 +1,5 @@
 <template>
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-8 mb-6">
+    <section class="bg-white rounded-sm shadow-sm border border-slate-200 p-5 sm:p-8 mb-6">
         <div
             v-if="loading"
             class="h-16 animate-pulse bg-primary-100 rounded-xl"

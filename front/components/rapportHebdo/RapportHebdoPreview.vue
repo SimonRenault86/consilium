@@ -1,7 +1,7 @@
 <template>
     <div
         v-if="loading || rapport"
-        class="rounded-2xl border border-secondary-200 bg-secondary-50 px-5 py-4"
+        class="rounded-sm border border-secondary-200 bg-secondary-50 px-5 py-4"
     >
         <!-- Skeleton loader -->
         <template v-if="loading">

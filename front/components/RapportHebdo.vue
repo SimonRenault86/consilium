@@ -50,7 +50,7 @@
 
         <template v-else>
             <!-- Narratif -->
-            <section class="mb-6 rounded-2xl border border-secondary-200 bg-secondary-50 px-6 py-5">
+            <section class="mb-6 rounded-sm border border-secondary-200 bg-secondary-50 px-6 py-5">
                 <div class="flex items-start gap-3">
                     <div class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary-200 text-secondary-600">
                         <i class="fa-solid fa-quote-left text-xs" />
@@ -68,7 +68,7 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Scrutins marquants -->
-                <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <section class="bg-white rounded-sm border border-slate-200 overflow-hidden">
                     <div class="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
                         <div class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                             <i class="fa-solid fa-check-to-slot text-xs" />
@@ -108,7 +108,7 @@
                 </section>
 
                 <!-- Thèmes QaG -->
-                <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <section class="bg-white rounded-sm border border-slate-200 overflow-hidden">
                     <div class="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
                         <div class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-blue-600">
                             <i class="fa-solid fa-comments text-xs" />
@@ -148,7 +148,7 @@
                 <!-- Amendements marquants -->
                 <section
                     v-if="rapportData.amendements.length > 0"
-                    class="bg-white rounded-2xl border border-slate-200 overflow-hidden lg:col-span-2"
+                    class="bg-white rounded-sm border border-slate-200 overflow-hidden lg:col-span-2"
                 >
                     <div class="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
                         <div class="flex h-7 w-7 items-center justify-center rounded-full bg-orange-100 text-orange-600">

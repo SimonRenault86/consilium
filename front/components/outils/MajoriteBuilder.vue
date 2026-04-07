@@ -2,7 +2,7 @@
     <div class="flex flex-col gap-6">
         <!-- Compteur majorité -->
         <div
-            class="rounded-2xl border p-5 transition-colors duration-300"
+            class="rounded-sm border p-5 transition-colors duration-300"
             :class="{
                 'border-emerald-300 bg-emerald-50': certaine,
                 'border-amber-300 bg-amber-50': !certaine && (atteint || possible),
@@ -126,7 +126,7 @@
         <!-- Hémicycle + sélecteur de groupes -->
         <div class="flex flex-col items-start gap-6 xl:flex-row">
             <!-- SVG hémicycle -->
-            <div class="w-full min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-6">
+            <div class="w-full min-w-0 flex-1 rounded-sm border border-slate-200 bg-white px-4 py-6">
                 <svg
                     :viewBox="`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`"
                     class="h-auto w-full"

@@ -9,7 +9,7 @@
             />
 
             <!-- Scrutins spécifiques au groupe -->
-            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+            <section class="bg-white rounded-sm shadow-sm border border-slate-200 p-5">
                 <h2 class="text-xs font-semibold text-primary-500 uppercase tracking-widest mb-4">
                     Scrutins récents
                 </h2>
@@ -60,7 +60,7 @@
         <!-- 3.3 + 3.4 : Carte + Nombre de députés -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <!-- Carte hémicycle (gauche, 2/3) -->
-            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="lg:col-span-2 bg-white rounded-sm shadow-sm border border-slate-200 overflow-hidden">
                 <AssemblyMap
                     :filter-groupe="abrev"
                     hide-filters
@@ -70,7 +70,7 @@
 
             <!-- Nombre de députés + résumé (droite, 1/3) -->
             <div class="flex flex-col gap-4">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center">
+                <div class="bg-white rounded-sm shadow-sm border border-slate-200 p-6 text-center">
                     <p class="text-5xl font-bold text-primary-900">
                         {{ nbDeputes }}
                     </p>
@@ -82,7 +82,7 @@
                 <!-- Résumé global pour/contre/abstentions -->
                 <div
                     v-if="totaux"
-                    class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5"
+                    class="bg-white rounded-sm shadow-sm border border-slate-200 p-5"
                 >
                     <p class="text-xs font-semibold text-primary-500 uppercase tracking-widest mb-4">
                         Vote global

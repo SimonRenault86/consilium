@@ -2,13 +2,13 @@
     <div>
         <div
             v-if="loading"
-            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6"
+            class="bg-white rounded-sm shadow-sm border border-slate-200 p-8 mb-6"
         >
             <LoadingState />
         </div>
         <div
             v-else-if="error"
-            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6"
+            class="bg-white rounded-sm shadow-sm border border-slate-200 p-8 mb-6"
         >
             <ErrorState message="Impossible de charger les informations." />
         </div>
@@ -285,6 +285,8 @@
                 <Panel
                     title="Évolution activité parlementaire"
                     tooltip="Historique des scores enregistrés."
+                    fullscreen
+                    iframe
                 >
                     <DeputeScoresChart :depute-id="deputeId" />
                 </Panel>

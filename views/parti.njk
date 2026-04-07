@@ -10,13 +10,13 @@
     </div>
 
     {% if not parti %}
-        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <section class="bg-white rounded-sm shadow-sm border border-slate-200 p-8">
             <p class="text-primary-500">Groupe introuvable.</p>
         </section>
     {% else %}
 
     {# En-tête SSR (pour SEO) #}
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-8 mb-6">
+    <section class="bg-white rounded-sm shadow-sm border border-slate-200 p-5 sm:p-8 mb-6">
         <div class="flex items-center gap-4">
             {% if parti.logo %}
                 <img src="{{ parti.logo }}" alt="{{ parti.nom }}" class="h-12 object-contain">

@@ -7,7 +7,7 @@
             Chargement de la carte…
         </div>
         <template v-else-if="vote">
-            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6">
+            <section class="bg-white rounded-sm shadow-sm border border-slate-200 overflow-hidden mb-6">
                 <AssemblyMap :selected-vote="vote" />
             </section>
         </template>
