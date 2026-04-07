@@ -25,7 +25,12 @@ const POSITIONNEMENT = {
 };
 
 // Parsing de l'argument --mois=YYYY-MM (défaut : mois courant)
-const moisArg = process.argv.slice(2).find(a => a.startsWith('--mois='))?.split('=')[1];
+// Supporte : npm run seed:coherence --mois=2026-03
+//        ou : npm run seed:coherence -- --mois=2026-03
+const moisArg =
+    process.argv.slice(2).find(a => a.startsWith('--mois='))?.split('=')[1]
+    ?? process.env.npm_config_mois
+    ?? null;
 const moisDayjs = moisArg ? dayjs(moisArg + '-01') : dayjs().subtract(1, 'month').startOf('month');
 if (!moisDayjs.isValid()) {
     console.error(`Mois invalide : "${moisArg}". Format attendu : YYYY-MM`);

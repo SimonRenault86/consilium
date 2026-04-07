@@ -21,6 +21,7 @@
         "seed:qags": "node back/db/seeds/qags.js",
         "seed:categorise-qags": "node back/db/seeds/categorise-qags.js",
         "seed:coherence": "node back/db/seeds/coherence.js",
+        "seed:rapport-hebdo": "node back/db/seeds/rapport-hebdo.js",
         "photos:deputes": "node scripts/photos.js",
         "photos:ministres": "node scripts/photos.js --source=ministres",
         "lint": "eslint .",

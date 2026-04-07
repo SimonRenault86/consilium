@@ -1,0 +1,10 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+    <rapport-hebdo
+        class="block"
+        data-semaine-actuelle="{{ semaineActuelle or '' }}"
+        data-semaines="{{ semaines | dump | escape }}"
+        data-rapport="{{ rapport | dump | escape }}"
+    ></rapport-hebdo>
+{% endblock %}
