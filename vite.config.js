@@ -20,12 +20,13 @@ export default defineConfig({
     build: {
         outDir: 'public/dist',
         emptyOutDir: true,
+        manifest: true,
         rollupOptions: {
             input: 'front/main.js',
             output: {
-                entryFileNames: 'main.js',
-                assetFileNames: '[name].[ext]'
-            }
-        }
-    }
+                entryFileNames: 'main.[hash].js',
+                assetFileNames: '[name].[hash].[ext]',
+            },
+        },
+    },
 });

@@ -177,4 +177,47 @@ export default class Depute {
             client.release();
         }
     }
+
+    static parse (row) {
+        const mandatPrincipal = (row.region || row.cause_mandat || row.place_hemicycle || row.collaborateurs)
+            ? {
+                legislature: row.legislature,
+                region: row.region ?? null,
+                causeMandat: row.cause_mandat ?? null,
+                placeHemicycle: row.place_hemicycle ?? null,
+                premiereElection: row.premiere_election ?? false,
+                collaborateurs: row.collaborateurs ?? [],
+            }
+            : null;
+
+        return {
+            id: row.id,
+            legislature: row.legislature,
+            civ: row.civ,
+            nom: row.nom,
+            prenom: row.prenom,
+            villeNaissance: row.ville_naissance,
+            naissance: row.naissance,
+            age: row.age,
+            groupe: row.groupe,
+            groupeAbrev: row.groupe_abrev,
+            departementNom: row.departement_nom,
+            departementCode: row.departement_code,
+            circo: row.circo,
+            datePriseFonction: row.date_prise_fonction,
+            job: row.job,
+            mail: row.mail,
+            twitter: row.twitter,
+            facebook: row.facebook,
+            website: row.website,
+            hatvpUrl: row.hatvp_url,
+            nombreMandats: row.nombre_mandats,
+            experienceDepute: row.experience_depute,
+            scoreParticipation: row.score_participation != null ? parseFloat(row.score_participation) : null,
+            scoreParticipationSpecialite: row.score_participation_specialite != null ? parseFloat(row.score_participation_specialite) : null,
+            scoreLoyaute: row.score_loyaute != null ? parseFloat(row.score_loyaute) : null,
+            scoreMajorite: row.score_majorite != null ? parseFloat(row.score_majorite) : null,
+            mandatPrincipal,
+        };
+    }
 }
